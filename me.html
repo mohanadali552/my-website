@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملف الإنجاز - مهند علي حسين</title>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;700&display=swap');
+
+        :root {
+            --primary-gold: #d4af37;
+            --dark-bg: #121212;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--dark-bg);
+            background-image: radial-gradient(circle at center, #222 0%, #121212 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        #book-wrapper {
+            margin-top: 50px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        #my-book {
+            width: 900px;
+            height: 600px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+        }
+
+        .page { background: #fff; }
+        
+        .page-content {
+            width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            background: #f9f9f9;
+        }
+
+        .page-content img {
+            max-width: 95%; max-height: 95%;
+            object-fit: contain;
+        }
+
+        .hard-cover {
+            background: linear-gradient(145deg, #1a252f 0%, #000 100%) !important;
+            color: var(--primary-gold);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border: 4px solid var(--primary-gold);
+            text-align: center;
+        }
+
+        .admin-trigger {
+            margin-top: 30px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 10px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.95); z-index: 1000;
+            backdrop-filter: blur(10px); align-items: center; justify-content: center;
+        }
+
+        .loader-screen {
+            position: fixed; inset: 0; background: #121212;
+            z-index: 2000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 20px;
+        }
+
+        .btn-gold {
+            background: var(--primary-gold); color: #000;
+            padding: 10px 25px; border-radius: 8px; font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-gold:hover { transform: scale(1.05); }
+
+        .status-badge {
+            position: fixed; top: 10px; left: 10px;
+            padding: 5px 12px; rounded: 20px; font-size: 10px;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 950px) {
+            #my-book { width: 380px; height: 500px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader" class="loader-screen">
+        <div id="spinner" class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#d4af37] mb-6"></div>
+        <p id="loader-text" class="text-[#d4af37] text-lg mb-6">جاري الاتصال بالسحاب...</p>
+        
+        <div id="loader-actions" class="flex flex-col gap-3">
+            <button onclick="location.reload()" class="btn-gold hidden" id="retry-btn">إعادة المحاولة</button>
+            <button onclick="switchToLocal()" class="text-gray-400 underline text-sm hidden" id="local-btn">الدخول للوضع المحلي (بدون سحاب)</button>
+        </div>
+    </div>
+
+    <div id="connection-status" class="status-badge text-gray-400">جاري التأكد من الاتصال...</div>
+
+    <div id="book-wrapper">
+        <div id="my-book"></div>
+    </div>
+
+    <div class="mt-6 text-gray-500 font-serif italic">تصميم مهند علي حسين 2026</div>
+
+    <button class="admin-trigger" onclick="$('#passModal').css('display','flex')">
+        <i class="fa-solid fa-gear ml-2"></i> لوحة التحكم
+    </button>
+
+    <!-- Pass Modal -->
+    <div id="passModal" class="modal">
+        <div class="bg-[#1e1e1e] p-8 rounded-2xl w-80 text-center border border-gray-800">
+            <h3 class="mb-4 text-[#d4af37]">الرقم السري</h3>
+            <input type="password" id="passInput" class="w-full bg-black p-3 rounded mb-4 text-center border border-gray-700 text-white">
+            <button onclick="verifyPass()" class="w-full btn-gold">دخول</button>
+            <button onclick="$('.modal').hide()" class="mt-4 text-gray-500 text-sm block w-full text-center">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div id="adminModal" class="modal">
+        <div class="bg-[#1e1e1e] p-6 rounded-2xl w-full max-w-md border border-gray-800 mx-4">
+            <div class="flex justify-between mb-4">
+                <h3 class="text-[#d4af37] font-bold">إدارة المحتوى <span id="mode-label" class="text-xs bg-gray-700 px-2 py-1 rounded">السحابي</span></h3>
+                <button onclick="$('.modal').hide()" class="text-white"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <input type="text" id="driveLink" placeholder="رابط جوجل درايف..." class="w-full bg-black p-3 rounded mb-4 border border-gray-700 text-white">
+            <button id="addBtn" onclick="addEntry()" class="w-full btn-gold mb-4">إضافة عمل جديد</button>
+            <div id="itemsList" class="max-h-40 overflow-y-auto space-y-2 mb-2"></div>
+            <p class="text-[10px] text-gray-500 text-center">سيتم الحفظ حسب وضع الاتصال الحالي</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot, updateDoc, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const PIN = "4753";
+        let portfolioItems = [];
+        let isCloudMode = false;
+        let db, appId, docRef;
+
+        // وضع العمل المحلي كاحتياط
+        window.switchToLocal = () => {
+            console.log("Switching to local mode...");
+            isCloudMode = false;
+            portfolioItems = JSON.parse(localStorage.getItem('mohanad_local_v1')) || [];
+            $('#connection-status').text("الوضع: محلي (أوفلاين)").addClass('text-yellow-500');
+            $('#mode-label').text("محلي");
+            completeAppInit();
+        };
+
+        // مؤقت يظهر أزرار الطوارئ بعد 5 ثواني
+        const emergencyTimer = setTimeout(() => {
+            $('#loader-text').text("الاتصال بالسحاب يستغرق وقتاً طويلاً...");
+            $('#retry-btn, #local-btn').fadeIn();
+        }, 5000);
+
+        async function initApp() {
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                const auth = getAuth(app);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'mohanad-final-2026';
+                docRef = doc(db, 'artifacts', appId, 'public', 'data', 'content');
+
+                await signInAnonymously(auth);
+                
+                // التأكد من وجود السجل
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) await setDoc(docRef, { images: [] });
+
+                onSnapshot(docRef, (snap) => {
+                    clearTimeout(emergencyTimer);
+                    isCloudMode = true;
+                    portfolioItems = snap.data()?.images || [];
+                    $('#connection-status').text("الوضع: سحابي (أونلاين)").addClass('text-green-500');
+                    $('#mode-label').text("سحابي");
+                    completeAppInit();
+                    renderList();
+                });
+            } catch (err) {
+                console.warn("Cloud failed, auto-switching to local.");
+                switchToLocal();
+            }
+        }
+
+        function completeAppInit() {
+            renderBook();
+            renderList();
+            $('#loader').fadeOut();
+            $('#book-wrapper').css('opacity', 1);
+        }
+
+        function renderBook() {
+            const wrapper = $('#book-wrapper');
+            wrapper.empty().append('<div id="my-book"></div>');
+            const book = $('#my-book');
+
+            book.append(`<div class="hard-cover">
+                <h1 class="text-4xl font-bold mb-4">ملف الإنجاز</h1>
+                <div class="w-16 h-1 bg-gold mb-4"></div>
+                <p class="italic text-[#d4af37]">مهند علي حسين 2026</p>
+            </div>`);
+
+            portfolioItems.forEach(url => {
+                book.append(`<div class="page"><div class="page-content"><img src="${url}" onerror="this.src='https://via.placeholder.com/450x600?text=Image+Error'"></div></div>`);
+            });
+
+            if(portfolioItems.length % 2 !== 0) book.append(`<div class="page bg-gray-100"></div>`);
+
+            book.append(`<div class="hard-cover">
+                <h2 class="text-2xl">شكراً للمتابعة</h2>
+                <p class="mt-4 text-xs opacity-50">مهند علي حسين 2026</p>
+            </div>`);
+
+            book.turn({
+                width: $(window).width() < 950 ? 380 : 900,
+                height: $(window).width() < 950 ? 500 : 600,
+                direction: 'rtl',
+                display: $(window).width() < 950 ? 'single' : 'double',
+                acceleration: true
+            });
+        }
+
+        window.verifyPass = () => {
+            if($('#passInput').val() === PIN) {
+                $('.modal').hide();
+                $('#adminModal').css('display','flex');
+                $('#passInput').val('');
+            } else alert("الرمز خطأ");
+        };
+
+        window.addEntry = async () => {
+            const urlInput = $('#driveLink').val();
+            const id = urlInput.match(/\/d\/([a-zA-Z0-9_-]+)|id=([a-zA-Z0-9_-]+)/)?.[1] || urlInput.match(/\/d\/([a-zA-Z0-9_-]+)|id=([a-zA-Z0-9_-]+)/)?.[2];
+            
+            if(!id) return alert("الرابط غير صحيح");
+            const finalUrl = `https://lh3.googleusercontent.com/d/${id}`;
+
+            $('#addBtn').text("جاري الحفظ...").prop('disabled', true);
+
+            if (isCloudMode) {
+                try {
+                    await updateDoc(docRef, { images: arrayUnion(finalUrl) });
+                } catch (e) { alert("فشل الحفظ سحابياً"); }
+            } else {
+                portfolioItems.push(finalUrl);
+                localStorage.setItem('mohanad_local_v1', JSON.stringify(portfolioItems));
+                renderBook();
+                renderList();
+            }
+
+            $('#driveLink').val('');
+            $('#addBtn').text("إضافة عمل جديد").prop('disabled', false);
+        };
+
+        window.removeItem = async (idx) => {
+            if(!confirm("هل أنت متأكد؟")) return;
+            const item = portfolioItems[idx];
+
+            if (isCloudMode) {
+                await updateDoc(docRef, { images: arrayRemove(item) });
+            } else {
+                portfolioItems.splice(idx, 1);
+                localStorage.setItem('mohanad_local_v1', JSON.stringify(portfolioItems));
+                renderBook();
+                renderList();
+            }
+        };
+
+        function renderList() {
+            const list = $('#itemsList');
+            list.empty();
+            portfolioItems.forEach((_, i) => {
+                list.append(`<div class="flex justify-between items-center bg-black p-3 rounded border border-gray-800 text-xs">
+                    <span class="opacity-70">عمل #${i+1}</span>
+                    <button onclick="removeItem(${i})" class="text-red-500 px-2"><i class="fa-trash fa-solid"></i></button>
+                </div>`);
+            });
+        }
+
+        $(window).resize(() => {
+            if ($('#my-book').turn('is')) {
+                $('#my-book').turn('size', $(window).width() < 950 ? 380 : 900, $(window).width() < 950 ? 500 : 600);
+                $('#my-book').turn('display', $(window).width() < 950 ? 'single' : 'double');
+            }
+        });
+
+        initApp();
+    </script>
+</body>
+</html>
+
