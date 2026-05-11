@@ -5,105 +5,123 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ملف الإنجاز - تصميم مهند علي حسين</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&family=Amiri:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Amiri:wght@700&display=swap" rel="stylesheet">
 <style>
-:root { --primary:#2c3e50; --gold:#d4af37; --paper:#f9f7f1; }
+:root { --primary:#2c3e50; --gold:#d4af37; --paper:#fdfdfd; }
 body {
   font-family:'Cairo',sans-serif;
-  background: radial-gradient(circle, #e0e0e0 0%, #bdc3c7 100%);
+  background: #bdc3c7;
   margin:0; min-height:100vh; display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
+  align-items:center; justify-content:center; overflow: hidden;
 }
-.book-container { perspective:2000px; width:90vw; max-width:600px; aspect-ratio:3/4; margin:20px auto; }
-.book { width:100%; height:100%; position:relative; transform-style:preserve-3d; }
+
+.book-container { 
+  perspective: 1500px; 
+  width: 90vw; max-width: 500px; 
+  aspect-ratio: 3/4; 
+  position: relative;
+}
+
+.book { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
+
 .page {
-  width:100%; height:100%; position:absolute; top:0; left:0;
-  transform-origin:right center; transition:transform .8s;
-  transform-style:preserve-3d; background:var(--paper);
-  box-shadow: inset -5px 0 10px rgba(0,0,0,.05), 0 5px 15px rgba(0,0,0,.2);
-  border-radius:5px 15px 15px 5px; overflow:hidden; cursor:pointer;
+  width: 100%; height: 100%; position: absolute;
+  top: 0; left: 0; transform-origin: right center;
+  transition: transform 0.6s ease-in-out, opacity 0.3s;
+  transform-style: preserve-3d;
+  background: var(--paper);
+  border-radius: 4px 12px 12px 4px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  will-change: transform;
 }
-.page.flipped { transform:rotateY(180deg); }
-.page-front,.page-back {
-  position:absolute; inset:0; backface-visibility:hidden;
-  display:flex; flex-direction:column; padding:20px;
+
+.page-front, .page-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  display: flex; flex-direction: column; padding: 20px;
 }
-.page-back { transform:rotateY(180deg); background:#f0f0f0; }
+
+.page-back { transform: rotateY(180deg); background: #e0e0e0; }
+.page.flipped { transform: rotateY(-180deg); }
+
 .cover {
-  background:linear-gradient(135deg,var(--primary),#1a252f);
-  color:var(--gold); display:flex; align-items:center; justify-content:center;
-  text-align:center; border-right:12px solid var(--gold);
+  background: linear-gradient(135deg, #2c3e50, #1a252f);
+  color: var(--gold); border-right: 8px solid var(--gold);
+  justify-content: center; text-align: center;
 }
-.cover h1 { font-family:'Amiri',serif; font-size:3rem; margin:1rem 0; }
-.cover-ornament { width:80%; height:2px; background:var(--gold); margin:20px 0; position:relative; }
-.cover-ornament::after {
-  content:'❖'; position:absolute; top:-15px; left:50%; transform:translateX(-50%);
-  background:var(--primary); padding:0 10px;
+
+.page-image { 
+  width: 100%; height: 80%; object-fit: contain; 
+  background: #fff; border-radius: 5px; 
 }
-.page-image { width:100%; height:85%; object-fit:contain; background:#fff; border-radius:4px; }
-.nav-controls,.action-buttons { display:flex; gap:10px; }
-.nav-controls { margin-top:10px; }
-.action-buttons { position:fixed; top:20px; left:20px; flex-direction:column; z-index:1000; }
-.mini-btn {
-  width:42px; height:42px; border-radius:50%; border:none;
-  background:rgba(44,62,80,.92); color:#d4af37;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; font-size:20px;
-  box-shadow:0 6px 15px rgba(0,0,0,.25);
-}
+
+/* أزرار التحكم */
+.nav-controls { display: flex; gap: 20px; margin-top: 25px; z-index: 100; }
 .btn-circle {
-  width:50px; height:50px; border-radius:50%; border:none;
-  background:var(--primary); color:var(--gold); cursor:pointer;
-  box-shadow:0 4px 10px rgba(0,0,0,.3); font-size:22px;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--primary); color: var(--gold);
+  display: flex; align-items:center; justify-content:center;
+  font-size: 24px; cursor: pointer; border: 2px solid var(--gold);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: 0.3s;
 }
-.btn {
-  background:var(--primary); color:#fff; border:none;
-  padding:10px 16px; border-radius:8px; cursor:pointer;
+.btn-circle:hover { transform: scale(1.1); background: #1a252f; }
+
+/* زر رفع الملفات الجديد الجميل */
+.upload-btn {
+  position: fixed; bottom: 30px; left: 30px; 
+  background: var(--gold); color: #2c3e50;
+  width: 150px; height: 50px; border-radius: 25px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold; cursor: pointer; z-index: 1000;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  transition: 0.3s;
 }
-.admin-btn {
-  position:fixed; bottom:20px; left:20px; background:var(--primary); color:#fff;
-  padding:8px 15px; border-radius:20px; opacity:.75; cursor:pointer;
-}
+.upload-btn:hover { transform: translateY(-5px); box-shadow: 0 15px 25px rgba(0,0,0,0.3); }
+.upload-btn span { margin-right: 10px; font-size: 20px; }
+
+/* تكبير المربعات المنبثقة */
 .modal {
-  display:none; position:fixed; inset:0; background:rgba(0,0,0,.8);
-  justify-content:center; align-items:center; z-index:2000;
+  display: none; position: fixed; inset: 0; 
+  background: rgba(0,0,0,0.85); z-index: 2000;
+  justify-content: center; align-items: center;
 }
 .modal-content {
-  background:#fff; padding:30px; border-radius:15px; width:min(400px,90vw);
+  background: white; padding: 40px; border-radius: 20px;
+  width: 90%; max-width: 550px; /* تم تكبير العرض */
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
 }
-input {
-  width:100%; padding:12px; margin:10px 0;
-  border:1px solid #ddd; border-radius:8px;
+.modal-content h3 { font-size: 24px; margin-bottom: 20px; color: var(--primary); font-weight: bold; }
+.modal-content input { 
+  width: 100%; border: 2px solid #eee; padding: 15px; 
+  rounded: 10px; margin-bottom: 15px; font-size: 16px;
+  outline: none; transition: 0.3s;
 }
-.footer-text { margin-top:20px; font-size:.9rem; color:#555; font-weight:bold; }
-.delete-btn {
-  position:absolute; top:8px; right:8px;
-  color:#c00; background:#fff; border:none;
-  padding:6px 10px; border-radius:8px; cursor:pointer;
+.modal-content input:focus { border-color: var(--gold); }
+
+.main-btn {
+  width: 100%; background: var(--primary); color: white;
+  padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold;
 }
-@media print {
-  .action-buttons,.nav-controls,.admin-btn,.footer-text,.delete-btn { display:none !important; }
-  body { background:#fff; }
+
+@media (max-width: 500px) {
+  .book-container { aspect-ratio: 4/5; }
 }
 </style>
 </head>
 <body>
 
-<div class="action-buttons">
-  <button onclick="window.print()" class="mini-btn" title="طباعة">🖨️</button>
-  <button onclick="copyShareLink()" class="mini-btn" title="مشاركة">🔗</button>
+<div class="upload-btn" onclick="openModal('authModal')">
+  <span>📤</span> رفع ملفات
 </div>
 
 <div class="book-container">
   <div class="book" id="book">
-    <div class="page" onclick="toggleFlip(this)">
+    <div class="page" id="p0" onclick="toggleFlip(this)">
       <div class="page-front cover">
-        <div>بسم الله الرحمن الرحيم</div>
-        <div class="cover-ornament"></div>
-        <h1>ملف الإنجاز</h1>
-        <div>تصميم مهند علي حسين</div>
-        <div class="cover-ornament"></div>
-        <p>انقر لتقليب الصفحة</p>
+        <h1 class="font-bold text-3xl mb-4" style="font-family:'Amiri'">ملف الإنجاز</h1>
+        <p class="text-sm">تصميم مهند علي حسين</p>
+        <div class="mt-10 opacity-50 text-xs">انقر للبدء</div>
       </div>
       <div class="page-back"></div>
     </div>
@@ -111,252 +129,146 @@ input {
 </div>
 
 <div class="nav-controls">
-  <button class="btn-circle" onclick="flipPrev()">◀</button>
-  <button class="btn-circle" onclick="flipNext()">▶</button>
+  <button class="btn-circle" onclick="flipPrev()">▶</button>
+  <button class="btn-circle" onclick="flipNext()">◀</button>
 </div>
-
-<div class="footer-text">تصميم مهند علي حسين 2026</div>
-<div class="admin-btn" onclick="openModal('authModal')">+ إدارة الملف</div>
 
 <div id="authModal" class="modal">
   <div class="modal-content">
-    <h3>دخول المسؤول</h3>
-    <input type="password" id="adminPass" placeholder="أدخل الرقم السري">
-    <button onclick="verifyPassword()" class="btn" style="width:100%">دخول</button>
-    <button onclick="closeModal('authModal')" class="btn" style="width:100%; margin-top:8px; background:#777">إلغاء</button>
+    <h3>🔐 دخول المسؤول</h3>
+    <input type="password" id="adminPass" placeholder="أدخل كلمة السر الخاصة بك">
+    <button id="loginBtn" class="main-btn">دخول</button>
+    <button onclick="closeModal('authModal')" class="w-full mt-4 text-gray-500">إلغاء</button>
   </div>
 </div>
 
 <div id="addModal" class="modal">
   <div class="modal-content">
-    <h3>إضافة صفحة جديدة</h3>
-    <input type="text" id="driveLink" placeholder="رابط Google Drive">
-    <input type="text" id="pageDesc" placeholder="وصف الصورة">
-    <button onclick="addNewPage()" class="btn" style="width:100%; background:#d4af37; color:#000">إضافة</button>
-    <button onclick="closeModal('addModal')" class="btn" style="width:100%; margin-top:8px; background:#777">إغلاق</button>
+    <h3>🆕 إضافة عمل جديد</h3>
+    <p class="text-sm text-gray-500 mb-2">رابط Google Drive:</p>
+    <input type="text" id="driveLink" placeholder="https://drive.google.com/...">
+    <p class="text-sm text-gray-500 mb-2">الملاحظات / اسم العمل:</p>
+    <input type="text" id="pageDesc" placeholder="مثال: تصميم شعار شركة المراعي">
+    <button id="savePageBtn" class="main-btn" style="background: var(--gold); color: #2c3e50;">حفظ</button>
+    <button onclick="closeModal('addModal')" class="w-full mt-4 text-gray-500">إغلاق</button>
   </div>
 </div>
 
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-  query,
-  orderBy,
-  serverTimestamp
-} from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: 'AIzaSyD-sGsgLVZSidrgiAuP7NkDr3zKaCdRPEY',
-  authDomain: 'book-552.firebaseapp.com',
-  projectId: 'book-552',
-  storageBucket: 'book-552.firebasestorage.app',
-  messagingSenderId: '252586078518',
-  appId: '1:252586078518:web:2fe02dac779c3da4d74397',
-  measurementId: 'G-1NRXZ5VR9K'
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyD-sGsgLVZSidrgiAuP7NkDr3zKaCdRPEY",
+    authDomain: "book-552.firebaseapp.com",
+    projectId: "book-552",
+    storageBucket: "book-552.firebasestorage.app",
+    messagingSenderId: "252586078518",
+    appId: "1:252586078518:web:2fe02dac779c3da4d74397"
+  };
 
-const SECRET_CODE = '4753';
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const pagesCollection = collection(db, 'pages');
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const pagesCol = collection(db, "portfolio_pages");
 
-const book = document.getElementById('book');
-let pagesData = [];
+  let pagesData = [];
 
-function extractId(url) {
-  const match = url.match(/(?:\/d\/|id=)([\w-]+)/);
-  return match ? match[1] : null;
-}
-
-function getImageUrl(id) {
-  return `https://drive.google.com/thumbnail?id=${id}&sz=w2000`;
-}
-
-function openModal(id) {
-  document.getElementById(id).style.display = 'flex';
-}
-
-function closeModal(id) {
-  document.getElementById(id).style.display = 'none';
-}
-
-function verifyPassword() {
-  if (document.getElementById('adminPass').value === SECRET_CODE) {
-    closeModal('authModal');
-    openModal('addModal');
-    document.getElementById('adminPass').value = '';
-  } else {
-    alert('الرمز غير صحيح');
-  }
-}
-
-async function loadPages() {
-  try {
-    const q = query(pagesCollection, orderBy('createdAt'));
-    const snapshot = await getDocs(q);
-    pagesData = [];
-    snapshot.forEach((docSnap) => {
-      pagesData.push({
-        docId: docSnap.id,
-        ...docSnap.data()
-      });
-    });
+  onSnapshot(query(pagesCol, orderBy("createdAt", "asc")), (snapshot) => {
+    pagesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     renderPages();
-  } catch (error) {
-    console.error(error);
-    alert('تعذر تحميل البيانات من Firebase. تأكد من إعداد قواعد Firestore.');
-  }
-}
+  });
 
-async function addNewPage() {
-  const link = document.getElementById('driveLink').value.trim();
-  const desc = document.getElementById('pageDesc').value.trim();
-  const id = extractId(link);
+  function renderPages() {
+    const book = document.getElementById('book');
+    const firstPage = document.getElementById('p0');
+    book.innerHTML = '';
+    book.appendChild(firstPage);
 
-  if (!id) {
-    alert('رابط Google Drive غير صحيح');
-    return;
-  }
-
-  try {
-    await addDoc(pagesCollection, {
-      id,
-      desc,
-      createdAt: serverTimestamp()
+    pagesData.forEach((data, index) => {
+      const page = document.createElement('div');
+      page.className = 'page';
+      page.onclick = function() { toggleFlip(this); };
+      page.innerHTML = `
+        <div class="page-front">
+          <img src="https://drive.google.com/thumbnail?id=${data.driveId}&sz=w800" class="page-image">
+          <p class="text-center mt-6 font-bold text-xl text-gray-700">${data.desc || ''}</p>
+          <button onclick="deletePage(event, '${data.id}')" class="text-red-400 text-sm mt-auto">حذف الصفحة</button>
+        </div>
+        <div class="page-back"></div>
+      `;
+      book.appendChild(page);
     });
 
-    document.getElementById('driveLink').value = '';
-    document.getElementById('pageDesc').value = '';
-    closeModal('addModal');
-
-    await loadPages();
-    await copyShareLink();
-  } catch (error) {
-    console.error(error);
-    alert('حدث خطأ أثناء حفظ الصفحة');
-  }
-}
-
-async function secureDeletePage(e, docId) {
-  e.stopPropagation();
-  const pass = prompt('أدخل الرقم السري لحذف الصفحة:');
-  if (pass !== SECRET_CODE) {
-    alert('الرقم السري غير صحيح');
-    return;
+    const end = document.createElement('div');
+    end.className = 'page';
+    end.innerHTML = '<div class="page-front cover"><h2>تم بحمد الله</h2><p class="text-xs mt-4">تصميم مهند علي حسين</p></div><div class="page-back"></div>';
+    book.appendChild(end);
+    updateZIndex();
   }
 
-  if (!confirm('حذف هذه الصفحة؟')) return;
-
-  try {
-    await deleteDoc(doc(db, 'pages', docId));
-    await loadPages();
-  } catch (error) {
-    console.error(error);
-    alert('تعذر حذف الصفحة');
+  window.toggleFlip = function(el) {
+    el.classList.toggle('flipped');
+    updateZIndex();
   }
-}
 
-function renderPages() {
-  document.querySelectorAll('.page').forEach((p, i) => {
-    if (i > 0) p.remove(); // احتفظ بالغلاف فقط
-  });
-
-  pagesData.forEach((data) => {
-    const page = document.createElement('div');
-    page.className = 'page';
-    page.onclick = function () { toggleFlip(this); };
-
-    page.innerHTML = `
-      <div class="page-front">
-        <img src="${getImageUrl(data.id)}" class="page-image" loading="lazy"
-             onerror="this.alt='تأكد أن الصورة متاحة لأي شخص لديه الرابط';">
-        <div style="margin-top:10px; text-align:center; color:#555;">${data.desc || ''}</div>
-        <button class="delete-btn">حذف</button>
-      </div>
-      <div class="page-back"></div>
-    `;
-
-    page.querySelector('.delete-btn').addEventListener('click', (e) => {
-      secureDeletePage(e, data.docId);
+  window.updateZIndex = function() {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach((page, i) => {
+      if (page.classList.contains('flipped')) {
+        page.style.zIndex = i;
+        page.style.opacity = "0";
+        setTimeout(() => { if(!page.classList.contains('flipped')) page.style.opacity = "1"; }, 600);
+      } else {
+        page.style.zIndex = pages.length - i;
+        page.style.opacity = "1";
+      }
     });
-
-    book.appendChild(page);
-  });
-
-  const endPage = document.createElement('div');
-  endPage.className = 'page';
-  endPage.onclick = function () { toggleFlip(this); };
-  endPage.innerHTML = `
-    <div class="page-front cover" style="background:#ecf0f1; color:#2c3e50; border-right:none; border-left:12px solid #d4af37;">
-      <div class="cover-ornament"></div>
-      <h2 style="font-size:2rem;">تم بحمد الله</h2>
-      <p>نهاية ملف الإنجاز</p>
-      <div class="cover-ornament"></div>
-    </div>
-    <div class="page-back"></div>
-  `;
-  book.appendChild(endPage);
-
-  updateZIndex();
-}
-
-function toggleFlip(el) {
-  el.classList.toggle('flipped');
-  updateZIndex();
-}
-
-function flipNext() {
-  const page = [...document.querySelectorAll('.page')]
-    .find(p => !p.classList.contains('flipped'));
-  if (page) {
-    page.classList.add('flipped');
-    updateZIndex();
+    const current = [...pages].find(p => !p.classList.contains('flipped'));
+    if(current) current.style.opacity = "1";
   }
-}
 
-function flipPrev() {
-  const pages = [...document.querySelectorAll('.page')];
-  const page = pages.reverse().find(p => p.classList.contains('flipped'));
-  if (page) {
-    page.classList.remove('flipped');
-    updateZIndex();
+  window.flipNext = () => {
+    const page = [...document.querySelectorAll('.page')].find(p => !p.classList.contains('flipped'));
+    if (page) toggleFlip(page);
   }
-}
 
-function updateZIndex() {
-  const pages = document.querySelectorAll('.page');
-  pages.forEach((page, i) => {
-    page.style.zIndex = page.classList.contains('flipped') ? i : (pages.length - i);
-  });
-}
-
-async function copyShareLink() {
-  const url = location.href;
-  try {
-    await navigator.clipboard.writeText(url);
-    alert('تم نسخ رابط المشاركة بنجاح');
-  } catch {
-    prompt('انسخ هذا الرابط:', url);
+  window.flipPrev = () => {
+    const pages = [...document.querySelectorAll('.page')];
+    const page = pages.reverse().find(p => p.classList.contains('flipped'));
+    if (page) toggleFlip(page);
   }
-}
 
-window.copyShareLink = copyShareLink;
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.verifyPassword = verifyPassword;
-window.addNewPage = addNewPage;
-window.toggleFlip = toggleFlip;
-window.flipNext = flipNext;
-window.flipPrev = flipPrev;
+  window.openModal = (id) => document.getElementById(id).style.display = 'flex';
+  window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
-window.addEventListener('load', loadPages);
+  document.getElementById('loginBtn').onclick = () => {
+    if(document.getElementById('adminPass').value === "4753") {
+      closeModal('authModal'); openModal('addModal');
+    } else alert("كلمة السر غير صحيحة");
+  };
+
+  document.getElementById('savePageBtn').onclick = async () => {
+    const link = document.getElementById('driveLink').value;
+    const driveId = link.match(/(?:\/d\/|id=)([\w-]+)/)?.[1];
+    if(driveId) {
+      await addDoc(pagesCol, { 
+        driveId, 
+        desc: document.getElementById('pageDesc').value, 
+        createdAt: Date.now() 
+      });
+      alert("✅ تم إضافة الصورة بنجاح"); // رسالة النجاح المطلوبة
+      document.getElementById('driveLink').value = "";
+      document.getElementById('pageDesc').value = "";
+      closeModal('addModal');
+    } else {
+      alert("عفواً، الرابط غير صحيح");
+    }
+  };
+
+  window.deletePage = async (e, id) => {
+    e.stopPropagation();
+    if(confirm("هل أنت متأكد من حذف هذه الصفحة؟")) await deleteDoc(doc(db, "portfolio_pages", id));
+  }
 </script>
-
 </body>
-  </html>
+</html>
