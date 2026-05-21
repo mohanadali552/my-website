@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ملف الإنجاز – مهند علي حسين</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:#c9a84c; --gold2:#e8c97a; --gold3:#f5dfa0;
+    --dark:#0d0d0d; --deep:#0b0b14; --surface:#14142a;
+    --panel:#181830; --border:#2a2a4a; --border2:#3a3a5a;
+    --text:#ede8de; --muted:#7a7468; --muted2:#a09888;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{min-height:100vh;}
+  body{
+    background:var(--deep);
+    font-family:'Tajawal',sans-serif;
+    color:var(--text);
+    display:flex; flex-direction:column;
+    align-items:center; overflow-x:hidden;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;
+    background:
+      radial-gradient(ellipse 90% 50% at 50% -5%,rgba(201,168,76,.13) 0%,transparent 65%),
+      radial-gradient(ellipse 40% 40% at 85% 85%,rgba(201,168,76,.07) 0%,transparent 55%),
+      radial-gradient(ellipse 30% 30% at 10% 70%,rgba(100,80,180,.06) 0%,transparent 55%);
+    pointer-events:none;z-index:0;
+  }
+
+  /* ── HEADER ── */
+  header{
+    width:100%;text-align:center;
+    padding:52px 20px 20px;position:relative;z-index:1;
+  }
+  .hline{
+    display:flex;align-items:center;justify-content:center;gap:14px;
+    margin-bottom:8px;
+  }
+  .hline-dec{
+    height:1px;width:80px;
+    background:linear-gradient(90deg,transparent,rgba(201,168,76,.5));
+  }
+  .hline-dec.r{background:linear-gradient(270deg,transparent,rgba(201,168,76,.5));}
+  .hline-star{color:var(--gold);font-size:.9rem;opacity:.7;}
+  .brand-title{
+    font-family:'Amiri',serif;
+    font-size:clamp(2.2rem,6vw,4rem);
+    color:var(--gold2);
+    letter-spacing:.06em;line-height:1;
+    text-shadow:0 0 50px rgba(201,168,76,.3),0 2px 4px rgba(0,0,0,.5);
+  }
+  .brand-name{
+    font-family:'Tajawal',sans-serif;font-weight:300;
+    font-size:.88rem;color:var(--muted2);
+    letter-spacing:.35em;text-transform:uppercase;
+    margin-top:8px;
+  }
+  .divider{
+    width:200px;height:1px;margin:14px auto;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  }
+
+  /* ── SETUP BANNER ── */
+  #setupBanner{
+    width:min(600px,92vw);
+    background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));
+    border:1px solid rgba(201,168,76,.2);
+    border-radius:12px;padding:18px 22px;
+    margin-bottom:24px;
+    position:relative;z-index:1;
+    font-size:.85rem;line-height:1.7;color:var(--muted2);
+    display:none;
+  }
+  #setupBanner.show{display:block;}
+  #setupBanner strong{color:var(--gold2);}
+  #setupBanner code{
+    background:rgba(255,255,255,.07);
+    padding:2px 7px;border-radius:4px;
+    font-family:monospace;font-size:.82rem;color:var(--gold3);
+  }
+
+  /* ── SCRIPT CONFIG ── */
+  #scriptConfig{
+    width:min(600px,92vw);
+    display:flex;gap:10px;align-items:center;
+    margin-bottom:20px;position:relative;z-index:1;
+  }
+  #scriptConfig input{
+    flex:1;background:rgba(255,255,255,.05);
+    border:1px solid var(--border2);border-radius:8px;
+    padding:10px 14px;color:var(--text);
+    font-family:'Tajawal',sans-serif;font-size:.85rem;
+    outline:none;transition:border-color .2s,box-shadow .2s;
+  }
+  #scriptConfig input:focus{
+    border-color:rgba(201,168,76,.45);
+    box-shadow:0 0 0 3px rgba(201,168,76,.09);
+  }
+  #scriptConfig input::placeholder{color:var(--muted);}
+  #saveScriptBtn{
+    padding:10px 18px;
+    background:linear-gradient(135deg,var(--gold),#9a6c20);
+    border:none;border-radius:8px;
+    color:#0d0d0d;font-weight:700;
+    font-family:'Tajawal',sans-serif;font-size:.85rem;
+    cursor:pointer;white-space:nowrap;
+    transition:opacity .2s,transform .1s;
+  }
+  #saveScriptBtn:hover{opacity:.85;transform:translateY(-1px);}
+  #scriptStatus{
+    font-size:.78rem;text-align:center;
+    margin-bottom:16px;position:relative;z-index:1;
+  }
+  .status-ok{color:#6bcb77;}
+  .status-no{color:var(--muted);}
+  .status-err{color:#e07070;}
+
+  /* ── STAGE ── */
+  #stage{
+    position:relative;z-index:1;
+    width:100%;display:flex;
+    flex-direction:column;align-items:center;
+    padding:0 20px;
+  }
+
+  /* ── BOOK WRAPPER ── */
+  #bookWrapper{
+    position:relative;display:flex;
+    align-items:center;justify-content:center;width:100%;
+  }
+
+  /* ── BOOK ── */
+  #book{
+    position:relative;
+    width:var(--bw,460px);height:var(--bh,620px);
+    perspective:2200px;user-select:none;
+    filter:drop-shadow(0 30px 60px rgba(0,0,0,.7));
+  }
+
+  /* ── COVER ── */
+  .book-cover{
+    position:absolute;inset:0;
+    background:linear-gradient(160deg,#1c1230 0%,#0e0e1c 60%,#12101e 100%);
+    border-radius:3px 14px 14px 3px;
+    border:1px solid rgba(201,168,76,.18);
+    box-shadow:
+      -10px 0 28px rgba(0,0,0,.7),
+      10px 10px 50px rgba(0,0,0,.85),
+      inset -5px 0 15px rgba(0,0,0,.5),
+      inset 1px 0 0 rgba(201,168,76,.08);
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    overflow:hidden;z-index:2;
+  }
+  .cover-pattern{
+    position:absolute;inset:0;opacity:.4;
+    background-image:
+      repeating-linear-gradient(-45deg,transparent,transparent 28px,
+        rgba(201,168,76,.025) 28px,rgba(201,168,76,.025) 29px),
+      repeating-linear-gradient(45deg,transparent,transparent 28px,
+        rgba(201,168,76,.015) 28px,rgba(201,168,76,.015) 29px);
+  }
+  .cover-frame{
+    position:absolute;inset:14px;
+    border:1px solid rgba(201,168,76,.2);border-radius:4px;
+    pointer-events:none;
+  }
+  .cover-frame::before{
+    content:'';position:absolute;inset:8px;
+    border:1px solid rgba(201,168,76,.1);border-radius:2px;
+  }
+  .cover-corner{
+    position:absolute;width:20px;height:20px;
+  }
+  .cover-corner.tl{top:22px;right:22px;
+    border-top:2px solid rgba(201,168,76,.45);
+    border-right:2px solid rgba(201,168,76,.45);}
+  .cover-corner.tr{top:22px;left:22px;
+    border-top:2px solid rgba(201,168,76,.45);
+    border-left:2px solid rgba(201,168,76,.45);}
+  .cover-corner.bl{bottom:22px;right:22px;
+    border-bottom:2px solid rgba(201,168,76,.45);
+    border-right:2px solid rgba(201,168,76,.45);}
+  .cover-corner.br{bottom:22px;left:22px;
+    border-bottom:2px solid rgba(201,168,76,.45);
+    border-left:2px solid rgba(201,168,76,.45);}
+  .cover-emblem{
+    font-size:3.5rem;margin-bottom:18px;
+    filter:drop-shadow(0 0 24px rgba(201,168,76,.55));
+    animation:floatEmb 4s ease-in-out infinite;
+  }
+  @keyframes floatEmb{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+  }
+  .cover-title{
+    font-family:'Amiri',serif;
+    font-size:clamp(1.5rem,4vw,2.3rem);
+    color:var(--gold2);text-align:center;
+    text-shadow:0 0 30px rgba(201,168,76,.45);
+    line-height:1.3;padding:0 28px;
+  }
+  .cover-name{
+    font-size:.78rem;color:rgba(201,168,76,.55);
+    letter-spacing:.3em;text-transform:uppercase;
+    margin-top:10px;
+  }
+  .cover-year{
+    position:absolute;bottom:32px;
+    font-family:'Amiri',serif;
+    font-size:.95rem;color:rgba(201,168,76,.5);
+    letter-spacing:.18em;
+  }
+  .book-spine{
+    position:absolute;right:0;top:0;width:22px;height:100%;
+    background:linear-gradient(to right,#08080f,#16122a);
+    border-radius:0 14px 14px 0;
+    border-right:1px solid rgba(201,168,76,.12);
+    border-top:1px solid rgba(201,168,76,.07);
+    border-bottom:1px solid rgba(201,168,76,.07);
+    z-index:3;box-shadow:4px 0 14px rgba(0,0,0,.6);
+  }
+
+  /* ── PAGES ── */
+  #pagesContainer{position:absolute;inset:0;z-index:1;}
+
+  .page-card{
+    position:absolute;inset:0;
+    background:#faf7f0;
+    border-radius:3px 12px 12px 3px;
+    overflow:hidden;
+    box-shadow:
+      -8px 0 22px rgba(0,0,0,.55),
+      8px 8px 35px rgba(0,0,0,.65),
+      inset -3px 0 10px rgba(0,0,0,.12);
+    display:none;
+  }
+  .page-card.active{display:block;z-index:5;}
+  .page-card.behind{display:block;z-index:4;}
+
+  .page-card img{
+    width:100%;height:100%;
+    object-fit:contain;display:block;
+    background:#f5f0e8;
+  }
+
+  /* Page curl left edge shadow */
+  .page-card.active::before{
+    content:'';position:absolute;
+    right:0;top:0;bottom:0;width:18px;
+    background:linear-gradient(to left,rgba(0,0,0,.13),transparent);
+    pointer-events:none;z-index:10;
+  }
+
+  /* Page number badge */
+  .page-num{
+    position:absolute;bottom:10px;left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,.35);
+    color:rgba(255,255,255,.7);
+    font-size:.7rem;padding:2px 10px;
+    border-radius:20px;backdrop-filter:blur(4px);
+    pointer-events:none;z-index:20;
+  }
+
+  /* ── FLIP ANIMATIONS ── */
+  .flip-out-right{
+    animation:flipOutRight .55s cubic-bezier(.4,0,.2,1) forwards;
+    transform-style:preserve-3d;
+  }
+  .flip-in-right{
+    animation:flipInRight .55s cubic-bezier(.4,0,.2,1) forwards;
+    transform-style:preserve-3d;
+  }
+  .flip-out-left{
+    animation:flipOutLeft .55s cubic-bezier(.4,0,.2,1) forwards;
+    transform-style:preserve-3d;
+  }
+  .flip-in-left{
+    animation:flipInLeft .55s cubic-bezier(.4,0,.2,1) forwards;
+    transform-style:preserve-3d;
+  }
+  @keyframes flipOutRight{
+    0%  {transform:rotateY(0deg);box-shadow:-8px 0 22px rgba(0,0,0,.55),8px 8px 35px rgba(0,0,0,.65);}
+    40% {transform:rotateY(-70deg) scaleX(.9);box-shadow:0 0 40px rgba(0,0,0,.4);}
+    100%{transform:rotateY(-180deg);opacity:0;}
+  }
+  @keyframes flipInRight{
+    0%  {transform:rotateY(-180deg);opacity:0;}
+    60% {transform:rotateY(-20deg) scaleX(.95);}
+    100%{transform:rotateY(0deg);opacity:1;}
+  }
+  @keyframes flipOutLeft{
+    0%  {transform:rotateY(0deg);}
+    40% {transform:rotateY(70deg) scaleX(.9);}
+    100%{transform:rotateY(180deg);opacity:0;}
+  }
+  @keyframes flipInLeft{
+    0%  {transform:rotateY(180deg);opacity:0;}
+    60% {transform:rotateY(20deg) scaleX(.95);}
+    100%{transform:rotateY(0deg);opacity:1;}
+  }
+
+  /* ── NAV ── */
+  .nav-btn{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:50px;height:50px;border-radius:50%;
+    background:rgba(13,13,20,.7);
+    border:1px solid rgba(201,168,76,.25);
+    color:var(--gold);font-size:1.5rem;
+    cursor:pointer;display:flex;
+    align-items:center;justify-content:center;
+    transition:all .2s;z-index:10;
+    backdrop-filter:blur(10px);
+  }
+  .nav-btn:hover{
+    background:rgba(201,168,76,.15);
+    border-color:var(--gold);
+    box-shadow:0 0 25px rgba(201,168,76,.25);
+    transform:translateY(-50%) scale(1.1);
+  }
+  .nav-btn:disabled{opacity:.25;cursor:default;}
+  .nav-btn:disabled:hover{transform:translateY(-50%) scale(1);box-shadow:none;background:rgba(13,13,20,.7);}
+  #prevBtn{right:-70px;}
+  #nextBtn{left:-70px;}
+
+  /* ── COUNTER ── */
+  #pageCounter{
+    margin-top:16px;
+    font-size:.8rem;color:var(--muted);
+    letter-spacing:.14em;
+  }
+
+  /* ── LOADING OVERLAY ── */
+  #loadOverlay{
+    position:absolute;inset:0;
+    background:rgba(11,11,20,.7);
+    backdrop-filter:blur(4px);
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:14px;z-index:20;border-radius:3px 14px 14px 3px;
+    opacity:0;pointer-events:none;
+    transition:opacity .25s;
+  }
+  #loadOverlay.show{opacity:1;pointer-events:all;}
+  .spinner{
+    width:38px;height:38px;
+    border:2px solid rgba(201,168,76,.15);
+    border-top-color:var(--gold);
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .load-text{font-size:.82rem;color:var(--muted2);}
+
+  /* ── BOTTOM BAR ── */
+  #bottomBar{
+    display:flex;align-items:center;justify-content:center;
+    gap:14px;margin-top:22px;flex-wrap:wrap;
+    position:relative;z-index:1;
+  }
+  #addBtn{
+    width:42px;height:42px;border-radius:50%;
+    background:rgba(201,168,76,.08);
+    border:1px solid rgba(201,168,76,.3);
+    color:var(--gold);font-size:1.4rem;
+    cursor:pointer;display:flex;
+    align-items:center;justify-content:center;
+    transition:all .25s;backdrop-filter:blur(8px);
+    position:relative;
+  }
+  #addBtn:hover{
+    background:rgba(201,168,76,.2);
+    box-shadow:0 0 20px rgba(201,168,76,.3);
+    transform:scale(1.12) rotate(90deg);
+  }
+  #addBtn .tooltip{
+    position:absolute;bottom:calc(100% + 8px);left:50%;
+    transform:translateX(-50%);
+    background:rgba(20,20,40,.95);
+    border:1px solid var(--border2);
+    color:var(--muted2);font-size:.72rem;
+    padding:4px 10px;border-radius:6px;
+    white-space:nowrap;pointer-events:none;
+    opacity:0;transition:opacity .2s;
+  }
+  #addBtn:hover .tooltip{opacity:1;}
+
+  /* ── CREDIT ── */
+  #credit{
+    margin-top:26px;padding-bottom:44px;
+    text-align:center;position:relative;z-index:1;
+    font-family:'Amiri',serif;font-size:1.05rem;
+    color:rgba(201,168,76,.45);letter-spacing:.06em;
+  }
+  #credit span{color:rgba(201,168,76,.75);}
+
+  /* ── MODAL ── */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.8);
+    backdrop-filter:blur(10px);
+    z-index:1000;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;
+    transition:opacity .25s;
+  }
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal-box{
+    background:linear-gradient(150deg,#1a1a30,#14142a);
+    border:1px solid var(--border2);
+    border-radius:18px;padding:38px 42px;
+    width:min(500px,92vw);
+    box-shadow:0 40px 100px rgba(0,0,0,.85),0 0 0 1px rgba(201,168,76,.08);
+    transform:translateY(24px) scale(.96);
+    transition:transform .25s;
+  }
+  .modal-overlay.open .modal-box{transform:translateY(0) scale(1);}
+  .modal-box h3{
+    font-family:'Amiri',serif;font-size:1.5rem;
+    color:var(--gold2);margin-bottom:6px;text-align:center;
+  }
+  .modal-desc{
+    font-size:.8rem;color:var(--muted);
+    text-align:center;margin-bottom:22px;
+    line-height:1.6;
+  }
+  .modal-box label{
+    display:block;font-size:.78rem;
+    color:var(--muted2);margin-bottom:5px;
+    letter-spacing:.05em;
+  }
+  .modal-box input,.modal-box textarea{
+    width:100%;
+    background:rgba(255,255,255,.04);
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:11px 14px;color:var(--text);
+    font-family:'Tajawal',sans-serif;font-size:.9rem;
+    margin-bottom:14px;outline:none;
+    transition:border-color .2s,box-shadow .2s;
+  }
+  .modal-box input:focus,.modal-box textarea:focus{
+    border-color:rgba(201,168,76,.45);
+    box-shadow:0 0 0 3px rgba(201,168,76,.08);
+  }
+  .modal-box textarea{resize:vertical;min-height:64px;}
+  .modal-btns{display:flex;gap:10px;margin-top:4px;}
+  .btn-primary{
+    flex:1;padding:12px;
+    background:linear-gradient(135deg,var(--gold),#9a6c20);
+    border:none;border-radius:9px;
+    color:#0d0d0d;font-weight:700;
+    font-family:'Tajawal',sans-serif;font-size:.9rem;
+    cursor:pointer;transition:opacity .2s,transform .1s;
+  }
+  .btn-primary:hover{opacity:.85;transform:translateY(-1px);}
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+  .btn-secondary{
+    flex:1;padding:12px;background:transparent;
+    border:1px solid var(--border);border-radius:9px;
+    color:var(--muted);font-family:'Tajawal',sans-serif;
+    font-size:.9rem;cursor:pointer;transition:border-color .2s,color .2s;
+  }
+  .btn-secondary:hover{border-color:var(--muted2);color:var(--muted2);}
+
+  /* ── TOAST ── */
+  #toast{
+    position:fixed;bottom:30px;left:50%;
+    transform:translateX(-50%) translateY(14px);
+    padding:11px 26px;border-radius:30px;
+    font-weight:600;font-size:.85rem;
+    z-index:3000;opacity:0;pointer-events:none;
+    transition:opacity .3s,transform .3s;
+    white-space:nowrap;
+  }
+  #toast.success{
+    background:linear-gradient(135deg,var(--gold),#9a6c20);color:#0d0d0d;
+  }
+  #toast.error{background:linear-gradient(135deg,#c0392b,#8e1c10);color:#fff;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ── EMPTY STATE ── */
+  #emptyHint{
+    display:flex;flex-direction:column;
+    align-items:center;gap:10px;padding:30px;
+    color:var(--muted);text-align:center;
+    pointer-events:none;
+  }
+  #emptyHint .ei{font-size:2.8rem;opacity:.3;}
+  #emptyHint p{font-size:.85rem;opacity:.55;line-height:1.6;}
+
+  /* ── DESC OVERLAY ── */
+  .desc-bar{
+    position:absolute;bottom:0;left:0;right:0;
+    background:linear-gradient(to top,rgba(0,0,0,.7),transparent);
+    padding:24px 16px 12px;
+    color:rgba(255,255,255,.85);font-size:.82rem;
+    text-align:center;z-index:15;
+    pointer-events:none;
+    opacity:0;transition:opacity .3s;
+  }
+  .page-card:hover .desc-bar{opacity:1;}
+
+  @media(max-width:640px){
+    #prevBtn,#nextBtn{display:none;}
+    #book{touch-action:pan-y;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="hline">
+    <div class="hline-dec"></div>
+    <div class="hline-star">✦</div>
+    <div class="hline-dec r"></div>
+  </div>
+  <div class="brand-title">ملف الإنجاز</div>
+  <div class="divider"></div>
+  <div class="brand-name">مهند علي حسين · معرض الأعمال</div>
+</header>
+
+<!-- ── SETUP BANNER ── -->
+<div id="setupBanner" style="display:none!important">
+  <strong>⚙️ إعداد أولي مطلوب:</strong> لربط قاعدة البيانات المشتركة، افتح
+  <a href="https://script.google.com" target="_blank" style="color:var(--gold2)">script.google.com</a>،
+  أنشئ مشروعاً جديداً، الصق كود <code>Code.gs</code> المرفق، انشره كـ Web App
+  (<em>Execute as: Me · Anyone can access</em>)، ثم الصق رابط النشر أدناه.
+</div>
+
+<!-- ── SCRIPT URL ── -->
+<div id="scriptConfig" style="display:none!important">
+  <input type="text" id="scriptUrlInput"
+    placeholder="الصق رابط Google Apps Script هنا..." />
+  <button id="saveScriptBtn" onclick="saveScriptUrl()">حفظ</button>
+</div>
+<div id="scriptStatus" style="display:none!important"></div>
+
+<!-- ── STAGE ── -->
+<div id="stage">
+  <div id="bookWrapper">
+    <button class="nav-btn" id="prevBtn" onclick="flipPage(-1)" disabled>&#8250;</button>
+
+    <div id="book">
+      <div id="pagesContainer"></div>
+
+      <!-- Cover (shown when no pages) -->
+      <div class="book-cover" id="bookCover">
+        <div class="cover-pattern"></div>
+        <div class="cover-frame"></div>
+        <div class="cover-corner tl"></div>
+        <div class="cover-corner tr"></div>
+        <div class="cover-corner bl"></div>
+        <div class="cover-corner br"></div>
+        <div class="cover-emblem">📖</div>
+        <div class="cover-title">ملف الإنجاز</div>
+        <div class="cover-name">Mohanad Ali Hussein</div>
+        <div class="cover-year">٢٠٢٦</div>
+        <div class="book-spine"></div>
+        <div id="emptyHint">
+          <div class="ei">🖼️</div>
+          <p>أضف صورك من خلال زر + أدناه<br>ستظهر لجميع زوار الصفحة</p>
+        </div>
+      </div>
+
+      <!-- Loading overlay -->
+      <div id="loadOverlay">
+        <div class="spinner"></div>
+        <div class="load-text">جارٍ التحميل...</div>
+      </div>
+    </div>
+
+    <button class="nav-btn" id="nextBtn" onclick="flipPage(1)" disabled>&#8249;</button>
+  </div>
+
+  <div id="pageCounter">—</div>
+
+  <div id="bottomBar">
+    <button id="addBtn" onclick="openAddModal()">
+      ＋
+      <span class="tooltip">إضافة صفحة جديدة</span>
+    </button>
+  </div>
+</div>
+
+<!-- ── CREDIT ── -->
+<div id="credit">
+  تصميم <span>مهند علي حسين</span> &nbsp;•&nbsp; <span>2026</span>
+</div>
+
+<!-- ── ADD PAGE MODAL ── -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal-box">
+    <h3>✦ إضافة صفحة جديدة</h3>
+    <p class="modal-desc">الصورة ستُضاف لقاعدة البيانات وتظهر لجميع الزوار</p>
+    <label>🔑 الرقم السري</label>
+    <input type="password" id="pinInput" placeholder="أدخل الرقم السري" maxlength="10"/>
+    <label>🔗 رابط مشاركة Google Drive</label>
+    <input type="text" id="driveLink"
+      placeholder="https://drive.google.com/file/d/..." />
+    <label>📝 وصف العمل (اختياري)</label>
+    <textarea id="pageDesc" placeholder="اكتب وصفاً موجزاً للعمل..."></textarea>
+    <div class="modal-btns">
+      <button class="btn-primary" id="addPageBtn" onclick="addPage()">إضافة</button>
+      <button class="btn-secondary" onclick="closeModal('addModal')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   CONSTANTS & STATE
+═══════════════════════════════════════ */
+const SECRET   = '4753';
+const SCRIPT_KEY = 'gas_script_url_v1';
+const PAGES_CACHE = 'portfolio_pages_cache_v2';
+
+let pages     = [];
+let current   = 0;
+let isFlipping = false;
+let scriptUrl  = 'https://script.google.com/macros/s/AKfycbx3nA8Xe0SJia5QF5qlWyMW81ET74o2AT-7RBK427DNZQyYPMc3smixagy59Enw8O0t/exec';
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+function init() {
+  scriptUrl = localStorage.getItem(SCRIPT_KEY) || '';
+
+  if (!scriptUrl) {
+    // setup banner hidden
+    
+    
+  } else {
+    document.getElementById('scriptUrlInput').value = scriptUrl;
+    document.getElementById('scriptStatus').textContent = '✓ متصل – جارٍ تحميل الصفحات...';
+    document.getElementById('scriptStatus').className = 'status-ok';
+    loadPagesFromServer();
+  }
+
+  // Load cached pages immediately for fast render
+  try {
+    const cached = localStorage.getItem(PAGES_CACHE);
+    if (cached) { pages = JSON.parse(cached); renderBook(); }
+  } catch(e){}
+}
+
+/* ═══════════════════════════════════════
+   SCRIPT URL
+═══════════════════════════════════════ */
+function saveScriptUrl() {
+  const val = document.getElementById('scriptUrlInput').value.trim();
+  if (!val || !val.startsWith('https://')) {
+    showToast('⚠️ رابط غير صحيح', 'error'); return;
+  }
+  scriptUrl = val;
+  localStorage.setItem(SCRIPT_KEY, scriptUrl);
+  document.getElementById('setupBanner').classList.remove('show');
+  document.getElementById('scriptStatus').textContent = '✓ تم الحفظ – جارٍ الاتصال...';
+  document.getElementById('scriptStatus').className = 'status-ok';
+  loadPagesFromServer();
+}
+
+/* ═══════════════════════════════════════
+   SERVER CALLS
+═══════════════════════════════════════ */
+async function loadPagesFromServer() {
+  if (!scriptUrl) return;
+  showLoad(true);
+  try {
+    const res = await fetch(`${scriptUrl}?action=getPages`, {
+      method:'GET', mode:'cors'
+    });
+    const data = await res.json();
+    if (data.ok) {
+      pages = data.pages || [];
+      localStorage.setItem(PAGES_CACHE, JSON.stringify(pages));
+      renderBook();
+      document.getElementById('scriptStatus').textContent =
+        `✓ متصل · ${pages.length} صفحة`;
+      document.getElementById('scriptStatus').className = 'status-ok';
+    }
+  } catch(e) {
+    document.getElementById('scriptStatus').textContent =
+      '✗ تعذّر الاتصال – تحقق من رابط Apps Script';
+    document.getElementById('scriptStatus').className = 'status-err';
+  } finally { showLoad(false); }
+}
+
+async function addPageToServer(url, desc) {
+  if (!scriptUrl) { showToast('⚠️ لم يتم ربط قاعدة البيانات بعد','error'); return false; }
+  try {
+    const params = new URLSearchParams({action:'addPage', url, desc});
+    const res = await fetch(`${scriptUrl}?${params}`, {
+      method:'GET', mode:'cors'
+    });
+    const data = await res.json();
+    return data.ok;
+  } catch(e) { return false; }
+}
+
+/* ═══════════════════════════════════════
+   EXTRACT DRIVE ID
+═══════════════════════════════════════ */
+function extractDriveId(url) {
+  url = url.trim();
+  let m = url.match(/\/d\/([a-zA-Z0-9_-]{10,})/);
+  if (m) return m[1];
+  m = url.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+  if (m) return m[1];
+  m = url.match(/open\?id=([a-zA-Z0-9_-]{10,})/);
+  if (m) return m[1];
+  return null;
+}
+
+function driveUrl(id) {
+  // Use thumbnail proxy – avoids CORS on display
+  return `https://drive.google.com/thumbnail?id=${id}&sz=w1200`;
+}
+
+/* ═══════════════════════════════════════
+   BOOK SIZE
+═══════════════════════════════════════ */
+function setBookSize(w, h) {
+  const maxW = Math.min(window.innerWidth - 160, 680);
+  const maxH = Math.min(window.innerHeight * .68, 820);
+  const ratio = w / h;
+  let bw = maxW, bh = maxW / ratio;
+  if (bh > maxH) { bh = maxH; bw = maxH * ratio; }
+  bw = Math.round(bw); bh = Math.round(bh);
+  const book = document.getElementById('book');
+  book.style.width  = bw + 'px';
+  book.style.height = bh + 'px';
+  book.style.setProperty('--bw', bw + 'px');
+  book.style.setProperty('--bh', bh + 'px');
+  const prev = document.getElementById('prevBtn');
+  const next = document.getElementById('nextBtn');
+  prev.style.right = (-bw/2 - 70) + 'px';
+  next.style.left  = (-bw/2 - 70) + 'px';
+  // Reset to center
+  prev.style.right = ''; next.style.left = '';
+  prev.style.right = `-70px`; next.style.left = `-70px`;
+}
+
+/* ═══════════════════════════════════════
+   RENDER
+═══════════════════════════════════════ */
+function renderBook() {
+  const cover  = document.getElementById('bookCover');
+  const cont   = document.getElementById('pagesContainer');
+  const counter= document.getElementById('pageCounter');
+  const prevB  = document.getElementById('prevBtn');
+  const nextB  = document.getElementById('nextBtn');
+
+  cont.innerHTML = '';
+
+  if (pages.length === 0) {
+    cover.style.display = 'flex';
+    counter.textContent = '—';
+    prevB.disabled = true; nextB.disabled = true;
+    return;
+  }
+
+  cover.style.display = 'none';
+  if (current >= pages.length) current = pages.length - 1;
+
+  const pg   = pages[current];
+  const card = makeCard(pg, current);
+  cont.appendChild(card);
+
+  counter.textContent = `${current + 1} / ${pages.length}`;
+  prevB.disabled = (current === 0);
+  nextB.disabled = (current === pages.length - 1);
+
+  addSwipe(card);
+}
+
+function makeCard(pg, idx) {
+  const card = document.createElement('div');
+  card.className = 'page-card active';
+
+  const img = document.createElement('img');
+  img.src = pg.url;
+  img.alt = pg.desc || `صفحة ${idx + 1}`;
+  img.draggable = false;
+  img.onload = () => {
+    if (idx === 0 || pages.length === 1)
+      setBookSize(img.naturalWidth, img.naturalHeight);
+  };
+
+  const num = document.createElement('div');
+  num.className = 'page-num';
+  num.textContent = `${idx + 1}`;
+
+  card.appendChild(img);
+  card.appendChild(num);
+
+  if (pg.desc) {
+    const desc = document.createElement('div');
+    desc.className = 'desc-bar';
+    desc.textContent = pg.desc;
+    card.appendChild(desc);
+  }
+
+  return card;
+}
+
+/* ═══════════════════════════════════════
+   FLIP
+═══════════════════════════════════════ */
+function flipPage(dir) {
+  if (isFlipping) return;
+  const next = current + dir;
+  if (next < 0 || next >= pages.length) return;
+
+  isFlipping = true;
+  const cont = document.getElementById('pagesContainer');
+  const active = cont.querySelector('.page-card.active');
+  if (!active) { current = next; renderBook(); isFlipping = false; return; }
+
+  // Build incoming card (hidden behind)
+  const incoming = makeCard(pages[next], next);
+  incoming.className = 'page-card behind';
+  incoming.style.zIndex = '4';
+  cont.insertBefore(incoming, active);
+
+  // Animate outgoing
+  active.style.transformOrigin = dir > 0 ? 'left center' : 'right center';
+  const outCls = dir > 0 ? 'flip-out-right' : 'flip-out-left';
+  const inCls  = dir > 0 ? 'flip-in-right'  : 'flip-in-left';
+
+  active.classList.add(outCls);
+  active.style.zIndex = '6';
+
+  active.addEventListener('animationend', () => {
+    current = next;
+    // Animate incoming
+    incoming.className = 'page-card active';
+    incoming.classList.add(inCls);
+    incoming.style.zIndex = '5';
+    incoming.addEventListener('animationend', () => {
+      incoming.classList.remove(inCls);
+      renderBook();
+      isFlipping = false;
+    }, {once:true});
+    active.remove();
+    updateCounter();
+  }, {once:true});
+}
+
+function updateCounter() {
+  const counter= document.getElementById('pageCounter');
+  const prevB  = document.getElementById('prevBtn');
+  const nextB  = document.getElementById('nextBtn');
+  counter.textContent = `${current + 1} / ${pages.length}`;
+  prevB.disabled = (current === 0);
+  nextB.disabled = (current === pages.length - 1);
+}
+
+/* ═══════════════════════════════════════
+   SWIPE
+═══════════════════════════════════════ */
+function addSwipe(el) {
+  let sx = 0;
+  el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, {passive:true});
+  el.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 45) flipPage(dx < 0 ? 1 : -1);
+  }, {passive:true});
+}
+
+/* ═══════════════════════════════════════
+   MODALS
+═══════════════════════════════════════ */
+function openAddModal() {
+  document.getElementById('pinInput').value  = '';
+  document.getElementById('driveLink').value = '';
+  document.getElementById('pageDesc').value  = '';
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(() => document.getElementById('pinInput').focus(), 150);
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => {
+    if (e.target === m) m.classList.remove('open');
+  });
+});
+
+/* ═══════════════════════════════════════
+   ADD PAGE
+═══════════════════════════════════════ */
+async function addPage() {
+  const pin  = document.getElementById('pinInput').value.trim();
+  const link = document.getElementById('driveLink').value.trim();
+  const desc = document.getElementById('pageDesc').value.trim();
+  const btn  = document.getElementById('addPageBtn');
+
+  if (pin !== SECRET) { showToast('❌ رقم سري خاطئ','error'); return; }
+  if (!link)          { showToast('⚠️ الرجاء إدخال الرابط','error'); return; }
+
+  const id = extractDriveId(link);
+  if (!id) { showToast('⚠️ لم يتعرف على الرابط – تأكد من نسخه كاملاً','error'); return; }
+
+  const url = driveUrl(id);
+
+  btn.disabled = true;
+  btn.textContent = '... جارٍ الإضافة';
+
+  if (!scriptUrl) {
+    // Offline / no server – store locally only
+    pages.push({url, desc});
+    localStorage.setItem(PAGES_CACHE, JSON.stringify(pages));
+    current = pages.length - 1;
+    renderBook();
+    closeModal('addModal');
+    showToast('✓ تمت الإضافة محلياً (بدون خادم)','success');
+  } else {
+    const ok = await addPageToServer(url, desc);
+    if (ok) {
+      await loadPagesFromServer();
+      current = pages.length - 1;
+      renderBook();
+      closeModal('addModal');
+      showToast('✓ تمت الإضافة وستظهر لجميع الزوار','success');
+    } else {
+      showToast('✗ فشل الحفظ – تحقق من الإعدادات','error');
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'إضافة';
+}
+
+/* ═══════════════════════════════════════
+   LOAD OVERLAY
+═══════════════════════════════════════ */
+function showLoad(v) {
+  document.getElementById('loadOverlay').classList.toggle('show', v);
+}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `${type} show`;
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ═══════════════════════════════════════
+   KEYBOARD
+═══════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (document.querySelector('.modal-overlay.open')) return;
+  if (e.key === 'ArrowRight') flipPage(-1);
+  if (e.key === 'ArrowLeft')  flipPage(1);
+});
+
+/* ═══════════════════════════════════════
+   START
+═══════════════════════════════════════ */
+init();
+</script>
+</body>
+</html>
