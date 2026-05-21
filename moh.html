@@ -396,3 +396,98 @@ function flipPage(dir) {
   cont.insertBefore(incoming, active);
 
   active.style.transformOrigin = dir > 0 ? 'left center' : 'right center';
+  active.classList.add(dir > 0 ? 'flip-out-right' : 'flip-out-left');
+  active.style.zIndex = '6';
+
+  active.addEventListener('animationend', () => {
+    current = next;
+    incoming.className = 'page-card active';
+    const inCls = dir > 0 ? 'flip-in-right' : 'flip-in-left';
+    incoming.classList.add(inCls);
+    incoming.addEventListener('animationend', () => {
+      incoming.classList.remove(inCls);
+      renderBook(); isFlipping = false;
+    }, {once:true});
+    active.remove();
+    document.getElementById('pageCounter').textContent = (current+1)+' / '+pages.length;
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').disabled = current === pages.length - 1;
+  }, {once:true});
+}
+
+/* ── SWIPE ── */
+function addSwipe(el) {
+  let sx = 0;
+  el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, {passive:true});
+  el.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 45) flipPage(dx < 0 ? 1 : -1);
+  }, {passive:true});
+}
+
+/* ── MODALS ── */
+function openAddModal() {
+  ['pinInput','driveLink','pageDesc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(() => document.getElementById('pinInput').focus(), 150);
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+/* ── ADD PAGE ── */
+async function addPage() {
+  const pin  = document.getElementById('pinInput').value.trim();
+  const link = document.getElementById('driveLink').value.trim();
+  const desc = document.getElementById('pageDesc').value.trim();
+  const btn  = document.getElementById('addPageBtn');
+
+  if (pin !== SECRET)  { showToast('❌ رقم سري خاطئ','error'); return; }
+  if (!link)           { showToast('⚠️ الرجاء إدخال الرابط','error'); return; }
+
+  const url = buildImageUrl(link);
+  btn.disabled = true; btn.textContent = '... جارٍ الحفظ';
+
+  try {
+    const ok = await saveToServer(url, desc);
+    if (ok) {
+      await loadPages();
+      current = pages.length - 1;
+      renderBook();
+      closeModal('addModal');
+      showToast('✓ تمت الإضافة وستظهر لجميع الزوار','success');
+    } else {
+      showToast('✗ فشل الحفظ في الخادم','error');
+    }
+  } catch(e) {
+    showToast('✗ خطأ في الاتصال','error');
+  }
+  btn.disabled = false; btn.textContent = 'إضافة';
+}
+
+/* ── STATUS ── */
+function setStatus(msg, cls) {
+  const el = document.getElementById('scriptStatus');
+  el.textContent = msg; el.className = cls;
+}
+
+/* ── TOAST ── */
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type + ' show';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown', e => {
+  if (document.querySelector('.modal-overlay.open')) return;
+  if (e.key === 'ArrowRight') flipPage(-1);
+  if (e.key === 'ArrowLeft')  flipPage(1);
+});
+
+init();
+</script>
+</body>
+</html>
