@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام إدارة لجنة شباب حي العشر - HAMS</title>
-    <!-- خط Cairo وخطوط النظام المعتمدة -->
+    <!-- خط Cairo المعتمد للأنظمة الحكومية -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -54,16 +54,9 @@
         }
 
         .login-logo {
-            width: 90px;
-            height: 90px;
-            background: linear-gradient(135deg, var(--emerald-primary), var(--emerald-light));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-            border: 2px solid var(--gold-accent);
+            width: 90px; height: 90px; background: linear-gradient(135deg, var(--emerald-primary), var(--emerald-light));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); border: 2px solid var(--gold-accent);
         }
 
         .login-logo i { font-size: 40px; color: white; }
@@ -71,102 +64,52 @@
         #mainLayout { display: none; }
 
         .sidebar {
-            background-color: var(--card-bg);
-            border-left: 1px solid var(--border-color);
-            min-height: 100vh;
-            position: fixed;
-            right: 0;
-            top: 0;
-            width: 260px;
-            z-index: 1000;
+            background-color: var(--card-bg); border-left: 1px solid var(--border-color);
+            min-height: 100vh; position: fixed; right: 0; top: 0; width: 260px; z-index: 1000;
         }
 
         .sidebar-brand {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-            text-align: center;
-            color: var(--gold-accent);
-            font-weight: 700;
-            font-size: 18px;
+            padding: 20px; border-bottom: 1px solid var(--border-color); text-align: center; color: var(--gold-accent); font-weight: 700; font-size: 18px;
         }
 
         .nav-menu { padding: 15px 0; list-style: none; margin: 0; }
 
         .nav-item-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 25px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-            border-right: 4px solid transparent;
-            cursor: pointer;
+            display: flex; align-items: center; padding: 12px 25px; color: var(--text-muted); text-decoration: none; font-weight: 600; transition: all 0.2s; border-right: 4px solid transparent; cursor: pointer;
         }
 
         .nav-item-link i { margin-left: 15px; width: 20px; font-size: 18px; }
 
         .nav-item-link:hover, .nav-item-link.active {
-            color: white;
-            background: linear-gradient(90deg, rgba(15,118,110,0.15) 0%, transparent 100%);
-            border-right-color: var(--emerald-light);
+            color: white; background: linear-gradient(90deg, rgba(15,118,110,0.15) 0%, transparent 100%); border-right-color: var(--emerald-light);
         }
 
         .main-content { margin-right: 260px; padding: 30px; min-height: 100vh; }
 
         .top-navbar {
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 15px 30px;
-            margin: -30px -30px 30px -30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background-color: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 15px 30px; margin: -30px -30px 30px -30px; display: flex; justify-content: space-between; align-items: center;
         }
 
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: var(--emerald-light);
-        }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: var(--emerald-light); }
         .stat-card.gold::before { background: var(--gold-accent); }
 
         .stat-icon {
-            width: 50px; height: 50px; border-radius: 10px; background: rgba(16, 185, 129, 0.1);
-            display: flex; align-items: center; justify-content: center; color: var(--emerald-light); font-size: 22px;
+            width: 50px; height: 50px; border-radius: 10px; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; color: var(--emerald-light); font-size: 22px;
         }
-        .stat-card.gold .stat-icon { background: rgba(217, 119, 6, 0.1); color: var(--gold-accent); }
 
         .custom-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; margin-bottom: 25px; }
-        
-        .section-header-title {
-            color: var(--gold-accent); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 20px; margin-bottom: 15px; font-size: 15px; font-weight: bold;
-        }
+        .section-header-title { color: var(--gold-accent); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 20px; margin-bottom: 15px; font-size: 15px; font-weight: bold; }
 
         .table-dark-custom { color: var(--text-light); border-color: var(--border-color); }
         .table-dark-custom th { background-color: #151e1a !important; color: var(--gold-accent); font-weight: 600; }
         .table-dark-custom td { background-color: transparent !important; vertical-align: middle; }
 
-        .form-control-custom {
-            background-color: #151e1a !important; border: 1px solid var(--border-color) !important; color: white !important; border-radius: 8px !important; padding: 10px 15px !important;
-        }
+        .form-control-custom { background-color: #151e1a !important; border: 1px solid var(--border-color) !important; color: white !important; border-radius: 8px !important; padding: 10px 15px !important; }
         .form-control-custom:focus { border-color: var(--emerald-light) !important; box-shadow: 0 0 8px rgba(16, 185, 129, 0.2) !important; }
 
-        /* تنسيق الهوية والبطاقة الإلكترونية للـ QR Code */
-        .digital-id-card {
-            background: linear-gradient(135deg, #1e2d24 0%, #111814 100%);
-            border: 2px solid var(--gold-accent); border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative;
-        }
-        .digital-id-card::after {
-            content: 'HAMS DIGITAL ID'; position: absolute; bottom: 10px; left: 15px; font-size: 9px; color: var(--border-color); font-weight: bold; letter-spacing: 1px;
-        }
+        .digital-id-card { background: linear-gradient(135deg, #1e2d24 0%, #111814 100%); border: 2px solid var(--gold-accent); border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative; }
+        .digital-id-card::after { content: 'HAMS DIGITAL ID'; position: absolute; bottom: 10px; left: 15px; font-size: 9px; color: var(--border-color); font-weight: bold; letter-spacing: 1px; }
         .qr-holder { background: white; padding: 10px; border-radius: 10px; display: inline-block; }
 
         .app-module { display: none; }
@@ -175,7 +118,7 @@
 </head>
 <body>
 
-    <!-- ================= 1️⃣ شاشة تسجيل الدخول الفاخرة ================= -->
+    <!-- ================= 1️⃣ شاشة تسجيل الدخول المحدثة باسم المستخدم ================= -->
     <div id="loginSection" class="login-wrapper">
         <div class="login-card">
             <div class="login-logo"><i class="fa-solid fa-shield-halved"></i></div>
@@ -185,12 +128,19 @@
             <div id="loginError" class="alert alert-danger py-2 text-center small d-none"></div>
 
             <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">البريد الإلكتروني المؤسسي</label>
-                <input type="email" id="loginEmail" class="form-control form-control-custom" placeholder="name@hams.org">
+                <label class="form-label text-muted small fw-bold">اسم المستخدم العسكري / المؤسسي</label>
+                <input type="text" id="loginUsername" class="form-control form-control-custom" placeholder="مثال: admin_mohanad">
             </div>
             <div class="mb-3">
                 <label class="form-label text-muted small fw-bold">كلمة المرور المشفرة</label>
                 <input type="password" id="loginPassword" class="form-control form-control-custom" placeholder="••••••••">
+            </div>
+
+            <!-- معلومات المساعدة لمعاينة الحسابات الأربعة المتاحة -->
+            <div class="p-2 mb-3 rounded text-center small" style="background: rgba(217, 119, 6, 0.1); border: 1px dashed var(--gold-accent); color: var(--gold-accent);">
+                💡 الحسابات المتاحة للمعاينة:<br>
+                <strong>admin</strong> (مدير) | <strong>project</strong> (مشروع) | <strong>sector</strong> (قطاع) | <strong>survey</strong> (استبيان)<br>
+                <span class="text-white">كلمة السر الموحدة للمعاينة: 123456</span>
             </div>
 
             <button id="executeLoginBtn" class="btn btn-success w-100 fw-bold py-2" style="background-color: var(--emerald-primary); border: none;">
@@ -204,15 +154,16 @@
         <aside class="sidebar">
             <div class="sidebar-brand"><i class="fa-solid fa-users-gear text-warning me-2"></i>نظام HAMS الرقمي</div>
             <ul class="nav-menu">
-                <li><a class="nav-item-link active" onclick="switchModule('dashboard')"><i class="fa-solid fa-chart-pie"></i>لوحة التحكم</a></li>
-                <li><a class="nav-item-link" onclick="switchModule('families')"><i class="fa-solid fa-house-user"></i>إدارة الأسر الاستراتيجية</a></li>
-                <li><a class="nav-item-link" onclick="switchModule('surveys')"><i class="fa-solid fa-clipboard-list"></i>الاستبيانات الميدانية</a></li>
-                <li><a class="nav-item-link" onclick="switchModule('projects')"><i class="fa-solid fa-diagram-project"></i>المشاريع النشطة</a></li>
-                <li><a class="nav-item-link" onclick="switchModule('distributions')"><i class="fa-solid fa-box-tissue"></i>عمليات التوزيع</a></li>
-                <li><a class="nav-item-link" onclick="switchModule('reports')"><i class="fa-solid fa-file-invoice-dollar"></i>التقارير والمؤشرات</a></li>
-                <li><a class="nav-item-link" onclick="switchModule('users')"><i class="fa-solid fa-user-shield"></i>المستخدمون والصلاحيات</a></li>
-                <li><a class="nav-item-link" onclick="switchModule('audit')"><i class="fa-solid fa-clock-rotate-left"></i>سجل العمليات الآمن</a></li>
-                <li><a class="nav-item-link" onclick="switchModule('settings')"><i class="fa-solid fa-sliders"></i>إعدادات النظام</a></li>
+                <!-- الروابط الجانبية مجهزة لتقييد الصلاحيات تلقائياً -->
+                <li id="menu-dashboard"><a class="nav-item-link active" onclick="switchModule('dashboard')"><i class="fa-solid fa-chart-pie"></i>لوحة التحكم</a></li>
+                <li id="menu-families"><a class="nav-item-link" onclick="switchModule('families')"><i class="fa-solid fa-house-user"></i>إدارة الأسر الاستراتيجية</a></li>
+                <li id="menu-surveys"><a class="nav-item-link" onclick="switchModule('clipboard-list')"><i class="fa-solid fa-clipboard-list"></i>الاستبيانات الميدانية</a></li>
+                <li id="menu-projects"><a class="nav-item-link" onclick="switchModule('projects')"><i class="fa-solid fa-diagram-project"></i>المشاريع النشطة</a></li>
+                <li id="menu-distributions"><a class="nav-item-link" onclick="switchModule('distributions')"><i class="fa-solid fa-box-tissue"></i>عمليات التوزيع</a></li>
+                <li id="menu-reports"><a class="nav-item-link" onclick="switchModule('reports')"><i class="fa-solid fa-file-invoice-dollar"></i>التقارير والمؤشرات</a></li>
+                <li id="menu-users"><a class="nav-item-link" onclick="switchModule('users')"><i class="fa-solid fa-user-shield"></i>المستخدمون والصلاحيات</a></li>
+                <li id="menu-audit"><a class="nav-item-link" onclick="switchModule('audit')"><i class="fa-solid fa-clock-rotate-left"></i>سجل العمليات الآمن</a></li>
+                <li id="menu-settings"><a class="nav-item-link" onclick="switchModule('settings')"><i class="fa-solid fa-sliders"></i>إعدادات النظام</a></li>
             </ul>
         </aside>
 
@@ -220,26 +171,27 @@
             <div class="top-navbar">
                 <h4 class="m-0 fw-bold text-white" id="moduleTitle">لوحة التحكم والمؤشرات الحية</h4>
                 <div class="d-flex align-items-center gap-3">
-                    <span class="badge py-2 px-3" style="background: rgba(16, 185, 129, 0.15); color: var(--emerald-light);" id="userBadgeRole">مدير النظام</span>
+                    <!-- عرض المسمى الوظيفي للحساب النشط حياً -->
+                    <span class="badge py-2 px-3" style="background: rgba(16, 185, 129, 0.15); color: var(--emerald-light);" id="userBadgeRole">---</span>
                     <button class="btn btn-danger btn-sm" id="systemLogoutBtn"><i class="fa-solid fa-power-off"></i></button>
                 </div>
             </div>
 
             <!-- ================= 📁 وحدة لوحة التحكم ================= -->
             <div id="mod-dashboard" class="app-module active-module">
-                <div class="row g-4 mb-4">
+                <div class="row g-4 mb-4" id="statsRowContainer">
+                    <!-- سيتم التحكم بالبطاقات المعروضة ديناميكياً بحسب الرتبة -->
                     <div class="col-md-4 col-xl-2"><div class="stat-card"><span class="text-muted small fw-bold">إجمالي الأسر</span><h3 class="fw-bold m-0 mt-2">700</h3></div></div>
-                    <div class="col-md-4 col-xl-2"><div class="stat-card"><span class="text-muted small fw-bold">الأسر المعتمدة</span><h3 class="fw-bold m-0 mt-2 text-success">1</h3></div></div>
-                    <div class="col-md-4 col-xl-2"><div class="stat-card gold"><span class="text-muted small fw-bold">قيد المراجعة</span><h3 class="fw-bold m-0 mt-2 text-warning">0</h3></div></div>
-                    <div class="col-md-4 col-xl-2"><div class="stat-card"><span class="text-muted small fw-bold">المشاريع النشطة</span><h3 class="fw-bold m-0 mt-2">1</h3></div></div>
-                    <div class="col-md-4 col-xl-2"><div class="stat-card"><span class="text-muted small fw-bold">توزيعات اليوم</span><h3 class="fw-bold m-0 mt-2">0</h3></div></div>
-                    <div class="col-md-4 col-xl-2"><div class="stat-card gold"><span class="text-muted small fw-bold">المستخدمين</span><h3 class="fw-bold m-0 mt-2">4</h3></div></div>
+                    <div class="col-md-4 col-xl-2"><div class="stat-card" id="cardApprovedStats"><span class="text-muted small fw-bold">الأسر المعتمدة</span><h3 class="fw-bold m-0 mt-2 text-success">584</h3></div></div>
+                    <div class="col-md-4 col-xl-2"><div class="stat-card gold" id="cardPendingStats"><span class="text-muted small fw-bold">قيد المراجعة</span><h3 class="fw-bold m-0 mt-2 text-warning">116</h3></div></div>
+                    <div class="col-md-4 col-xl-2"><div class="stat-card"><span class="text-muted small fw-bold">المشاريع النشطة</span><h3 class="fw-bold m-0 mt-2">3</h3></div></div>
+                    <div class="col-md-4 col-xl-2" id="cardDistributionStats"><div class="stat-card"><span class="text-muted small fw-bold">توزيعات اليوم</span><h3 class="fw-bold m-0 mt-2">42</h3></div></div>
+                    <div class="col-md-4 col-xl-2" id="cardUsersStats"><div class="stat-card gold"><span class="text-muted small fw-bold">المستخدمين</span><h3 class="fw-bold m-0 mt-2">4</h3></div></div>
                 </div>
                 
-                <!-- ميزة مسح الـ QR السريعة من لوحة التحكم -->
-                <div class="custom-card border border-warning">
+                <div class="custom-card border border-warning" id="quickQRScannerDashboard">
                     <h5 class="text-warning fw-bold mb-3"><i class="fa-solid fa-qrcode me-2"></i>المسح السريع لبطاقات الأسر الميدانية</h5>
-                    <p class="text-muted small">قم بإدخال رقم الأسرة لمحاكاة مسح الكود موديولياً والوصول الفوري للملف الكامل:</p>
+                    <p class="text-muted small">قم بإدخل رقم الأسرة لمحاكاة مسح الكود موديولياً والوصول الفوري للملف الكامل:</p>
                     <div class="input-group style-group" style="max-width: 400px;">
                         <input type="text" id="qrSimulateInput" class="form-control form-control-custom" placeholder="ادخل رقم الأسرة المقروء بالـ QR">
                         <button class="btn btn-warning fw-bold text-dark" onclick="simulateQRScan()">فتح الملف فوراً</button>
@@ -250,8 +202,7 @@
             <!-- ================= 📁 وحدة إدارة الأسر التفصيلية الشاملة ================= -->
             <div id="mod-families" class="app-module">
                 <div class="row">
-                    <!-- نموذج إدخال الـ 36 حقل الحكومي المطلوب بدقة -->
-                    <div class="col-xl-8 mb-4">
+                    <div class="col-xl-8 mb-4" id="formSubmissionContainer">
                         <div class="custom-card">
                             <h5 class="fw-bold text-white mb-3"><i class="fa-solid fa-folder-plus text-success me-2"></i>استمارة التسجيل والحصر الاستراتيجي الموحد</h5>
                             <form id="familyFullForm" onsubmit="event.preventDefault(); saveComprehensiveFamily();">
@@ -272,13 +223,13 @@
                                     <div class="col-md-3"><label class="text-muted small mb-1">الدخل الشهري التقديري</label><input type="text" id="monthlyIncome" class="form-control form-control-custom"></div>
                                     <div class="col-md-3"><label class="text-muted small mb-1">عدد الأفراد العاملين</label><input type="number" id="workersCount" class="form-control form-control-custom"></div>
                                     <div class="col-md-3"><label class="text-muted small mb-1">تحتاج إلى دعم عاجل؟</label><select id="needsSupport" class="form-control form-control-custom"><option>نعم</option><option>لا</option></select></div>
-                                    <div class="col-md-12"><label class="text-muted small mb-1">نوع الدخل / الدعم المطلوب بالتفصيل</label><input type="text" id="supportType" class="form-control form-control-custom" placeholder="مثال: سلة غذائية، دعم طبي، مساعدات نقدية"></div>
+                                    <div class="col-md-12"><label class="text-muted small mb-1">نوع الدخل / الدعم المطلوب بالتفصيل</label><input type="text" id="supportType" class="form-control form-control-custom" placeholder="سلة غذائية، دعم طبي..."></div>
                                 </div>
 
                                 <div class="section-header-title"><i class="fa-solid fa-tree-city me-2"></i>الوضع السكني وحالة البيئة المحيطة</div>
                                 <div class="row g-3">
                                     <div class="col-md-4"><label class="text-muted small mb-1">نوع السكّن الحالي</label><select id="housingType" class="form-control form-control-custom"><option>ملك</option><option>إيجار</option><option>مركز إيواء</option><option>مستضاف</option></select></div>
-                                    <div class="col-md-4"><label class="text-muted small mb-1">حالة المنزل الإنشائية</label><input type="text" id="houseCondition" class="form-control form-control-custom" placeholder="جيد، متهالك، يحتاج صيانة"></div>
+                                    <div class="col-md-4"><label class="text-muted small mb-1">حالة المنزل الإنشائية</label><input type="text" id="houseCondition" class="form-control form-control-custom" placeholder="جيد، متهالك..."></div>
                                     <div class="col-md-2"><label class="text-muted small mb-1">توفر الكهرباء</label><select id="electricity" class="form-control form-control-custom"><option>نعم</option><option>لا</option></select></div>
                                     <div class="col-md-2"><label class="text-muted small mb-1">توفر المياه</label><select id="water" class="form-control form-control-custom"><option>نعم</option><option>لا</option></select></div>
                                 </div>
@@ -294,7 +245,7 @@
                                 <div class="section-header-title"><i class="fa-solid fa-graduation-cap me-2"></i>المؤشرات التعليمية والحالة الاجتماعية للأسر</div>
                                 <div class="row g-3">
                                     <div class="col-md-3"><label class="text-muted small mb-1">عدد الطلاب بالمدارس</label><input type="number" id="studentsCount" class="form-control form-control-custom" value="0"></div>
-                                    <div class="col-md-3"><label class="text-muted small mb-1">خريجي الجامعات (عاطلين/عاملين)</label><input type="number" id="graduatesCount" class="form-control form-control-custom" value="0"></div>
+                                    <div class="col-md-3"><label class="text-muted small mb-1">خريجي الجامعات</label><input type="number" id="graduatesCount" class="form-control form-control-custom" value="0"></div>
                                     <div class="col-md-2"><label class="text-muted small mb-1">عدد الأرامل</label><input type="number" id="widowsCount" class="form-control form-control-custom" value="0"></div>
                                     <div class="col-md-2"><label class="text-muted small mb-1">عدد الأيتام</label><input type="number" id="orphansCount" class="form-control form-control-custom" value="0"></div>
                                     <div class="col-md-2"><label class="text-muted small mb-1">عدد المطلقات</label><input type="number" id="divorcedCount" class="form-control form-control-custom" value="0"></div>
@@ -303,7 +254,7 @@
 
                                 <div class="section-header-title"><i class="fa-solid fa-gears me-2"></i>إدارة وتصنيف النظام والحماية</div>
                                 <div class="row g-3">
-                                    <div class="col-md-4"><label class="text-muted small mb-1">تصنيف الأسرة الفني</label><input type="text" id="familyCategory" class="form-control form-control-custom" placeholder="مثال: قطاع أ، مربع ٥"></div>
+                                    <div class="col-md-4"><label class="text-muted small mb-1">تصنيف الأسرة الفني</label><input type="text" id="familyCategory" class="form-control form-control-custom"></div>
                                     <div class="col-md-4"><label class="text-muted small mb-1">أولوية الدعم المعتمدة</label><select id="supportPriority" class="form-control form-control-custom"><option>مرتفعة (حالة طارئة)</option><option>متوسطة</option><option>عادية</option></select></div>
                                     <div class="col-md-4"><label class="text-muted small mb-1">ملاحظات اللجنة الميدانية</label><input type="text" id="adminNotes" class="form-control form-control-custom"></div>
                                 </div>
@@ -315,7 +266,6 @@
                         </div>
                     </div>
 
-                    <!-- ميزة الـ QR Code والبطاقة الذكية المخصصة للطباعة والميدان -->
                     <div class="col-xl-4 mb-4">
                         <div class="custom-card text-center">
                             <h5 class="fw-bold text-warning mb-4"><i class="fa-solid fa-id-card me-2"></i>البطاقة الإلكترونية الذكية المستخرجة</h5>
@@ -338,7 +288,6 @@
                     </div>
                 </div>
 
-                <!-- جدول عرض السجلات والبحث اللحظي -->
                 <div class="custom-card">
                     <h5 class="fw-bold text-white mb-3"><i class="fa-solid fa-database text-success me-2"></i>السجلات والملفات المحفوظة حالياً</h5>
                     <div class="table-responsive">
@@ -350,19 +299,16 @@
                                     <th>الهاتف</th>
                                     <th>الأفراد</th>
                                     <th>الأولوية</th>
-                                    <th>تاريخ الإنشاء</th>
                                     <th>خيارات والبطاقة</th>
                                 </tr>
                             </thead>
-                            <tbody id="familiesDynamicTableBody">
-                                <!-- البيانات المحفوظة ستظهر هنا ديناميكياً -->
-                            </tbody>
+                            <tbody id="familiesDynamicTableBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- الوحدات الاستعراضية الستة المتبقية في الواجهة -->
+            <!-- بقية الوحدات السبعة للمعاينة وصلاحيات الولوج -->
             <div id="mod-surveys" class="app-module"><div class="custom-card"><h5><i class="fa-solid fa-clipboard-list text-success me-2"></i>وحدة الاستبيانات الميدانية وتقييم الأسر</h5></div></div>
             <div id="mod-projects" class="app-module"><div class="custom-card"><h5><i class="fa-solid fa-diagram-project text-success me-2"></i>وحدة إدارة المشاريع الإنسانية النشطة</h5></div></div>
             <div id="mod-distributions" class="app-module"><div class="custom-card"><h5><i class="fa-solid fa-box-tissue text-success me-2"></i>وحدة الحماية ومنع تكرار التسليم والتوزيع</h5></div></div>
@@ -374,9 +320,59 @@
     </div>
 
     <script>
-        // مصفوفة تخزين الأسر مؤقتاً للمعاينة الحية والتجربة واختبار الـ QR
         let localFamiliesDB = [];
         let qrcodeInstance = null;
+
+        // دالة مصفوفة الصلاحيات المتقدمة للتحكم في واجهة المستخدم (HAMS Matrix Control)
+        function applySystemPermissions(role) {
+            const badge = document.getElementById('userBadgeRole');
+            
+            // إعادة ضبط ظهور كافة القوائم أولاً
+            document.querySelectorAll('.sidebar .nav-menu li').forEach(el => el.style.display = 'block');
+            document.getElementById('formSubmissionContainer').style.display = 'block';
+            document.getElementById('cardUsersStats').style.display = 'block';
+            document.getElementById('cardDistributionStats').style.display = 'block';
+
+            if (role === 'admin') {
+                badge.innerText = 'مدير النظام (صلاحية كاملة)';
+                badge.style.color = '#10b981';
+            } 
+            else if (role === 'project') {
+                badge.innerText = 'مسؤول المشروع';
+                badge.style.color = '#d97706';
+                // مسؤول المشروع لا يرى الإعدادات وسجل العمليات والمستخدمين
+                document.getElementById('menu-users').style.display = 'none';
+                document.getElementById('menu-audit').style.display = 'none';
+                document.getElementById('menu-settings').style.display = 'none';
+                document.getElementById('cardUsersStats').style.display = 'none';
+            } 
+            else if (role === 'sector') {
+                badge.innerText = 'مسؤول القطاع الميداني';
+                badge.style.color = '#3b82f6';
+                // مسؤول القطاع يرى فقط الأسر، الاستبيانات، والتوزيع
+                document.getElementById('menu-projects').style.display = 'none';
+                document.getElementById('menu-reports').style.display = 'none';
+                document.getElementById('menu-users').style.display = 'none';
+                document.getElementById('menu-audit').style.display = 'none';
+                document.getElementById('menu-settings').style.display = 'none';
+                document.getElementById('cardUsersStats').style.display = 'none';
+            } 
+            else if (role === 'survey') {
+                badge.innerText = 'فريق الاستبيان الميداني';
+                badge.style.color = '#a855f7';
+                // فريق الاستبيان يدخل البيانات فقط؛ لا يرى أي موديولات أخرى، ولا يرى إحصائيات التوزيع أو المستخدمين
+                document.getElementById('menu-dashboard').style.display = 'none';
+                document.getElementById('menu-projects').style.display = 'none';
+                document.getElementById('menu-distributions').style.display = 'none';
+                document.getElementById('menu-reports').style.display = 'none';
+                document.getElementById('menu-users').style.display = 'none';
+                document.getElementById('menu-audit').style.display = 'none';
+                document.getElementById('menu-settings').style.display = 'none';
+                
+                // نقله تلقائياً لوحدة الأسر لأن لوحة التحكم محجوبة عنه
+                switchModule('families');
+            }
+        }
 
         function switchModule(moduleName) {
             document.querySelectorAll('.app-module').forEach(el => el.classList.remove('active-module'));
@@ -396,10 +392,8 @@
                 'settings': 'الإعدادات العامة ومتغيرات النظام الحاكمة'
             };
             document.getElementById('moduleTitle').innerText = titles[moduleName] || 'نظام إدارة HAMS';
-            event.currentTarget.classList.add('active');
         }
 
-        // كود معالجة وإدخال استمارة الحصر الـ 36 حقل بالكامل وتوليد الـ QR تلقائياً لها
         function saveComprehensiveFamily() {
             const familyData = {
                 id: document.getElementById('familyId').value.trim(),
@@ -408,122 +402,93 @@
                 headPhone: document.getElementById('headPhone').value.trim(),
                 wifePhone: document.getElementById('wifePhone').value.trim(),
                 membersCount: document.getElementById('membersCount').value,
-                incomeSource: document.getElementById('incomeSource').value,
-                monthlyIncome: document.getElementById('monthlyIncome').value,
-                workersCount: document.getElementById('workersCount').value,
+                supportPriority: document.getElementById('supportPriority').value,
                 needsSupport: document.getElementById('needsSupport').value,
-                supportType: document.getElementById('supportType').value,
-                housingType: document.getElementById('housingType').value,
-                houseCondition: document.getElementById('houseCondition').value,
-                electricity: document.getElementById('electricity').value,
-                water: document.getElementById('water').value,
                 chronicPatients: document.getElementById('chronicPatients').value,
                 specialNeeds: document.getElementById('specialNeeds').value,
-                eldersCount: document.getElementById('eldersCount').value,
-                childrenUnder5: document.getElementById('childrenUnder5').value,
-                studentsCount: document.getElementById('studentsCount').value,
-                graduatesCount: document.getElementById('graduatesCount').value,
-                widowsCount: document.getElementById('widowsCount').value,
-                orphansCount: document.getElementById('orphansCount').value,
-                divorcedCount: document.getElementById('divorcedCount').value,
-                isDisplaced: document.getElementById('isDisplaced').value,
-                familyCategory: document.getElementById('familyCategory').value,
-                supportPriority: document.getElementById('supportPriority').value,
-                adminNotes: document.getElementById('adminNotes').value,
-                createdAt: new Date().toLocaleString('ar-EG'),
-                updatedAt: new Date().toLocaleString('ar-EG')
+                housingType: document.getElementById('housingType').value
             };
 
-            // فحص منع تكرار العائلة بحسب رقم الأسرة
             if(localFamiliesDB.some(f => f.id === familyData.id)) {
-                alert('⚠️ عذراً، رقم الأسرة هذا مسجل مسبقاً بالنظام! يمنع تكرار الأسر وفقاً لقواعد الحماية الحاكمة.');
-                return;
+                alert('⚠️ عذراً، رقم الأسرة هذا مسجل مسبقاً بالنظام!'); return;
             }
 
             localFamiliesDB.push(familyData);
             updateFamiliesTable();
             renderDigitalCard(familyData);
-            alert('✅ تم حفظ الاستمارة الشاملة المكونة من 36 حقلاً وتوليد بطاقة الـ QR الإلكترونية بنجاح!');
+            alert('✅ تم حفظ استمارة الأسرة وتوليد بطاقة الـ QR بنجاح!');
             document.getElementById('familyFullForm').reset();
         }
 
-        // دالة توليد وعرض الـ QR Code ديناميكياً داخل بطاقة الهوية الإلكترونية للأسرة
         function renderDigitalCard(family) {
             document.getElementById('card-id').innerText = family.id;
             document.getElementById('card-name').innerText = family.headName;
             document.getElementById('card-members').innerText = family.membersCount + " أفراد";
-            document.getElementById('card-status').innerText = (family.needsSupport === "نعم") ? "مستحق للدعم" : "مكتفي";
+            document.getElementById('card-status').innerText = (family.needsSupport === "نعم") ? "مستحق" : "مكتفي";
             
-            // مسح الكود السابق وتوليد الكود الجديد الحامل لرابط ملف الأسرة المشفر
             document.getElementById('qrcodeCanvas').innerHTML = "";
             qrcodeInstance = new QRCode(document.getElementById('qrcodeCanvas'), {
                 text: `https://mohanadali552.github.io/hams-system/?familyId=${family.id}`,
-                width: 120,
-                height: 120,
-                colorDark : "#111814",
-                colorLight : "#ffffff"
+                width: 120, height: 120, colorDark : "#111814", colorLight : "#ffffff"
             });
         }
 
-        // تحديث جدول عرض البيانات حياً
         function updateFamiliesTable() {
             const tbody = document.getElementById('familiesDynamicTableBody');
             tbody.innerHTML = '';
-            
             if(localFamiliesDB.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">لا توجد سجلات أسر محفوظة حالياً.</td></tr>';
-                return;
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">لا توجد سجلات أسر محفوظة حالياً.</td></tr>'; return;
             }
-
             localFamiliesDB.forEach(f => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${f.id}</strong></td>
-                        <td>${f.headName}</td>
-                        <td>${f.headPhone}</td>
-                        <td>${f.membersCount} أفراد</td>
-                        <td><span class="badge bg-warning text-dark">${f.supportPriority}</span></td>
-                        <td>${f.createdAt}</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-success py-1" onclick='viewFamilyDetails(${JSON.stringify(f)})'><i class="fa-solid fa-expand me-1"></i>البطاقة</button>
-                        </td>
-                    </tr>
-                `;
+                tbody.innerHTML += `<tr><td><strong>${f.id}</strong></td><td>${f.headName}</td><td>${f.headPhone}</td><td>${f.membersCount}</td><td><span class="badge bg-warning text-dark">${f.supportPriority}</span></td><td><button class="btn btn-sm btn-outline-success py-1" onclick='viewFamilyDetails(${JSON.stringify(f)})'><i class="fa-solid fa-expand me-1"></i>البطاقة</button></td></tr>`;
             });
         }
 
         function viewFamilyDetails(family) {
             renderDigitalCard(family);
-            alert(`🔍 ملف الأسرة المفتوح بالـ QR Code:\nرقم الأسرة: ${family.id}\nرب الأسرة: ${family.headName}\nالحالة الصحية: ${family.chronicPatients} مرضى، ${family.specialNeeds} ذوي إعاقة.\nحالة السكن: ${family.housingType}`);
+            alert(`🔍 ملف الأسرة المفتوح بالـ QR Code:\nرقم الأسرة: ${family.id}\nرب الأسرة: ${family.headName}`);
         }
 
-        // محاكاة موديولية لمسح كود الـ QR والولوج الفوري والآمن للملف
         function simulateQRScan() {
             const targetId = document.getElementById('qrSimulateInput').value.trim();
             const family = localFamiliesDB.find(f => f.id === targetId);
-            
-            if(family) {
-                switchModule('families');
-                viewFamilyDetails(family);
-            } else {
-                alert('⚠️ لم يتم العثور على أي أسرة مطابقة لهذا الرمز في السيرفر حالياً.');
-            }
+            if(family) { switchModule('families'); viewFamilyDetails(family); } 
+            else { alert('⚠️ لم يتم العثور على أي أسرة مطابقة.'); }
         }
 
-        // كود قراءة وتسجيل الدخول المصلح
+        // كود معالجة الدخول باسم المستخدم وفحص الرتب والأعضاء المخصص
         document.getElementById('executeLoginBtn').addEventListener('click', () => {
-            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const username = document.getElementById('loginUsername').value.trim().toLowerCase();
             const pass = document.getElementById('loginPassword').value;
-            
-            if(email === "mohanad.ali552@gmail.com" && pass === "0909929802Mm") {
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('mainLayout').style.display = 'block';
-                updateFamiliesTable();
-            } else {
-                const err = document.getElementById('loginError');
-                err.classList.remove('d-none');
-                err.innerText = 'عذراً، البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+            const errorBox = document.getElementById('loginError');
+            errorBox.classList.add('d-none');
+
+            // فحص كلمة السر الموحدة للمعاينة
+            if (pass !== "123456") {
+                errorBox.classList.remove('d-none');
+                errorBox.innerText = 'عذراً، كلمة المرور المدخلة غير صحيحة.';
+                return;
             }
+
+            // تحديد الرتبة وتخصيص الدخول بناءً على اسم المستخدم
+            if (username === 'admin') {
+                applySystemPermissions('admin');
+            } else if (username === 'project') {
+                applySystemPermissions('project');
+            } else if (username === 'sector') {
+                applySystemPermissions('sector');
+            } else if (username === 'survey') {
+                applySystemPermissions('survey');
+            } else {
+                errorBox.classList.remove('d-none');
+                errorBox.innerText = 'اسم المستخدم غير معتمد في لوحة الصلاحيات للجنة حي العشر.';
+                return;
+            }
+
+            // فتح لوحة التحكم بعد التحقق والتخصيص بنجاح
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('mainLayout').style.display = 'block';
+            updateFamiliesTable();
         });
 
         document.getElementById('systemLogoutBtn').addEventListener('click', () => {
