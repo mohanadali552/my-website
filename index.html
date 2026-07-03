@@ -34,34 +34,8 @@
             overflow-x: hidden;
         }
 
-        .login-wrapper {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #0b100d 0%, #16241d 100%);
-        }
-
-        .login-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-top: 5px solid var(--gold-accent);
-            border-radius: 16px;
-            padding: 40px;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-
-        .login-logo {
-            width: 90px; height: 90px; background: linear-gradient(135deg, var(--emerald-primary), var(--emerald-light));
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); border: 2px solid var(--gold-accent);
-        }
-
-        .login-logo i { font-size: 40px; color: white; }
-
-        #mainLayout { display: none; }
+        /* الهيكل الرئيسي للوحة التحكم المفتوحة تلقائياً */
+        #mainLayout { display: block; }
 
         .sidebar {
             background-color: var(--card-bg); border-left: 1px solid var(--border-color);
@@ -118,46 +92,14 @@
 </head>
 <body>
 
-    <!-- ================= 1️⃣ شاشة تسجيل الدخول المحدثة باسم المستخدم ================= -->
-    <div id="loginSection" class="login-wrapper">
-        <div class="login-card">
-            <div class="login-logo"><i class="fa-solid fa-shield-halved"></i></div>
-            <h3 class="text-center fw-bold mb-1 text-white">بوابة لجنة حي العشر</h3>
-            <p class="text-center text-muted small mb-4">نظام إدارة الحصر والمشاريع الإنسانية (HAMS)</p>
-            
-            <div id="loginError" class="alert alert-danger py-2 text-center small d-none"></div>
-
-            <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">اسم المستخدم العسكري / المؤسسي</label>
-                <input type="text" id="loginUsername" class="form-control form-control-custom" placeholder="مثال: admin_mohanad">
-            </div>
-            <div class="mb-3">
-                <label class="form-label text-muted small fw-bold">كلمة المرور المشفرة</label>
-                <input type="password" id="loginPassword" class="form-control form-control-custom" placeholder="••••••••">
-            </div>
-
-            <!-- معلومات المساعدة لمعاينة الحسابات الأربعة المتاحة -->
-            <div class="p-2 mb-3 rounded text-center small" style="background: rgba(217, 119, 6, 0.1); border: 1px dashed var(--gold-accent); color: var(--gold-accent);">
-                💡 الحسابات المتاحة للمعاينة:<br>
-                <strong>admin</strong> (مدير) | <strong>project</strong> (مشروع) | <strong>sector</strong> (قطاع) | <strong>survey</strong> (استبيان)<br>
-                <span class="text-white">كلمة السر الموحدة للمعاينة: 123456</span>
-            </div>
-
-            <button id="executeLoginBtn" class="btn btn-success w-100 fw-bold py-2" style="background-color: var(--emerald-primary); border: none;">
-                <i class="fa-solid fa-key me-2"></i>ولوچ آمن للنظام
-            </button>
-        </div>
-    </div>
-
-    <!-- ================= 2️⃣ الهيكل واللوحة الرئيسية للنظام ================= -->
+    <!-- ================= اللوحة الرئيسية المفتوحة مباشرة ================= -->
     <div id="mainLayout">
         <aside class="sidebar">
             <div class="sidebar-brand"><i class="fa-solid fa-users-gear text-warning me-2"></i>نظام HAMS الرقمي</div>
             <ul class="nav-menu">
-                <!-- الروابط الجانبية مجهزة لتقييد الصلاحيات تلقائياً -->
                 <li id="menu-dashboard"><a class="nav-item-link active" onclick="switchModule('dashboard')"><i class="fa-solid fa-chart-pie"></i>لوحة التحكم</a></li>
                 <li id="menu-families"><a class="nav-item-link" onclick="switchModule('families')"><i class="fa-solid fa-house-user"></i>إدارة الأسر الاستراتيجية</a></li>
-                <li id="menu-surveys"><a class="nav-item-link" onclick="switchModule('clipboard-list')"><i class="fa-solid fa-clipboard-list"></i>الاستبيانات الميدانية</a></li>
+                <li id="menu-surveys"><a class="nav-item-link" onclick="switchModule('surveys')"><i class="fa-solid fa-clipboard-list"></i>الاستبيانات الميدانية</a></li>
                 <li id="menu-projects"><a class="nav-item-link" onclick="switchModule('projects')"><i class="fa-solid fa-diagram-project"></i>المشاريع النشطة</a></li>
                 <li id="menu-distributions"><a class="nav-item-link" onclick="switchModule('distributions')"><i class="fa-solid fa-box-tissue"></i>عمليات التوزيع</a></li>
                 <li id="menu-reports"><a class="nav-item-link" onclick="switchModule('reports')"><i class="fa-solid fa-file-invoice-dollar"></i>التقارير والمؤشرات</a></li>
@@ -169,21 +111,26 @@
 
         <main class="main-content">
             <div class="top-navbar">
-                <h4 class="m-0 fw-bold text-white" id="moduleTitle">لوحة التحكم والمؤشرات الحية</h4>
+                <h4 class="m-0 fw-bold text-white" id="moduleTitle">لوحة التحكم والمؤشرات الحية لشؤون الحي</h4>
                 <div class="d-flex align-items-center gap-3">
-                    <!-- عرض المسمى الوظيفي للحساب النشط حياً -->
-                    <span class="badge py-2 px-3" style="background: rgba(16, 185, 129, 0.15); color: var(--emerald-light);" id="userBadgeRole">---</span>
-                    <button class="btn btn-danger btn-sm" id="systemLogoutBtn"><i class="fa-solid fa-power-off"></i></button>
+                    <!-- صندوق منسدل سريع لاختبار تبديل الصلاحيات حياً وتخصيص الدخول -->
+                    <label class="text-warning small m-0 fw-bold">تبديل الرتبة للمعاينة:</label>
+                    <select class="form-control form-control-custom py-1 px-2 small" style="width: auto;" onchange="applySystemPermissions(this.value)">
+                        <option value="admin">مدير النظام (صلاحية كاملة)</option>
+                        <option value="project">مسؤول المشروع</option>
+                        <option value="sector">مسؤول القطاع الميداني</option>
+                        <option value="survey">فريق الاستبيان الميداني</option>
+                    </select>
+                    <span class="badge py-2 px-3" style="background: rgba(16, 185, 129, 0.15); color: var(--emerald-light);" id="userBadgeRole">مدير النظام (صلاحية كاملة)</span>
                 </div>
             </div>
 
             <!-- ================= 📁 وحدة لوحة التحكم ================= -->
             <div id="mod-dashboard" class="app-module active-module">
                 <div class="row g-4 mb-4" id="statsRowContainer">
-                    <!-- سيتم التحكم بالبطاقات المعروضة ديناميكياً بحسب الرتبة -->
                     <div class="col-md-4 col-xl-2"><div class="stat-card"><span class="text-muted small fw-bold">إجمالي الأسر</span><h3 class="fw-bold m-0 mt-2">700</h3></div></div>
-                    <div class="col-md-4 col-xl-2"><div class="stat-card" id="cardApprovedStats"><span class="text-muted small fw-bold">الأسر المعتمدة</span><h3 class="fw-bold m-0 mt-2 text-success">584</h3></div></div>
-                    <div class="col-md-4 col-xl-2"><div class="stat-card gold" id="cardPendingStats"><span class="text-muted small fw-bold">قيد المراجعة</span><h3 class="fw-bold m-0 mt-2 text-warning">116</h3></div></div>
+                    <div class="col-md-4 col-xl-2" id="cardApprovedStats"><div class="stat-card"><span class="text-muted small fw-bold">الأسر المعتمدة</span><h3 class="fw-bold m-0 mt-2 text-success">584</h3></div></div>
+                    <div class="col-md-4 col-xl-2" id="cardPendingStats"><div class="stat-card gold"><span class="text-muted small fw-bold">قيد المراجعة</span><h3 class="fw-bold m-0 mt-2 text-warning">116</h3></div></div>
                     <div class="col-md-4 col-xl-2"><div class="stat-card"><span class="text-muted small fw-bold">المشاريع النشطة</span><h3 class="fw-bold m-0 mt-2">3</h3></div></div>
                     <div class="col-md-4 col-xl-2" id="cardDistributionStats"><div class="stat-card"><span class="text-muted small fw-bold">توزيعات اليوم</span><h3 class="fw-bold m-0 mt-2">42</h3></div></div>
                     <div class="col-md-4 col-xl-2" id="cardUsersStats"><div class="stat-card gold"><span class="text-muted small fw-bold">المستخدمين</span><h3 class="fw-bold m-0 mt-2">4</h3></div></div>
@@ -191,7 +138,7 @@
                 
                 <div class="custom-card border border-warning" id="quickQRScannerDashboard">
                     <h5 class="text-warning fw-bold mb-3"><i class="fa-solid fa-qrcode me-2"></i>المسح السريع لبطاقات الأسر الميدانية</h5>
-                    <p class="text-muted small">قم بإدخل رقم الأسرة لمحاكاة مسح الكود موديولياً والوصول الفوري للملف الكامل:</p>
+                    <p class="text-muted small">قم بإدخال رقم الأسرة لمحاكاة مسح الكود موديولياً والوصول الفوري للملف الكامل:</p>
                     <div class="input-group style-group" style="max-width: 400px;">
                         <input type="text" id="qrSimulateInput" class="form-control form-control-custom" placeholder="ادخل رقم الأسرة المقروء بالـ QR">
                         <button class="btn btn-warning fw-bold text-dark" onclick="simulateQRScan()">فتح الملف فوراً</button>
@@ -308,7 +255,7 @@
                 </div>
             </div>
 
-            <!-- بقية الوحدات السبعة للمعاينة وصلاحيات الولوج -->
+            <!-- الوحدات السبعة المتبقية للمعاينة الاستعراضية والتأكد من التصميم -->
             <div id="mod-surveys" class="app-module"><div class="custom-card"><h5><i class="fa-solid fa-clipboard-list text-success me-2"></i>وحدة الاستبيانات الميدانية وتقييم الأسر</h5></div></div>
             <div id="mod-projects" class="app-module"><div class="custom-card"><h5><i class="fa-solid fa-diagram-project text-success me-2"></i>وحدة إدارة المشاريع الإنسانية النشطة</h5></div></div>
             <div id="mod-distributions" class="app-module"><div class="custom-card"><h5><i class="fa-solid fa-box-tissue text-success me-2"></i>وحدة الحماية ومنع تكرار التسليم والتوزيع</h5></div></div>
@@ -340,7 +287,6 @@
             else if (role === 'project') {
                 badge.innerText = 'مسؤول المشروع';
                 badge.style.color = '#d97706';
-                // مسؤول المشروع لا يرى الإعدادات وسجل العمليات والمستخدمين
                 document.getElementById('menu-users').style.display = 'none';
                 document.getElementById('menu-audit').style.display = 'none';
                 document.getElementById('menu-settings').style.display = 'none';
@@ -349,7 +295,6 @@
             else if (role === 'sector') {
                 badge.innerText = 'مسؤول القطاع الميداني';
                 badge.style.color = '#3b82f6';
-                // مسؤول القطاع يرى فقط الأسر، الاستبيانات، والتوزيع
                 document.getElementById('menu-projects').style.display = 'none';
                 document.getElementById('menu-reports').style.display = 'none';
                 document.getElementById('menu-users').style.display = 'none';
@@ -360,7 +305,6 @@
             else if (role === 'survey') {
                 badge.innerText = 'فريق الاستبيان الميداني';
                 badge.style.color = '#a855f7';
-                // فريق الاستبيان يدخل البيانات فقط؛ لا يرى أي موديولات أخرى، ولا يرى إحصائيات التوزيع أو المستخدمين
                 document.getElementById('menu-dashboard').style.display = 'none';
                 document.getElementById('menu-projects').style.display = 'none';
                 document.getElementById('menu-distributions').style.display = 'none';
@@ -368,8 +312,6 @@
                 document.getElementById('menu-users').style.display = 'none';
                 document.getElementById('menu-audit').style.display = 'none';
                 document.getElementById('menu-settings').style.display = 'none';
-                
-                // نقله تلقائياً لوحدة الأسر لأن لوحة التحكم محجوبة عنه
                 switchModule('families');
             }
         }
@@ -456,45 +398,10 @@
             else { alert('⚠️ لم يتم العثور على أي أسرة مطابقة.'); }
         }
 
-        // كود معالجة الدخول باسم المستخدم وفحص الرتب والأعضاء المخصص
-        document.getElementById('executeLoginBtn').addEventListener('click', () => {
-            const username = document.getElementById('loginUsername').value.trim().toLowerCase();
-            const pass = document.getElementById('loginPassword').value;
-            const errorBox = document.getElementById('loginError');
-            errorBox.classList.add('d-none');
-
-            // فحص كلمة السر الموحدة للمعاينة
-            if (pass !== "123456") {
-                errorBox.classList.remove('d-none');
-                errorBox.innerText = 'عذراً، كلمة المرور المدخلة غير صحيحة.';
-                return;
-            }
-
-            // تحديد الرتبة وتخصيص الدخول بناءً على اسم المستخدم
-            if (username === 'admin') {
-                applySystemPermissions('admin');
-            } else if (username === 'project') {
-                applySystemPermissions('project');
-            } else if (username === 'sector') {
-                applySystemPermissions('sector');
-            } else if (username === 'survey') {
-                applySystemPermissions('survey');
-            } else {
-                errorBox.classList.remove('d-none');
-                errorBox.innerText = 'اسم المستخدم غير معتمد في لوحة الصلاحيات للجنة حي العشر.';
-                return;
-            }
-
-            // فتح لوحة التحكم بعد التحقق والتخصيص بنجاح
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('mainLayout').style.display = 'block';
+        // تشغيل أولي تلقائي للجدول عند الفتح المباشر للوحة التحكم
+        window.onload = function() {
             updateFamiliesTable();
-        });
-
-        document.getElementById('systemLogoutBtn').addEventListener('click', () => {
-            document.getElementById('loginSection').style.display = 'flex';
-            document.getElementById('mainLayout').style.display = 'none';
-        });
+        };
     </script>
 </body>
 </html>
