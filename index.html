@@ -3,202 +3,446 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة وإحصاء HAMS السحابي</title>
+    <title>نظام إدارة لجنة شباب حي العشر - HAMS</title>
+    <!-- خط Cairo من Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* التنسيق العام للنظام المظلم */
-        body { background: #121212; color: #fff; font-family: system-ui, -apple-system, sans-serif; padding: 20px; margin: 0; }
-        .container { max-width: 600px; margin: 0 auto; }
-        
-        /* شاشة تسجيل الدخول */
-        .login-card { background: #1e1e1e; padding: 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); margin-top: 10vh; }
-        
-        /* لوحة التحكم (مخفية في البداية) */
-        #dashboardPage { display: none; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: #1e1e1e; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; }
-        .form-section { background: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        
-        /* العناصر المشتركة */
-        .form-control { background: #2d2d2d; border: 1px solid #444; color: #fff; width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
-        .btn { border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
-        .btn-primary { background: #007bff; }
-        .btn-success { background: #28a745; }
-        .btn-danger { background: #dc3545; width: auto; padding: 8px 15px; }
-        
-        /* الجدول والسجلات */
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #1e1e1e; border-radius: 8px; overflow: hidden; }
-        .data-table th, .data-table td { padding: 12px; text-align: right; border-bottom: 1px solid #333; }
-        .data-table th { background: #007bff; color: white; }
-        .error-msg { color: #ff6b6b; font-size: 14px; text-align: center; margin-bottom: 10px; display: none; }
+        :root {
+            --bg-dark: #111814;
+            --card-bg: #1a231e;
+            --emerald-primary: #0f766e;
+            --emerald-light: #10b981;
+            --gold-accent: #d97706;
+            --text-light: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #2c3e35;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* تنسيق شاشة تسجيل الدخول الفاخرة */
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0b100d 0%, #16241d 100%);
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: 5px solid var(--gold-accent);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .login-logo {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--emerald-primary), var(--emerald-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            border: 2px solid var(--gold-accent);
+        }
+
+        .login-logo i {
+            font-size: 40px;
+            color: white;
+        }
+
+        /* الهيكل الرئيسي للوحة التحكم */
+        #mainLayout {
+            display: none; /* مخفي حتى تسجيل الدخول */
+        }
+
+        .sidebar {
+            background-color: var(--card-bg);
+            border-left: 1px solid var(--border-color);
+            min-height: 100vh;
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 260px;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--gold-accent);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .nav-menu {
+            padding: 15px 0;
+            list-style: none;
+            margin: 0;
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-right: 4px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item-link i {
+            margin-left: 15px;
+            width: 20px;
+            font-size: 18px;
+        }
+
+        .nav-item-link:hover, .nav-item-link.active {
+            color: white;
+            background: linear-gradient(90deg, rgba(15,118,110,0.15) 0%, transparent 100%);
+            border-right-color: var(--emerald-light);
+        }
+
+        .main-content {
+            margin-right: 260px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .top-navbar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px;
+            margin: -30px -30px 30px -30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* البطاقات الاحترافية */
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--emerald-light);
+        }
+
+        .stat-card.gold::before { background: var(--gold-accent); }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: rgba(16, 185, 129, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--emerald-light);
+            font-size: 22px;
+        }
+
+        .stat-card.gold .stat-icon {
+            background: rgba(217, 119, 6, 0.1);
+            color: var(--gold-accent);
+        }
+
+        /* عناصر الجداول المتقدمة */
+        .custom-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .table-dark-custom {
+            color: var(--text-light);
+            border-color: var(--border-color);
+        }
+
+        .table-dark-custom th {
+            background-color: #151e1a !important;
+            color: var(--gold-accent);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .table-dark-custom td {
+            background-color: transparent !important;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .form-control-custom {
+            background-color: #151e1a !important;
+            border: 1px solid var(--border-color) !important;
+            color: white !important;
+            border-radius: 8px !important;
+            padding: 10px 15px !important;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--emerald-light) !important;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.2) !important;
+        }
+
+        .badge-active { background-color: rgba(16, 185, 129, 0.15); color: var(--emerald-light); border: 1px solid var(--emerald-light); }
+        .badge-pending { background-color: rgba(217, 119, 6, 0.15); color: var(--gold-accent); border: 1px solid var(--gold-accent); }
+
+        /* إخفاء الأقسام البرمجية غير النشطة */
+        .app-module { display: none; }
+        .app-module.active-module { display: block; }
     </style>
 </head>
 <body>
 
-<div class="container">
-
-    <!-- ================= 1️⃣ شاشة تسجيل الدخول ================= -->
-    <div id="loginPage" class="login-card">
-        <h3 style="text-align: center; margin-bottom: 5px; color: #007bff;">نظام إدارة HAMS</h3>
-        <p style="text-align: center; color: #aaa; font-size: 14px; margin-bottom: 25px;">بوابة تسجيل الدخول الآمنة للموظفين</p>
-        
-        <div id="errorBox" class="error-msg"></div>
-        
-        <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني المعتمد" required>
-        <input type="password" id="password" class="form-control" placeholder="كلمة المرور" required>
-        
-        <button id="loginBtn" class="btn btn-primary">تسجيل الدخول الآمن</button>
-    </div>
-
-    <!-- ================= 2️⃣ لوحة التحكم وإدخال البيانات ================= -->
-    <div id="dashboardPage">
-        <div class="header">
-            <h2 style="font-size: 18px; margin: 0;">لوحة حصر منازل HAMS السحابية</h2>
-            <button id="logoutBtn" class="btn btn-danger">خروج</button>
-        </div>
-
-        <div class="form-section">
-            <h3 style="margin-top: 0; color: #28a745; font-size: 16px;">📝 استمارة تسجيل بيانات المنازل میدانياً</h3>
-            <input type="number" id="houseNum" class="form-control" placeholder="رقم المنزل (من 1 إلى 700)" min="1" max="700" required>
-            <input type="text" id="ownerName" class="form-control" placeholder="اسم الساكن / رئيس العائلة الكامل" required>
-            <input type="text" id="notes" class="form-control" placeholder="ملاحظات ميدانية إضافية">
-            <button id="saveBtn" class="btn btn-success">إرسال وحفظ البيانات سحابياً</button>
-        </div>
-
-        <h3>📊 السجلات المحفوظة في قاعدة البيانات حياً</h3>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>رقم المنزل</th>
-                    <th>اسم الساكن</th>
-                    <th>الملاحظات</th>
-                </tr>
-            </thead>
-            <tbody id="dataTableBody">
-                <!-- البيانات تظهر هنا تلقائياً -->
-            </tbody>
-        </table>
-    </div>
-
-</div>
-
-<!-- ================= 3️⃣ محرك تشغيل النظام والربط بالسيرفر ================= -->
-<script type="module">
-    // استدعاء حزم جوجل المباشرة
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // مفاتيح سيرفر المهندس مهند الحية
-    const firebaseConfig = {
-        apiKey: "AIzaSyBXiNgXPXF9Y7lnQCo_0R0SFrf2uppQ7kw",
-        authDomain: "hams-system.firebaseapp.com",
-        projectId: "hams-system",
-        storageBucket: "hams-system.firebasestorage.app",
-        messagingSenderId: "28774598116",
-        appId: "1:28774598116:web:c168288f626a587d9c33f1"
-    };
-
-    // تهيئة الاتصال
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    auth.languageCode = 'ar';
-
-    const loginPage = document.getElementById('loginPage');
-    const dashboardPage = document.getElementById('dashboardPage');
-
-    // مراقبة حالة المستخدم (هل مسجل دخول أم لا)
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            loginPage.style.display = 'none';
-            dashboardPage.style.display = 'block';
-            loadHousesData();
-        } else {
-            loginPage.style.display = 'block';
-            dashboardPage.style.display = 'none';
-        }
-    });
-
-    // كود زر تسجيل الدخول
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const errorBox = document.getElementById('errorBox');
-        errorBox.style.display = 'none';
-
-        if(!email || !password) { errorBox.style.display = 'block'; errorBox.innerText = 'الرجاء ملء الحقول المطلوبة'; return; }
-
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            errorBox.style.display = 'block';
-            if(error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-                errorBox.innerText = 'عذراً، البريد الإلكتروني أو كلمة المرور غير صحيحة.';
-            } else {
-                errorBox.innerText = 'خطأ في الاتصال: ' + error.message;
-            }
-        }
-    });
-
-    // كود حفظ منزل جديد في السيرفر
-    document.getElementById('saveBtn').addEventListener('click', async () => {
-        const houseNum = document.getElementById('houseNum').value;
-        const ownerName = document.getElementById('ownerName').value;
-        const notes = document.getElementById('notes').value;
-
-        if(!houseNum || !ownerName) { alert('الرجاء إدخال رقم المنزل واسم الساكن!'); return; }
-
-        try {
-            await addDoc(collection(db, "houses"), {
-                houseNumber: parseInt(houseNum),
-                ownerName: ownerName,
-                notes: notes,
-                timestamp: new Date()
-            });
-            alert('✅ تم حفظ بيانات المنزل بنجاح في سيرفر جوجل السحابي!');
-            document.getElementById('houseNum').value = '';
-            document.getElementById('ownerName').value = '';
-            document.getElementById('notes').value = '';
-            loadHousesData();
-        } catch (error) {
-            alert('حدث خطأ أثناء الحفظ: ' + error.message);
-        }
-    });
-
-    // كود جلب السجلات وعرضها في الجدول تلقائياً
-    async function loadHousesData() {
-        const tbody = document.getElementById('dataTableBody');
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">جاري تحميل البيانات الحية من السيرفر...</td></tr>';
-        
-        try {
-            const q = query(collection(db, "houses"), orderBy("houseNumber", "asc"));
-            const querySnapshot = await getDocs(q);
-            tbody.innerHTML = '';
+    <!-- ======================================================== -->
+    <!-- 1️⃣ شاشة تسجيل الدخول الفاخرة                             -->
+    <!-- ======================================================== -->
+    <div id="loginSection" class="login-wrapper">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="text-center fw-bold mb-1 text-white">بوابة لجنة حي العشر</h3>
+            <p class="text-center text-muted small mb-4">نظام إدارة الحصر والمشاريع الإنسانية (HAMS)</p>
             
-            if(querySnapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#aaa;">لا توجد سجلات محفوظة حالياً.</td></tr>';
-                return;
-            }
+            <div id="loginError" class="alert alert-danger py-2 text-center small d-none"></div>
 
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>المنزل رقم ${data.houseNumber}</strong></td>
-                        <td>${data.ownerName}</td>
-                        <td>${data.notes || '-'}</td>
-                    </tr>
-                `;
-            });
-        } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">خطأ أثناء جلب البيانات: ${error.message}</td></tr>`;
-        }
-    }
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-bold">البريد الإلكتروني المؤسسي</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-secondary text-muted"><i class="fa-solid fa-envelope"></i></span>
+                    <input type="email" id="loginEmail" class="form-control form-control-custom" placeholder="name@hams.org">
+                </div>
+            </div>
 
-    // كود تسجيل الخروج
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        signOut(auth);
-    });
-</script>
+            <div class="mb-3">
+                <label class="form-label text-muted small fw-bold">كلمة المرور المشفرة</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-secondary text-muted"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" id="loginPassword" class="form-control form-control-custom" placeholder="••••••••">
+                </div>
+            </div>
 
-</body>
-</html>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rememberMe">
+                    <label class="form-check-label text-muted small" for="rememberMe">تذكر عودتي للنظام</label>
+                </div>
+                <a href="#" class="text-decoration-none small text-warning">نسيت كلمة المرور؟</a>
+            </div>
+
+            <button id="executeLoginBtn" class="btn btn-success w-100 fw-bold py-2" style="background-color: var(--emerald-primary); border: none;">
+                <i class="fa-solid fa-key me-2"></i>ولوج آمن للنظام
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ======================================================== -->
+    <!-- 2️⃣ الهيكل واللوحة الرئيسية للنظام (Main Layout)            -->
+    <!-- ======================================================== -->
+    <div id="mainLayout">
+        
+        <!-- الشريط الجانبي المطور للوحدات العشر -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-users-gear text-warning me-2"></i>نظام HAMS الرقمي
+            </div>
+            <ul class="nav-menu">
+                <li><a class="nav-item-link active" onclick="switchModule('dashboard')"><i class="fa-solid fa-chart-pie"></i>لوحة التحكم</a></li>
+                <li><a class="nav-item-link" onclick="switchModule('families')"><i class="fa-solid fa-house-user"></i>إدارة الأسر (700)</a></li>
+                <li><a class="nav-item-link" onclick="switchModule('surveys')"><i class="fa-solid fa-clipboard-list"></i>الاستبيانات الميدانية</a></li>
+                <li><a class="nav-item-link" onclick="switchModule('projects')"><i class="fa-solid fa-diagram-project"></i>المشاريع النشطة</a></li>
+                <li><a class="nav-item-link" onclick="switchModule('distributions')"><i class="fa-solid fa-box-tissue"></i>عمليات التوزيع</a></li>
+                <li><a class="nav-item-link" onclick="switchModule('reports')"><i class="fa-solid fa-file-invoice-dollar"></i>التقارير والمؤشرات</a></li>
+                <li><a class="nav-item-link" onclick="switchModule('users')"><i class="fa-solid fa-user-shield"></i>المستخدمون والصلاحيات</a></li>
+                <li><a class="nav-item-link" onclick="switchModule('audit')"><i class="fa-solid fa-clock-rotate-left"></i>سجل العمليات الآمن</a></li>
+                <li><a class="nav-item-link" onclick="switchModule('settings')"><i class="fa-solid fa-sliders"></i>إعدادات النظام</a></li>
+            </ul>
+        </aside>
+
+        <!-- المحتوى الرئيسي المتغير -->
+        <main class="main-content">
+            
+            <!-- شريط علوي للمستخدم والاشعارات -->
+            <div class="top-navbar">
+                <div class="d-flex align-items-center">
+                    <h4 class="m-0 fw-bold text-white" id="moduleTitle">لوحة التحكم والمؤشرات الحية</h4>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge badge-active py-2 px-3" id="userBadgeRole"><i class="fa-solid fa-user-large me-2"></i>مدير النظام</span>
+                    <button class="btn btn-danger btn-danger-custom btn-sm" id="systemLogoutBtn"><i class="fa-solid fa-power-off"></i></button>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 📁 وحدة: لوحة التحكم (Dashboard Module)  -->
+            <!-- ========================================== -->
+            <div id="mod-dashboard" class="app-module active-module">
+                <!-- الست بطاقات الإحصائية المطلوبة بدقة حكومية -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4 col-xl-2">
+                        <div class="stat-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small fw-bold">إجمالي الأسر</span>
+                                <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                            </div>
+                            <h3 class="fw-bold m-0 text-white" id="stat-total-families">700</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-2">
+                        <div class="stat-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small fw-bold">الأسر المعتمدة</span>
+                                <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
+                            </div>
+                            <h3 class="fw-bold m-0 text-white" id="stat-approved-families">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-2">
+                        <div class="stat-card gold">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small fw-bold">قيد المراجعة</span>
+                                <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                            </div>
+                            <h3 class="fw-bold m-0 text-white" id="stat-pending-surveys">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-2">
+                        <div class="stat-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small fw-bold">المشاريع النشطة</span>
+                                <div class="stat-icon"><i class="fa-solid fa-folder-open"></i></div>
+                            </div>
+                            <h3 class="fw-bold m-0 text-white" id="stat-active-projects">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-2">
+                        <div class="stat-card">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small fw-bold">توزيعات اليوم</span>
+                                <div class="stat-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                            </div>
+                            <h3 class="fw-bold m-0 text-white" id="stat-today-distributions">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xl-2">
+                        <div class="stat-card gold">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small fw-bold">المستخدمين</span>
+                                <div class="stat-icon"><i class="fa-solid fa-users-shield"></i></div>
+                            </div>
+                            <h3 class="fw-bold m-0 text-white" id="stat-total-users">4</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الرسوم البيانية والجداول السريعة لوحدة التحكم -->
+                <div class="row">
+                    <div class="col-lg-7 mb-4">
+                        <div class="custom-card">
+                            <h5 class="fw-bold text-white mb-4"><i class="fa-solid fa-chart-line text-success me-2"></i>مؤشر التوزيع المسجل حياً</h5>
+                            <div style="height: 250px; background: #151e1a; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                                [لوحة الرسوم البيانية المتقدمة - Chart.js]
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 mb-4">
+                        <div class="custom-card">
+                            <h5 class="fw-bold text-white mb-3"><i class="fa-solid fa-bolt text-warning me-2"></i>آخر العمليات في النظام</h5>
+                            <div class="table-responsive">
+                                <table class="table table-dark-custom small">
+                                    <thead>
+                                        <tr>
+                                            <th>المسؤول</th>
+                                            <th>العملية</th>
+                                            <th>الوقت</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="quickAuditLogs">
+                                        <tr><td colspan="3" class="text-center text-muted">جاري سحب التحديثات الفورية...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 📁 وحدة: إدارة الأسر (Families Module)      -->
+            <!-- ========================================== -->
+            <div id="mod-families" class="app-module">
+                <div class="custom-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold m-0 text-white"><i class="fa-solid fa-users text-success me-2"></i>قاعدة بيانات الحصر الموحدة للأسر</h5>
+                        <button class="btn btn-success btn-sm px-3" data-bs-toggle="modal" data-bs-target="#addFamilyModal"><i class="fa-solid fa-plus me-2"></i>إضافة أسرة جديدة</button>
+                    </div>
+                    
+                    <!-- جدول البيانات المتقدم المدعوم بـ DataTables -->
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom w-100" id="familiesMainTable">
+                            <thead>
+                                <tr>
+                                    <th>رقم المنزل</th>
+                                    <th>اسم رئيس الأسرة</th>
+                                    <th>الرقم الوطني</th>
+                                    <th>عدد الأفراد</th>
+                                    <th>مستوى الاحتياج</th>
+                                    <th>الحالة</th>
+                                    <th>الخيارات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- سيتم تعبئتها ديناميكياً من قواعد البيانات -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بقية الوحدات السبعة سيتم تبديلها ديناميكياً من نفس الواجهة الهيكلية -->
+        
