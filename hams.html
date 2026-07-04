@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HAMS | نظام إدارة أسر حي العشر</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts - Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background-color: white !important;
+        color: black !important;
+      }
+    }
+  </style>
+</head>
+<body class="h-full bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
+
+  <!-- ==================== SCREEN 0: LOGIN SCREEN ==================== -->
+  <section id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-950 p-4 overflow-y-auto">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent pointer-events-none"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-emerald-500/5 via-transparent to-transparent pointer-events-none"></div>
+    
+    <div class="w-full max-w-md bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl border border-white/10 dark:border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6 text-center">
+      
+      <!-- App Header inside Login -->
+      <div class="space-y-2">
+        <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg mx-auto">
+          <i data-lucide="shield-check" class="w-7 h-7 stroke-[2.2]"></i>
+        </div>
+        <h2 class="text-2xl font-black text-white">بوابة تسجيل الدخول الآمنة</h2>
+        <p class="text-xs text-slate-300 font-medium">نظام HAMS المتكامل لإدارة أسر حي العشر</p>
+      </div>
+
+      <!-- Login Form inputs -->
+      <div class="space-y-4 text-right">
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-300 font-bold block">اسم المستخدم أو الباحث</label>
+          <div class="relative">
+            <span class="absolute right-3 top-3 text-slate-400">
+              <i data-lucide="user" class="w-4.5 h-4.5"></i>
+            </span>
+            <input 
+              id="login-username" 
+              type="text" 
+              placeholder="mohanad" 
+              class="w-full pr-10 pl-4 py-2.5 text-xs rounded-xl focus:outline-none border border-white/10 bg-white/5 text-white placeholder-slate-400 focus:border-blue-500 transition-all font-bold"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] text-slate-300 font-bold block">كلمة المرور الخاصة بك</label>
+          <div class="relative">
+            <span class="absolute right-3 top-3 text-slate-400">
+              <i data-lucide="lock" class="w-4.5 h-4.5"></i>
+            </span>
+            <input 
+              id="login-password" 
+              type="password" 
+              placeholder="••••••" 
+              class="w-full pr-10 pl-12 py-2.5 text-xs rounded-xl focus:outline-none border border-white/10 bg-white/5 text-white placeholder-slate-400 focus:border-blue-500 transition-all font-bold"
+            />
+            <button onclick="toggleLoginPassword()" class="absolute left-3 top-3.5 text-slate-400 hover:text-white transition-all">
+              <i id="eye-icon" data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button onclick="processSystemLogin()" class="w-full py-3 bg-gradient-to-r from-blue-600 to-emerald-500 hover:opacity-90 text-white text-xs font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+        <i data-lucide="log-in" class="w-4 h-4"></i>
+        <span>التحقق والدخول للنظام</span>
+      </button>
+
+      <p id="login-error" class="text-[10px] text-red-400 font-bold hidden">اسم المستخدم أو كلمة المرور غير صحيحة.</p>
+    </div>
+  </section>
+
+  <!-- ==================== MAIN SYSTEM WORKSPACE ==================== -->
+  <div id="main-app" class="hidden flex-col h-screen overflow-hidden">
+    
+    <!-- Top Navbar -->
+    <header class="no-print sticky top-0 z-40 w-full backdrop-blur-md border-b flex items-center justify-between px-6 py-4 shadow-sm bg-white/90 border-slate-200 dark:bg-slate-900/90 dark:border-slate-800">
+      <div class="flex items-center gap-3">
+        <!-- Sidebar Toggle (Mobile) -->
+        <button onclick="toggleMobileMenu()" class="p-2 rounded-lg lg:hidden hover:bg-slate-200 dark:hover:bg-slate-800">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        
+        <!-- App Logo & Title -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-xl flex items-center justify-center text-white shadow-md">
+            <i data-lucide="users" class="w-5 h-5 stroke-[2.5]"></i>
+          </div>
+          <div>
+            <h1 class="text-lg font-black tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400">HAMS</h1>
+            <span class="text-[10px] text-slate-400 dark:text-slate-500 font-bold">نظام إدارة أسر حي العشر</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Left Controls -->
+      <div class="flex items-center gap-3">
+        <!-- Live Connection Status Badge -->
+        <div id="system-status-badge" class="hidden md:flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-full border">
+          <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+          <span id="system-status-text">جاري الكشف...</span>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <button onclick="toggleDarkMode()" class="p-2 rounded-xl border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200 dark:border-slate-800 dark:bg-slate-800 dark:text-amber-400 dark:hover:bg-slate-700 transition-all">
+          <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Current User Role Panel -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/60 flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold text-sm">
+            <i data-lucide="user-check" class="w-4.5 h-4.5"></i>
+          </div>
+          <div class="text-right">
+            <p id="nav-user-fullname" class="text-xs font-black leading-none">مدير النظام</p>
+            <span id="nav-user-role" class="text-[9px] text-blue-500 dark:text-blue-400 font-bold">المدير العام</span>
+          </div>
+        </div>
+
+        <!-- Logout Action -->
+        <button onclick="processSystemLogout()" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl transition-all" title="تسجيل الخروج">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+      <!-- Drawer Overlay for Mobile -->
+      <div id="drawer-overlay" onclick="toggleMobileMenu()" class="hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-xs lg:hidden"></div>
+
+      <!-- Navigation Sidebar -->
+      <aside id="sidebar" class="no-print fixed lg:static right-0 top-0 bottom-0 z-30 w-64 transform translate-x-full lg:translate-x-0 transition-transform duration-300 flex-shrink-0 border-l bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 h-full flex flex-col justify-between p-4">
+        <nav class="space-y-1.5">
+          <button onclick="switchTab('dashboard')" id="btn-dashboard" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
+            <i data-lucide="layout-dashboard" class="w-4.5 h-4.5"></i>
+            <span>لوحة التحكم الرئيسية</span>
+          </button>
+
+          <button onclick="switchTab('families')" id="btn-families" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+            <i data-lucide="users" class="w-4.5 h-4.5"></i>
+            <span>إدارة وتنظيم الأسر</span>
+          </button>
+
+          <button onclick="openAddFamilyForm()" id="btn-add_family" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+            <i data-lucide="plus" class="w-4.5 h-4.5"></i>
+            <span>تسجيل أسرة جديدة</span>
+          </button>
+
+          <button onclick="switchTab('reports')" id="btn-reports" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+            <i data-lucide="file-text" class="w-4.5 h-4.5"></i>
+            <span>التقارير والإحصائيات</span>
+          </button>
+
+          <button onclick="switchTab('flutter_code')" id="btn-flutter_code" class="sidebar-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+            <div class="flex items-center gap-3">
+              <i data-lucide="code" class="w-4.5 h-4.5 text-amber-500"></i>
+              <span>مستودع كود Flutter</span>
+            </div>
+            <span class="bg-amber-500 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">دارت</span>
+          </button>
+
+          <button onclick="switchTab('settings')" id="btn-settings" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+            <i data-lucide="settings" class="w-4.5 h-4.5"></i>
+            <span>إعدادات النظام</span>
+          </button>
+        </nav>
+
+        <!-- Quick Seeding Tools -->
+        <div id="admin-seed-box" class="p-4 rounded-xl border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800">
+          <div class="flex items-center gap-1.5 mb-2 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
+            <i data-lucide="database" class="w-3.5 h-3.5"></i>
+            توليد عينة بيانات
+          </div>
+          <p class="text-[10px] text-slate-400 dark:text-slate-500 mb-3 leading-relaxed">
+            اضغط لتوليد 4 أسر ذات بيانات واقعية لتنشيط كافة المؤشرات والرسومات التوضيحية فوراً.
+          </p>
+          <button onclick="seedDemoData()" id="btn-seed" class="w-full text-[10px] font-black py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg flex items-center justify-center gap-1.5 shadow transition-all">
+            <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+            رفع 4 أسر تجريبية
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 overflow-y-auto p-6 md:p-8 no-scrollbar bg-slate-50 dark:bg-slate-950">
+
+        <!-- ==================== SCREEN 1: DASHBOARD ==================== -->
+        <section id="screen-dashboard" class="space-y-6">
+          <div class="bg-gradient-to-r from-blue-900 via-blue-950 to-slate-900 text-white rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-xl">
+            <div class="absolute top-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 space-y-2">
+              <span class="bg-blue-500/20 text-blue-300 text-[10px] px-3 py-1 rounded-full border border-blue-400/20 font-bold">لوحة التحكم والمؤشرات التنفيذية</span>
+              <h2 class="text-2xl md:text-3xl font-black">نظام HAMS المتكامل | حي العشر</h2>
+              <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                متابعة دقيقة للأوضاع المادية والاجتماعية وسجلات الدعم للعائلات بالحي. متصل مباشرة بقاعدة بيانات Firebase الموثوقة لتقديم إحصاءات فورية محدثة.
+              </p>
+              <div class="flex flex-wrap gap-2.5 pt-2">
+                <button id="dashboard-add-btn" onclick="openAddFamilyForm()" class="px-4 py-2 text-[10px] bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl shadow transition-all flex items-center gap-1.5">
+                  <i data-lucide="plus" class="w-3.5 h-3.5 stroke-[3]"></i>
+                  تسجيل أسرة جديدة
+                </button>
+                <button onclick="switchTab('families')" class="px-4 py-2 text-[10px] bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl border border-white/10 transition-all flex items-center gap-1.5">
+                  <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                  البحث والاستعلام
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Statistics Grid -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-5 rounded-2xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 flex items-center justify-between">
+              <div class="space-y-1">
+                <span class="text-[10px] text-slate-400 font-bold block">إجمالي الأسر بالحي</span>
+                <h3 id="stat-total-families" class="text-2xl md:text-3xl font-black">0</h3>
+                <p class="text-[9px] text-slate-400">سجل نشط وموثق</p>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400 flex items-center justify-center">
+                <i data-lucide="users" class="w-5 h-5"></i>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-2xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 flex items-center justify-between">
+              <div class="space-y-1">
+                <span class="text-[10px] text-slate-400 font-bold block">إجمالي السكان المستفيدين</span>
+                <h3 id="stat-total-people" class="text-2xl md:text-3xl font-black">0</h3>
+                <p class="text-[9px] text-slate-400">فرد مقيم بالحي</p>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400 flex items-center justify-center">
+                <i data-lucide="user-check" class="w-5 h-5"></i>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-2xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 flex items-center justify-between">
+              <div class="space-y-1">
+                <span class="text-[10px] text-slate-400 font-bold block">الأسر المستحقة للدعم</span>
+                <h3 id="stat-needing-support" class="text-2xl md:text-3xl font-black text-amber-500">0</h3>
+                <p id="stat-support-percentage" class="text-[9px] text-slate-400">بنسبة 0%</p>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 flex items-center justify-center">
+                <i data-lucide="heart" class="w-5 h-5"></i>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-2xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 flex items-center justify-between">
+              <div class="space-y-1">
+                <span class="text-[10px] text-slate-400 font-bold block">عدد الطلاب الدارسين</span>
+                <h3 id="stat-total-students" class="text-2xl md:text-3xl font-black">0</h3>
+                <p class="text-[9px] text-slate-400">طالب في مختلف المراحل</p>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400 flex items-center justify-center">
+                <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytical Insights -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="p-6 rounded-2xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 flex flex-col justify-between">
+              <div>
+                <h4 class="text-xs font-bold text-slate-500 mb-4 flex items-center gap-2">
+                  <i data-lucide="trending-up" class="w-4 h-4 text-blue-500"></i>
+                  توزيع أولوية تقديم الدعم للأسر
+                </h4>
+                <div class="flex flex-col items-center justify-center py-4">
+                  <svg class="w-32 h-32" viewBox="0 0 36 36">
+                    <path class="text-slate-100 dark:text-slate-800" stroke-width="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path id="priority-chart-bar" class="text-red-500 transition-all duration-500" stroke-width="4" stroke-dasharray="0, 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  </svg>
+                  <div class="mt-4 w-full space-y-2 text-xs">
+                    <div class="flex justify-between items-center">
+                      <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded bg-red-500 inline-block"></span>أولوية حرجة / عالية جداً</span>
+                      <span id="stat-high-priority" class="font-bold">0 أسرة</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-400">
+                      <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded bg-slate-400 inline-block"></span>أولويات عادية ومتوسطة</span>
+                      <span id="stat-normal-priority" class="font-bold">0 أسرة</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 rounded-2xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800">
+              <h4 class="text-xs font-bold text-slate-500 mb-4 flex items-center gap-2">
+                <i data-lucide="activity" class="w-4 h-4 text-emerald-500"></i>
+                الفئات المستحقة للحماية والرعاية
+              </h4>
+              <div class="space-y-2">
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl flex justify-between items-center text-xs">
+                  <span class="text-slate-400">كبار السن المقيمين (60+)</span>
+                  <strong id="stat-elderly" class="text-sm text-blue-500">0</strong>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl flex justify-between items-center text-xs">
+                  <span class="text-slate-400">ذوو الاحتياجات الخاصة والإعاقة</span>
+                  <strong id="stat-special-needs" class="text-sm text-red-500">0</strong>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl flex justify-between items-center text-xs">
+                  <span class="text-slate-400">مرضى الأمراض المزمنة</span>
+                  <strong id="stat-chronic" class="text-sm text-amber-500">0</strong>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl flex justify-between items-center text-xs">
+                  <span class="text-slate-400">الأرامل والأيتام المسجلين</span>
+                  <strong id="stat-widows-orphans" class="text-sm text-indigo-500">0</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 rounded-2xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800">
+              <h4 class="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i>
+                أسر بحاجة لمساعدات وتدخل عاجل
+              </h4>
+              <div id="dashboard-critical-list" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
+                <div class="text-center py-10 text-xs text-slate-400">لا توجد سجلات حالية بالحي</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== SCREEN 2: FAMILIES REGISTRY ==================== -->
+        <section id="screen-families" class="space-y-6 hidden">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold">دليل وتنظيم أسر الحي</h2>
+              <p class="text-xs text-slate-400">يمكنك البحث، فرز البيانات، استعراض الملفات الصحية والاقتصادية وتعديلها.</p>
+            </div>
+            <button id="families-add-btn" onclick="openAddFamilyForm()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center gap-2 self-start md:self-auto transition-all shadow-md">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              تسجيل أسرة جديدة
+            </button>
+          </div>
+
+          <div class="p-4 rounded-2xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+            <div class="relative">
+              <span class="absolute right-3 top-3.5 text-slate-400">
+                <i data-lucide="search" class="w-4 h-4"></i>
+              </span>
+              <input 
+                id="search-input"
+                type="text" 
+                placeholder="ابحث بالاسم، برقم الأسرة، أو برقم الهاتف..."
+                oninput="performSearch()"
+                class="w-full pr-10 pl-4 py-2.5 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 text-slate-800 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100 focus:border-blue-500 dark:focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <select 
+                id="search-filter-type"
+                onchange="performSearch()"
+                class="w-full px-3 py-2.5 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 text-slate-800 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100 focus:border-blue-500"
+              >
+                <option value="all">كل المعايير (بحث ذكي)</option>
+                <option value="id">رقم الأسرة فقط</option>
+                <option value="name">اسم عائل رب الأسرة</option>
+                <option value="phone">رقم الهاتف</option>
+              </select>
+            </div>
+
+            <div class="text-left text-xs font-bold text-slate-400">
+              عدد النتائج المطابقة للبحث: <span id="search-results-count" class="text-blue-500">0</span>
+            </div>
+          </div>
+
+          <div id="families-loading-state" class="hidden flex flex-col items-center justify-center py-10 gap-4">
+            <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-xs text-slate-400">جاري تحميل البيانات الحية...</span>
+          </div>
+
+          <div id="families-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </section>
+
+        <!-- ==================== SCREEN 3: STEPPER FORM (ADD/EDIT) ==================== -->
+        <section id="screen-add_family" class="max-w-4xl mx-auto space-y-6 hidden">
+          <div>
+            <h2 id="form-title" class="text-xl font-bold">نموذج تسجيل الأسر الجديد</h2>
+            <p class="text-xs text-slate-400 font-bold">يرجى اتباع الخطوات وتدوين كافة البيانات بدقة لضمان دقة فرز الأولويات بالحي.</p>
+          </div>
+
+          <!-- Stepper Headers -->
+          <div class="flex justify-between items-center bg-slate-100 dark:bg-slate-900 p-4 rounded-2xl overflow-x-auto gap-4 no-scrollbar">
+            <button onclick="goToStep(1)" class="stepper-btn flex items-center gap-2 flex-shrink-0 text-right focus:outline-none">
+              <span id="step-badge-1" class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs bg-blue-600 text-white">1</span>
+              <span id="step-label-1" class="text-xs font-bold text-blue-600 dark:text-blue-400">المعلومات العامة</span>
+            </button>
+            <button onclick="goToStep(2)" class="stepper-btn flex items-center gap-2 flex-shrink-0 text-right focus:outline-none">
+              <span id="step-badge-2" class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs bg-slate-200 dark:bg-slate-800 text-slate-400">2</span>
+              <span id="step-label-2" class="text-xs font-bold text-slate-400">البيانات الاقتصادية</span>
+            </button>
+            <button onclick="goToStep(3)" class="stepper-btn flex items-center gap-2 flex-shrink-0 text-right focus:outline-none">
+              <span id="step-badge-3" class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs bg-slate-200 dark:bg-slate-800 text-slate-400">3</span>
+              <span id="step-label-3" class="text-xs font-bold text-slate-400">بيانات السكن</span>
+            </button>
+            <button onclick="goToStep(4)" class="stepper-btn flex items-center gap-2 flex-shrink-0 text-right focus:outline-none">
+              <span id="step-badge-4" class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs bg-slate-200 dark:bg-slate-800 text-slate-400">4</span>
+              <span id="step-label-4" class="text-xs font-bold text-slate-400">الصحة والتعليم</span>
+            </button>
+            <button onclick="goToStep(5)" class="stepper-btn flex items-center gap-2 flex-shrink-0 text-right focus:outline-none">
+              <span id="step-badge-5" class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs bg-slate-200 dark:bg-slate-800 text-slate-400">5</span>
+              <span id="step-label-5" class="text-xs font-bold text-slate-400">المراجعة والرفع</span>
+            </button>
+          </div>
+
+          <!-- Forms Inputs Container -->
+          <div class="p-6 md:p-8 rounded-3xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 space-y-6">
+            <!-- STEP 1 Form -->
+            <div id="step-content-1" class="step-content space-y-4">
+              <h3 class="text-xs font-bold pb-2 border-b border-slate-100 dark:border-slate-800">1. المعلومات والاتصالات الأساسية للأسرة</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">رقم الأسرة بالنظام (HA-XXXX)</label>
+                  <input id="f-familyId" type="text" placeholder="توليد تلقائي" disabled class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-100 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100 opacity-70" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">اسم رب الأسرة كاملاً *</label>
+                  <input id="f-headName" type="text" placeholder="أدخل الاسم الرباعي لرب الأسرة" class="w-full pr-3 pl-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100 focus:border-blue-500" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">اسم الزوجة الكامل</label>
+                  <input id="f-wifeName" type="text" placeholder="أدخل اسم الزوجة" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">عدد أفراد الأسرة المقيمين بالحي *</label>
+                  <input id="f-membersCount" type="number" value="1" min="1" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">هاتف رب الأسرة</label>
+                  <input id="f-headPhone" type="text" placeholder="05xxxxxxxx" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">هاتف الزوجة</label>
+                  <input id="f-wifePhone" type="text" placeholder="05xxxxxxxx" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 2 Form -->
+            <div id="step-content-2" class="step-content space-y-4 hidden">
+              <h3 class="text-xs font-bold pb-2 border-b border-slate-100 dark:border-slate-800">2. الحالة المالية ومستوى الاستحقاق الاقتصادي</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">مصدر الدخل المادي الأساسي</label>
+                  <select id="f-incomeSource" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100">
+                    <option value="راتب شهري">وظيفة / راتب شهري ثابت</option>
+                    <option value="تقاعد حكومي">معاش تقاعدي</option>
+                    <option value="عمل حر">عمل حر أو متقطع</option>
+                    <option value="الضمان الاجتماعي">الضمان الاجتماعي والمساعدات فقط</option>
+                    <option value="بلا دخل">بلا دخل مادي ثابت</option>
+                  </select>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">الدخل الشهري الإجمالي (ريال سعودي)</label>
+                  <input id="f-monthlyIncome" type="number" value="0" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">عدد العاملين الفعليين بالأسرة</label>
+                  <input id="f-workersCount" type="number" value="1" min="0" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1 flex items-center h-full pt-4">
+                  <label class="relative flex items-center gap-2 cursor-pointer text-xs font-bold">
+                    <input id="f-needsSupport" type="checkbox" onchange="toggleSupportTypeField()" class="rounded border-slate-300 dark:border-slate-800" />
+                    <span>هل يحتاج أفراد الأسرة لدعم ومساعدات مستمرة؟</span>
+                  </label>
+                </div>
+                <div id="support-type-container" class="space-y-1 md:col-span-2 hidden">
+                  <label class="text-[10px] text-slate-400 block font-bold">نوع ومقدار الدعم المقترح والمطلوب</label>
+                  <textarea id="f-supportType" rows="2" placeholder="مثال: سلة غذائية شهرية، رعاية طبية خاصة، سداد إيجار..." class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 3 Form -->
+            <div id="step-content-3" class="step-content space-y-4 hidden">
+              <h3 class="text-xs font-bold pb-2 border-b border-slate-100 dark:border-slate-800">3. مواصفات السكن والخدمات الأساسية</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">نوع السكن الحالي بالحي</label>
+                  <select id="f-housingType" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100">
+                    <option value="إيجار">شقة مستأجرة</option>
+                    <option value="ملك">شقة أو منزل ملك</option>
+                    <option value="بيت شعبي">بيت شعبي تقليدي</option>
+                    <option value="سكن مع أقارب">سكن مشترك مع العائلة</option>
+                  </select>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">الحالة الإنشائية العامة للمنزل</label>
+                  <select id="f-houseCondition" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100">
+                    <option value="ممتاز">ممتاز وحديث</option>
+                    <option value="جيد">جيد ومستقر</option>
+                    <option value="يحتاج ترميم">يحتاج إلى أعمال ترميم وصيانة أساسية</option>
+                    <option value="متهالك">متهالك وفي حالة حرجة جداً</option>
+                  </select>
+                </div>
+                <div class="flex items-center gap-5 py-2">
+                  <label class="flex items-center gap-2 cursor-pointer text-xs font-bold">
+                    <input id="f-hasElectricity" type="checkbox" checked />
+                    <span>يتوفر تيار كهربائي</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer text-xs font-bold">
+                    <input id="f-hasWater" type="checkbox" checked />
+                    <span>يتوفر مصدر مياه صالح</span>
+                  </label>
+                </div>
+                <div class="flex items-center py-2">
+                  <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-amber-500">
+                    <input id="f-isDisplaced" type="checkbox" />
+                    <span>هل الأسرة نازحة من منطقة أو حي آخر؟</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 4 Form -->
+            <div id="step-content-4" class="step-content space-y-4 hidden">
+              <h3 class="text-xs font-bold pb-2 border-b border-slate-100 dark:border-slate-800">4. الحالة الصحية، التعليمية والفئات الاجتماعية الخاصة</h3>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">كبار السن (60+ سنة)</label>
+                  <input id="f-elderlyCount" type="number" value="0" min="0" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">أطفال دون سن 5 سنوات</label>
+                  <input id="f-childrenUnder5" type="number" value="0" min="0" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">الطلاب بالمدارس والجامعات</label>
+                  <input id="f-studentsCount" type="number" value="0" min="0" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">خريجي الجامعات غير العاملين</label>
+                  <input id="f-graduatesCount" type="number" value="0" min="0" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">عدد الأرامل</label>
+                  <input id="f-widowsCount" type="number" value="0" min="0" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">عدد الأيتام</label>
+                  <input id="f-orphansCount" type="number" value="0" min="0" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">عدد المطلقات بالأسرة</label>
+                  <input id="f-divorceesCount" type="number" value="0" min="0" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                </div>
+                <div class="space-y-1 flex items-center h-full pt-4">
+                  <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-red-500">
+                    <input id="f-specialNeeds" type="checkbox" />
+                    <span>يوجد أفراد ذوي إعاقة</span>
+                  </label>
+                </div>
+                <div class="space-y-1 flex items-center h-full pt-4 col-span-2">
+                  <label class="flex items-center gap-2 cursor-pointer text-xs font-bold">
+                    <input id="f-chronicIllness" type="checkbox" />
+                    <span>يوجد أفراد مصابين بأمراض مزمنة</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 border-slate-100 dark:border-slate-800">
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">تصنيف الأسرة العام</label>
+                  <select id="f-familyCategory" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100">
+                    <option value="أ">تصنيف (أ): عاجلة وتحتاج دعم فوري</option>
+                    <option value="ب">تصنيف (ب): متوسطة الاحتياج</option>
+                    <option value="ج">تصنيف (ج): مستقرة مادياً حالياً</option>
+                  </select>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold">درجة أولوية الدعم</label>
+                  <select id="f-supportPriority" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100">
+                    <option value="عالية جداً">عالية جداً (أولوية تدخل قصوى)</option>
+                    <option value="متوسطة">متوسطة الأولوية</option>
+                    <option value="عادية">عادية جداً</option>
+                  </select>
+                </div>
+                <div class="space-y-1 md:col-span-2">
+                  <label class="text-[10px] text-slate-400 block font-bold">مرئيات وملاحظات الباحث الميداني</label>
+                  <textarea id="f-notes" rows="2" placeholder="اكتب هنا أي ملاحظات إضافية حول وضع المنزل، أو الاحتياجات الخاصة..." class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 5 Form (Review) -->
+            <div id="step-content-5" class="step-content space-y-4 hidden">
+              <h3 class="text-xs font-bold pb-2 border-b border-slate-100 dark:border-slate-800 text-emerald-500 flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4.5 h-4.5"></i>
+                مراجعة نهائية لبيانات السجل وتأكيد الرفع
+              </h3>
+              
+              <div id="form-review-container" class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-xs leading-relaxed text-right">
+                <!-- Loaded Dynamically -->
+              </div>
+
+              <div class="flex items-center gap-2 text-xs text-amber-600 bg-amber-500/5 p-3 rounded-xl border border-amber-500/10">
+                <i data-lucide="shield" class="w-4 h-4"></i>
+                عند النقر على "تأكيد وحفظ السجل"، سيتم حفظ الملف في الذاكرة الحالية وتحديث قاعدة البيانات.
+              </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="flex justify-between border-t border-slate-100 dark:border-slate-800 pt-6">
+              <button id="btn-step-prev" type="button" onclick="changeStep(-1)" class="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 transition-all flex items-center gap-1.5">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                السابق
+              </button>
+              <button id="btn-step-next" type="button" onclick="changeStep(1)" class="px-4 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow transition-all flex items-center gap-1.5">
+                التالي
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+              <button id="btn-step-save" type="button" onclick="saveFamilyToDatabase()" class="hidden px-5 py-2.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow transition-all flex items-center gap-1.5">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                تأكيد وحفظ السجل
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== SCREEN 4: REPORTS ==================== -->
+        <section id="screen-reports" class="space-y-6 hidden">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h2 class="text-xl font-bold">التقارير والإحصاءات الرسمية</h2>
+              <p class="text-xs text-slate-400">توليد جداول المستحقين، فرز الأيتام، الطلاب، والطباعة الرسمية الفورية.</p>
+            </div>
+            <div class="flex gap-2.5">
+              <button onclick="exportToCSV()" class="p-2.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                تصدير البيانات (CSV)
+              </button>
+              <button onclick="window.print()" class="p-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-md">
+                <i data-lucide="printer" class="w-4 h-4"></i>
+                بدء طباعة التقرير الحالي
+              </button>
+            </div>
+          </div>
+
+          <!-- Report Tabs -->
+          <div class="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+            <button onclick="filterReport('all')" id="report-tab-all" class="report-tab px-3.5 py-2 text-xs font-bold rounded-t-xl border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-500/5">كافة أسر الحي</button>
+            <button onclick="filterReport('support')" id="report-tab-support" class="report-tab px-3.5 py-2 text-xs font-bold rounded-t-xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-100">المستحقون للدعم</button>
+            <button onclick="filterReport('students')" id="report-tab-students" class="report-tab px-3.5 py-2 text-xs font-bold rounded-t-xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-100">الطلاب والدارسين</button>
+            <button onclick="filterReport('elderly')" id="report-tab-elderly" class="report-tab px-3.5 py-2 text-xs font-bold rounded-t-xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-100">كبار السن</button>
+            <button onclick="filterReport('special')" id="report-tab-special" class="report-tab px-3.5 py-2 text-xs font-bold rounded-t-xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-100">ذوي الإعاقة</button>
+          </div>
+
+          <div class="p-6 rounded-3xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-right border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 font-bold">
+                    <th class="py-3 px-2">رقم الأسرة</th>
+                    <th class="py-3 px-2">اسم رب الأسرة</th>
+                    <th class="py-3 px-2">رقم الهاتف</th>
+                    <th class="py-3 px-2 text-center">عدد الأفراد</th>
+                    <th class="py-3 px-2 text-center">نوع السكن</th>
+                    <th class="py-3 px-2 text-center">الدخل الشهري</th>
+                    <th class="py-3 px-2 text-center">أولوية التدخل</th>
+                  </tr>
+                </thead>
+                <tbody id="report-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== SCREEN 5: FLUTTER REPOSITORY ==================== -->
+        <section id="screen-flutter_code" class="space-y-6 hidden">
+          <div>
+            <h2 class="text-xl font-bold flex items-center gap-2">
+              <i data-lucide="code" class="text-amber-500"></i>
+              مستودع كود Flutter المرفق لـ HAMS
+            </h2>
+            <p class="text-xs text-slate-400">لقد تم تصميم كود Flutter متطابق تماماً وبشكل احترافي متناسق مع نفس قاعدة بيانات Firestore لحي العشر لتتمكن من تشغيل التطبيق بالهاتف.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div class="p-4 rounded-2xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 space-y-1.5 lg:col-span-1">
+              <h3 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 pb-2 border-b border-slate-100 dark:border-slate-800">هيكل ملفات Flutter</h3>
+              <button onclick="switchFlutterFile('pubspec')" id="btn-f-pubspec" class="flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <i data-lucide="file-code" class="w-4 h-4"></i>pubspec.yaml
+              </button>
+              <button onclick="switchFlutterFile('main')" id="btn-f-main" class="flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+                <i data-lucide="folder" class="w-4 h-4"></i>lib / main.dart
+              </button>
+              <button onclick="switchFlutterFile('model')" id="btn-f-model" class="flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+                <i data-lucide="folder" class="w-4 h-4"></i>models / family_model.dart
+              </button>
+              <button onclick="switchFlutterFile('service')" id="btn-f-service" class="flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+                <i data-lucide="folder" class="w-4 h-4"></i>services / firestore_service.dart
+              </button>
+            </div>
+
+            <div class="p-4 rounded-2xl border bg-slate-900 border-slate-800 lg:col-span-3 overflow-hidden shadow-inner flex flex-col text-right">
+              <div class="flex justify-between items-center pb-3 border-b border-slate-800 mb-4" dir="ltr">
+                <span id="flutter-file-name" class="text-xs font-mono text-slate-400">pubspec.yaml</span>
+                <button onclick="copyFlutterCode()" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 text-[10px] font-bold rounded-lg transition-all flex items-center gap-1">
+                  <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>نسخ الكود الكامل
+                </button>
+              </div>
+              <pre class="text-left text-xs font-mono p-4 bg-slate-950 text-emerald-400 rounded-xl overflow-x-auto max-h-[420px] leading-relaxed"><code id="flutter-code-block"></code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== SCREEN 6: SYSTEM SETTINGS ==================== -->
+        <section id="screen-settings" class="max-w-2xl mx-auto space-y-6 hidden">
+          <div>
+            <h2 class="text-xl font-bold">إعدادات النظام وإدارته</h2>
+            <p class="text-xs text-slate-400">إدارة صلاحيات الباحثين، ضبط النسخ الاحتياطي اليدوي ومعالجة البيانات السحابية.</p>
+          </div>
+
+          <div class="p-6 rounded-3xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 space-y-6">
+            
+            <!-- Firebase Custom Link Manual Panel -->
+            <div class="space-y-3 pb-6 border-b border-slate-100 dark:border-slate-800 text-right">
+              <h3 class="text-sm font-bold flex items-center gap-2">
+                <i data-lucide="database" class="w-4.5 h-4.5 text-blue-600"></i>
+                ربط حساب Firebase Firestore الخاص بك
+              </h3>
+              <p class="text-xs text-slate-400">انسخ والصق كود الـ Config من لوحة تحكم Firebase للتحول الفوري من نمط "المحاكاة المحلي" إلى "البث السحابي".</p>
+              
+              <div class="space-y-2">
+                <textarea id="custom-firebase-config-input" rows="4" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "...", "storageBucket": "..."}' class="w-full p-3 font-mono text-[11px] rounded-xl border bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 focus:outline-none"></textarea>
+                <div class="flex gap-2">
+                  <button onclick="saveCustomFirebaseConfig()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black rounded-xl transition-all shadow-md">
+                    حفظ وربط سحابي فوري
+                  </button>
+                  <button onclick="clearCustomFirebaseConfig()" class="px-4 py-2 bg-red-600/10 hover:bg-red-600 hover:text-white text-red-500 text-[10px] font-bold rounded-xl transition-all">
+                    مسح الإعدادات والعودة للمحاكي
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- User management panel (Visible only to Admin/mohanad) -->
+            <div id="settings-admin-panel" class="space-y-4 pb-6 border-b border-slate-100 dark:border-slate-800 hidden">
+              <h3 class="text-sm font-bold flex items-center gap-2">
+                <i data-lucide="shield" class="w-4.5 h-4.5 text-blue-600"></i>
+                إدارة صلاحيات الأعضاء والباحثين بالحي
+              </h3>
+              <p class="text-xs text-slate-400">بصفتك مديراً للنظام، يحق لك تعيين حسابات جديدة لباحثي حي العشر وتحديد صلاحيات دقيقة للعمل على الحالات.</p>
+              
+              <div class="p-5 rounded-2xl border bg-slate-50 dark:bg-slate-950/40 space-y-3">
+                <h4 class="text-xs font-bold text-slate-500">إضافة عضو / باحث جديد</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <input id="new-user-username" type="text" placeholder="اسم المستخدم" class="px-3 py-2 text-xs rounded-xl focus:outline-none border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100" />
+                  <input id="new-user-password" type="password" placeholder="كلمة المرور" class="px-3 py-2 text-xs rounded-xl focus:outline-none border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100" />
+                  <select id="new-user-role" class="px-3 py-2 text-xs rounded-xl focus:outline-none border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100">
+                    <option value="entry">إدخال وتعديل البيانات</option>
+                    <option value="read">قراءة وتقارير فقط</option>
+                  </select>
+                </div>
+                <button onclick="addNewSystemUser()" class="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black rounded-xl shadow transition-all">
+                  إضافة وتسجيل الحساب
+                </button>
+              </div>
+
+              <div class="space-y-2">
+                <h4 class="text-xs font-bold text-slate-400">قائمة الأعضاء الحاليين</h4>
+                <div id="users-list-container" class="divide-y divide-slate-100 dark:divide-slate-800 max-h-[200px] overflow-y-auto"></div>
+              </div>
+            </div>
+
+            <!-- Backup tools -->
+            <div class="space-y-3">
+              <h3 class="text-sm font-bold flex items-center gap-2">
+                <i data-lucide="database" class="w-4.5 h-4.5 text-emerald-600"></i>
+                النسخ الاحتياطي للبيانات
+              </h3>
+              <p class="text-xs text-slate-400">يمكنك حفظ نسخة كاملة ومستقلة بصيغة JSON لجميع العائلات والاحتفاظ بها لضمان الحماية القصوى.</p>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="downloadBackupJSON()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold rounded-xl transition-all">
+                  تنزيل النسخة الاحتياطية (JSON)
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== MODALS & OVERLAYS ==================== -->
+
+  <!-- Family Details Modal -->
+  <div id="modal-details" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-3xl rounded-3xl p-6 md:p-8 space-y-6 bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-100 shadow-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar border dark:border-slate-800">
+      <button onclick="closeModal('modal-details')" class="absolute top-4 left-4 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:opacity-75 text-slate-400">
+        <i data-lucide="x" class="w-4.5 h-4.5"></i>
+      </button>
+
+      <div>
+        <span id="md-familyId" class="text-xs font-mono font-bold text-blue-500 bg-blue-500/10 px-2.5 py-1 rounded-md">HA-XXXX</span>
+        <h3 id="md-headName" class="text-xl font-bold mt-2">اسم رب الأسرة بالكامل</h3>
+        <p class="text-xs text-slate-400 mt-1">آخر تحديث للسجل: <span id="md-updatedAt">--/--/----</span></p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border dark:border-slate-800">
+          <span class="text-xs text-slate-400 font-bold block mb-1.5">معلومات عامة</span>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">اسم الزوجة:</strong> <span id="md-wifeName">--</span></p>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">هاتف الزوج:</strong> <span id="md-headPhone">--</span></p>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">هاتف الزوجة:</strong> <span id="md-wifePhone">--</span></p>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">عدد الأفراد:</strong> <span id="md-membersCount">0</span></p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border dark:border-slate-800">
+          <span class="text-xs text-slate-400 font-bold block mb-1.5">الوضع المالي والسكن</span>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">الدخل الشهري:</strong> <span id="md-monthlyIncome">0</span> ريال</p>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">مصدر الدخل:</strong> <span id="md-incomeSource">--</span></p>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">نوع السكن:</strong> <span id="md-housingType">--</span></p>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">حالة المنزل:</strong> <span id="md-houseCondition">--</span></p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border dark:border-slate-800">
+          <span class="text-xs text-slate-400 font-bold block mb-1.5">الاحتياج والدعم</span>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">يحتاج لدعم؟</strong> <span id="md-needsSupport">--</span></p>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">أولوية التدخل:</strong> <span id="md-supportPriority">--</span></p>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">تصنيف الأسرة:</strong> <span id="md-familyCategory">--</span></p>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">نوع الدعم:</strong> <span id="md-supportType">--</span></p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10 text-center">
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold block">الطلاب</span>
+          <strong id="md-studentsCount" class="text-base text-blue-500">0</strong>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold block">كبار السن</span>
+          <strong id="md-elderlyCount" class="text-base text-emerald-500">0</strong>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold block">أيتام وأرامل</span>
+          <strong id="md-orphansCount" class="text-base text-red-500">0</strong>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold block">أمراض مزمنة</span>
+          <strong id="md-chronicIllness" class="text-base text-amber-500">0</strong>
+        </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <span class="text-xs text-slate-400 font-bold block">ملاحظات ومرئيات الباحث الميداني:</span>
+        <p id="md-notes" class="text-xs p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border dark:border-slate-800 italic text-slate-600 dark:text-slate-300">
+          لا توجد ملاحظات إضافية مسجلة حالياً حول هذه الأسرة.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-2 justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+        <!-- New Dedicated PDF Print button -->
+        <button id="md-btn-print-pdf" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          طباعة كرت الأسرة (PDF)
+        </button>
+        <button id="md-btn-edit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all">تعديل الملف بالكامل</button>
+        <button onclick="closeModal('modal-details')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-xl text-slate-500 transition-all">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secure Delete Confirmation Modal -->
+  <div id="modal-delete" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-3xl p-6 md:p-8 bg-white text-slate-800 dark:bg-slate-900 dark:text-slate-100 shadow-2xl space-y-4 border dark:border-slate-800">
+      <div class="flex items-center gap-3 text-red-600">
+        <div class="w-10 h-10 bg-red-100 dark:bg-red-950/50 rounded-xl flex items-center justify-center text-red-600">
+          <i data-lucide="trash-2" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-bold text-base">حذف ملف الأسرة</h3>
+      </div>
+      <p class="text-xs leading-relaxed text-slate-400 dark:text-slate-500 font-bold text-right">
+        هل أنت متأكد تماماً من رغبتك في إزالة السجل الخاص بـ <span id="del-family-name" class="text-red-500 font-black">رب الأسرة</span> نهائياً من النظام؟ هذه العملية فورية ولا يمكن التراجع عنها.
+      </p>
+      <div class="flex gap-2 justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+        <button id="btn-confirm-delete" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-all">نعم، احذف الملف نهائياً</button>
+        <button onclick="closeModal('modal-delete')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-xl text-slate-500 transition-all">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Alert Toast notification -->
+  <div id="toast" class="hidden fixed bottom-6 left-6 z-50 flex items-center gap-3 p-4 rounded-xl shadow-lg border transition-all duration-300 translate-y-20 opacity-0 bg-white dark:bg-slate-900">
+    <i id="toast-icon" class="w-5 h-5"></i>
+    <span id="toast-text" class="text-xs font-bold">رسالة تنبيه تجريبية</span>
+  </div>
+
+  <!-- ==================== FRONTEND CONTROLLER LOGIC ==================== -->
+  <script>
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'hams-system-app';
+    
+    // Config default loaded in-memory directly
+    let db = null;
+    let auth = null;
+    let isFirebaseActive = false;
+    let familiesData = [];
+    let systemUsers = []; 
+    let currentUserProfile = null; 
+    let selectedFamilyForDeletion = null;
+    let isEditingMode = false;
+    let editingId = null;
+    let currentStep = 1;
+    let currentReportTab = 'all';
+
+    const LOCAL_FAMILIES_KEY = 'hams_local_families';
+    const LOCAL_USERS_KEY = 'hams_local_users';
+    const FIREBASE_CONFIG_KEY = 'hams_custom_firebase_config';
+
+    const DEMO_FAMILIES_PRESETS = [
+      {
+        familyId: "HA-0001",
+        headName: "محمد بن أحمد العتيبي",
+        wifeName: "فاطمة صالح الحربي",
+        headPhone: "0501234567",
+        wifePhone: "0559876543",
+        membersCount: 6,
+        incomeSource: "تقاعد حكومي",
+        monthlyIncome: 4200,
+        workersCount: 1,
+        needsSupport: true,
+        supportType: "دعم مالي وسلة غذائية شهرياً",
+        housingType: "إيجار",
+        houseCondition: "جيد",
+        hasElectricity: true,
+        hasWater: true,
+        chronicIllness: true,
+        specialNeeds: false,
+        elderlyCount: 1,
+        childrenUnder5: 1,
+        studentsCount: 3,
+        graduatesCount: 1,
+        widowsCount: 0,
+        orphansCount: 0,
+        divorceesCount: 0,
+        isDisplaced: false,
+        familyCategory: "أ",
+        supportPriority: "عالية جداً",
+        notes: "يعاني رب الأسرة من أمراض مزمنة كالسكر، ولديهم إيجار شقة مستمر.",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        familyId: "HA-0002",
+        headName: "خالد بن عبد الله الدوسري",
+        wifeName: "سارة محمد السبيعي",
+        headPhone: "0543210987",
+        wifePhone: "0567890123",
+        membersCount: 8,
+        incomeSource: "عمل حر",
+        monthlyIncome: 2500,
+        workersCount: 1,
+        needsSupport: true,
+        supportType: "سداد فاتورة الكهرباء وتأمين كسوة المدارس",
+        housingType: "بيت شعبي",
+        houseCondition: "يحتاج ترميم",
+        hasElectricity: true,
+        hasWater: false,
+        chronicIllness: false,
+        specialNeeds: true,
+        elderlyCount: 0,
+        childrenUnder5: 2,
+        studentsCount: 4,
+        graduatesCount: 0,
+        widowsCount: 0,
+        orphansCount: 0,
+        divorceesCount: 0,
+        isDisplaced: true,
+        familyCategory: "ب",
+        supportPriority: "متوسطة",
+        notes: "أحد الأطفال مسجل رسمياً من ذوي الاحتياجات الخاصة (حركي خفيف).",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        familyId: "HA-0003",
+        headName: "نورة مسفر القحطاني (أرملة)",
+        wifeName: "المرحوم علي الشهري",
+        headPhone: "0533334444",
+        wifePhone: "",
+        membersCount: 5,
+        incomeSource: "الضمان الاجتماعي",
+        monthlyIncome: 1800,
+        workersCount: 0,
+        needsSupport: true,
+        supportType: "كفالة أيتام ودعم تعليمي شهري للطلاب",
+        housingType: "ملك",
+        houseCondition: "جيد",
+        hasElectricity: true,
+        hasWater: true,
+        chronicIllness: false,
+        specialNeeds: false,
+        elderlyCount: 0,
+        childrenUnder5: 0,
+        studentsCount: 3,
+        graduatesCount: 1,
+        widowsCount: 1,
+        orphansCount: 4,
+        divorceesCount: 0,
+        isDisplaced: false,
+        familyCategory: "أ",
+        supportPriority: "عالية جداً",
+        notes: "ترعى الأرامل أربعة أطفال أيتام دون وجود معيل مادي ثابت للأسرة.",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        familyId: "HA-0004",
+        headName: "عبد العزيز فهد الشمري",
+        wifeName: "منى خالد التميمي",
+        headPhone: "0505556666",
+        wifePhone: "0506667777",
+        membersCount: 4,
+        incomeSource: "راتب شهري",
+        monthlyIncome: 9200,
+        workersCount: 2,
+        needsSupport: false,
+        supportType: "",
+        housingType: "ملك",
+        houseCondition: "ممتاز",
+        hasElectricity: true,
+        hasWater: true,
+        chronicIllness: false,
+        specialNeeds: false,
+        elderlyCount: 0,
+        childrenUnder5: 0,
+        studentsCount: 2,
+        graduatesCount: 0,
+        widowsCount: 0,
+        orphansCount: 0,
+        divorceesCount: 0,
+        isDisplaced: false,
+        familyCategory: "ج",
+        supportPriority: "عادية",
+        notes: "حالة الأسرة ممتازة ولا تطلب المساعدة حالياً بفضل الله.",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
+
+    const flutterCodes = {
+      pubspec: `name: hams_system\ndescription: "Hay Al-Ashr Families Management System (HAMS) in Flutter."\npublish_to: 'none'\nversion: 1.0.0+1\n\nenvironment:\n  sdk: '>=3.0.0 <4.0.0'\n\ndependencies:\n  flutter:\n    sdk: flutter\n  cupertino_icons: ^1.0.5\n  firebase_core: ^2.24.0\n  firebase_auth: ^4.15.0\n  cloud_firestore: ^4.13.0\n  provider: ^6.1.1\n  google_fonts: ^6.1.0\n  intl: ^0.18.1\n\ndev_dependencies:\n  flutter_test:\n    sdk: flutter\n  flutter_lints: ^3.0.0\n\nflutter:\n  uses-material-design: true`,
+
+      main: `import 'package:flutter/material.dart';\nimport 'package:flutter_localizations/flutter_localizations.dart';\nimport 'package:google_fonts/google_fonts.dart';\nimport 'package:provider/provider.dart';\nimport 'package:firebase_core/firebase_core.dart';\nimport 'models/family_model.dart';\nimport 'services/firestore_service.dart';\nimport 'views/login_screen.dart';\nimport 'views/dashboard_screen.dart';\n\nvoid main() async {\n  WidgetsFlutterBinding.ensureInitialized();\n  await Firebase.initializeApp();\n  runApp(\n    MultiProvider(\n      providers: [\n        ChangeNotifierProvider(create: (_) => FirestoreService()),\n      ],\n      child: const HamsApp(),\n    ),\n  );\n}\n\nclass HamsApp extends StatelessWidget {\n  const HamsApp({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return MaterialApp(\n      title: 'HAMS | نظام أسر حي العشر',\n      debugShowCheckedModeBanner: false,\n      locale: const Locale('ar', 'SA'),\n      supportedLocales: const [\n        Locale('ar', 'SA'),\n      ],\n      localizationsDelegates: const [\n        GlobalMaterialLocalizations.delegate,\n        GlobalWidgetsLocalizations.delegate,\n        GlobalCupertinoLocalizations.delegate,\n      ],\n      theme: ThemeData(\n        useMaterial3: true,\n        colorScheme: ColorScheme.fromSeed(\n          seedColor: const Color(0xFF1E3A8A),\n          primary: const Color(0xFF1E3A8A),\n          secondary: const Color(0xFF047857),\n          brightness: Brightness.light,\n        ),\n        textTheme: GoogleFonts.cairoTextTheme(Theme.of(context).textTheme),\n      ),\n      darkTheme: ThemeData(\n        useMaterial3: true,\n        colorScheme: ColorScheme.fromSeed(\n          seedColor: const Color(0xFF1E3A8A),\n          primary: const Color(0xFF3B82F6),\n          secondary: const Color(0xFF10B981),\n          brightness: Brightness.dark,\n        ),\n        textTheme: GoogleFonts.cairoTextTheme(Theme.of(context).primaryTextTheme),\n      ),\n      themeMode: ThemeMode.system,\n      home: const LoginScreen(),\n    );\n  }\n}`,
+
+      model: `class FamilyModel {\n  final String familyId;\n  final String headName;\n  final String wifeName;\n  final String headPhone;\n  final String wifePhone;\n  final int membersCount;\n  final String incomeSource;\n  final double monthlyIncome;\n  final int workersCount;\n  final bool needsSupport;\n  final String supportType;\n  final String housingType;\n  final String houseCondition;\n  final bool hasElectricity;\n  final bool hasWater;\n  final bool chronicIllness;\n  final bool specialNeeds;\n  final int elderlyCount;\n  final int childrenUnder5;\n  final int studentsCount;\n  final int graduatesCount;\n  final int widowsCount;\n  final int orphansCount;\n  final int divorceesCount;\n  final bool isDisplaced;\n  final String familyCategory;\n  final String supportPriority;\n  final String notes;\n  final String createdAt;\n  final String updatedAt;\n\n  FamilyModel({\n    required this.familyId,\n    required this.headName,\n    required this.wifeName,\n    required this.headPhone,\n    required this.wifePhone,\n    required this.membersCount,\n    required this.incomeSource,\n    required this.monthlyIncome,\n    required this.workersCount,\n    required this.needsSupport,\n    required this.supportType,\n    required this.housingType,\n    required this.houseCondition,\n    required this.hasElectricity,\n    required this.hasWater,\n    required this.chronicIllness,\n    required this.specialNeeds,\n    required this.elderlyCount,\n    required this.childrenUnder5,\n    required this.studentsCount,\n    required this.graduatesCount,\n    required this.widowsCount,\n    required this.orphansCount,\n    required this.divorceesCount,\n    required this.isDisplaced,\n    required this.familyCategory,\n    required this.supportPriority,\n    required this.notes,\n    required this.createdAt,\n    required this.updatedAt,\n  });\n\n  Map<String, dynamic> toMap() {\n    return {\n      'familyId': familyId,\n      'headName': headName,\n      'wifeName': wifeName,\n      'headPhone': headPhone,\n      'wifePhone': wifePhone,\n      'membersCount': membersCount,\n      'incomeSource': incomeSource,\n      'monthlyIncome': monthlyIncome,\n      'workersCount': workersCount,\n      'needsSupport': needsSupport,\n      'supportType': supportType,\n      'housingType': housingType,\n      'houseCondition': houseCondition,\n      'hasElectricity': hasElectricity,\n      'hasWater': hasWater,\n      'chronicIllness': chronicIllness,\n      'specialNeeds': specialNeeds,\n      'elderlyCount': elderlyCount,\n      'childrenUnder5': childrenUnder5,\n      'studentsCount': studentsCount,\n      'graduatesCount': graduatesCount,\n      'widowsCount': widowsCount,\n      'orphansCount': orphansCount,\n      'divorceesCount': divorceesCount,\n      'isDisplaced': isDisplaced,\n      'familyCategory': familyCategory,\n      'supportPriority': supportPriority,\n      'notes': notes,\n      'createdAt': createdAt,\n      'updatedAt': updatedAt,\n    };\n  }\n\n  factory FamilyModel.fromMap(Map<String, dynamic> map) {\n    return FamilyModel( \n      familyId: map['familyId'] ?? '',\n      headName: map['headName'] ?? '',\n      wifeName: map['wifeName'] ?? '',\n      headPhone: map['headPhone'] ?? '',\n      wifePhone: map['wifePhone'] ?? '',\n      membersCount: map['membersCount']?.toInt() ?? 0,\n      incomeSource: map['incomeSource'] ?? '',\n      monthlyIncome: map['monthlyIncome']?.toDouble() ?? 0.0,\n      workersCount: map['workersCount']?.toInt() ?? 0,\n      needsSupport: map['needsSupport'] ?? false,\n      supportType: map['supportType'] ?? '',\n      housingType: map['housingType'] ?? '',\n      houseCondition: map['houseCondition'] ?? '',\n      hasElectricity: map['hasElectricity'] ?? false,\n      hasWater: map['hasWater'] ?? false,\n      chronicIllness: map['chronicIllness'] ?? false,\n      specialNeeds: map['specialNeeds'] ?? false,\n      elderlyCount: map['elderlyCount']?.toInt() ?? 0,\n      childrenUnder5: map['childrenUnder5']?.toInt() ?? 0,\n      studentsCount: map['studentsCount']?.toInt() ?? 0,\n      graduatesCount: map['graduatesCount']?.toInt() ?? 0,\n      widowsCount: map['widowsCount']?.toInt() ?? 0,\n      orphansCount: map['orphansCount']?.toInt() ?? 0,\n      divorceesCount: map['divorceesCount']?.toInt() ?? 0,\n      isDisplaced: map['isDisplaced'] ?? false,\n      familyCategory: map['familyCategory'] ?? '',\n      supportPriority: map['supportPriority'] ?? '',\n      notes: map['notes'] ?? '',\n      createdAt: map['createdAt'] ?? '',\n      updatedAt: map['updatedAt'] ?? '',\n    );\n  }\n}`,
+
+      service: `import 'package:cloud_firestore/cloud_firestore.dart';\nimport 'package:flutter/foundation.dart';\nimport '../models/family_model.dart';\n\nclass FirestoreService extends ChangeNotifier {\n  final FirebaseFirestore _db = FirebaseFirestore.instance;\n  final String _appId = "hams-system-app";\n  \n  List<FamilyModel> _families = [];\n  bool _isLoading = false;\n\n  List<FamilyModel> get families => _families;\n  bool get isLoading => _isLoading;\n\n  CollectionReference get _collectionRef => \n      _db.collection('artifacts').doc(_appId).collection('public').doc('data').collection('families');\n\n  void listenToFamilies() {\n    _isLoading = true;\n    notifyListeners();\n    _collectionRef.snapshots().listen((snapshot) {\n      _families = snapshot.docs\n          .map((doc) => FamilyModel.fromMap(doc.data() as Map<String, dynamic>))\n          .toList();\n      _isLoading = false;\n      notifyListeners();\n    }, onError: (e) {\n      _isLoading = false;\n      notifyListeners();\n    });\n  }\n\n  Future<void> saveFamily(FamilyModel family) async {\n    await _collectionRef.doc(family.familyId).set(family.toMap());\n  }\n\n  Future<void> deleteFamily(String familyId) async {\n    await _collectionRef.doc(familyId).delete();\n  }\n}`
+    };
+
+    // System Startup: Safe detection of Firebase SDK & config
+    window.onload = async function() {
+      try { lucide.createIcons(); } catch (e) { console.warn("Lucide icons failed to load", e); }
+      switchFlutterFile('pubspec');
+      
+      detectAndInitializeDatabase();
+    };
+
+    function detectAndInitializeDatabase() {
+      const isSDKLoaded = (typeof firebase !== 'undefined');
+      
+      // Default embedded configurations
+      let fbConfig = {
+        apiKey: "AIzaSyAuA6XbPRyh1YETTweEv0OoRCs2VWWwJMU",
+        authDomain: "hams-system-app.firebaseapp.com",
+        projectId: "hams-system-app",
+        storageBucket: "hams-system-app.firebasestorage.app",
+        messagingSenderId: "1075846677118",
+        appId: "1:1075846677118:web:2f3e56ffb9f7f4c1704e2f"
+      };
+
+      try {
+        const saved = localStorage.getItem(FIREBASE_CONFIG_KEY);
+        if (saved) {
+          fbConfig = JSON.parse(saved);
+          document.getElementById('custom-firebase-config-input').value = saved;
+        } else {
+          document.getElementById('custom-firebase-config-input').value = JSON.stringify(fbConfig, null, 2);
+        }
+      } catch (e) {
+        console.warn("Could not load saved configuration override", e);
+      }
+
+      const badge = document.getElementById('system-status-badge');
+      const badgeText = document.getElementById('system-status-text');
+
+      if (isSDKLoaded && fbConfig) {
+        try {
+          firebase.initializeApp(fbConfig);
+          auth = firebase.auth();
+          db = firebase.firestore();
+          isFirebaseActive = true;
+          
+          badge.className = "hidden md:flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/50";
+          badgeText.innerText = "متصل بسحابة Firebase حية";
+          
+          auth.signInAnonymously().catch(err => console.warn("Anon Auth Error", err));
+          
+          listenToFirestoreData();
+          listenToSystemUsers();
+        } catch (err) {
+          console.error("Firebase startup crash, falling back to local simulation:", err);
+          initLocalStorageFallback();
+        }
+      } else {
+        initLocalStorageFallback();
+      }
+    }
+
+    function initLocalStorageFallback() {
+      isFirebaseActive = false;
+      const badge = document.getElementById('system-status-badge');
+      const badgeText = document.getElementById('system-status-text');
+
+      badge.className = "hidden md:flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/50";
+      badgeText.innerText = "النمط المحلي النشط (محاكي)";
+      
+      familiesData = JSON.parse(localStorage.getItem(LOCAL_FAMILIES_KEY)) || [];
+      systemUsers = JSON.parse(localStorage.getItem(LOCAL_USERS_KEY)) || [];
+      
+      processStatisticsAndRender();
+      renderSystemUsersList();
+    }
+
+    async function writeFamilyToDatabase(id, docData) {
+      if (isFirebaseActive) {
+        await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('families').doc(id).set(docData);
+      } else {
+        const index = familiesData.findIndex(f => f.familyId === id);
+        if (index > -1) {
+          familiesData[index] = docData;
+        } else {
+          familiesData.push(docData);
+        }
+        localStorage.setItem(LOCAL_FAMILIES_KEY, JSON.stringify(familiesData));
+        processStatisticsAndRender();
+      }
+    }
+
+    async function removeFamilyFromDatabase(id) {
+      if (isFirebaseActive) {
+        await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('families').doc(id).delete();
+      } else {
+        familiesData = familiesData.filter(f => f.familyId !== id);
+        localStorage.setItem(LOCAL_FAMILIES_KEY, JSON.stringify(familiesData));
+        processStatisticsAndRender();
+      }
+    }
+
+    async function writeUserToDatabase(username, userDoc) {
+      if (isFirebaseActive) {
+        const docId = `user-${username}`;
+        await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('users').doc(docId).set(userDoc);
+      } else {
+        systemUsers.push(userDoc);
+        localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(systemUsers));
+        renderSystemUsersList();
+      }
+    }
+
+    async function removeUserFromDatabase(username) {
+      if (isFirebaseActive) {
+        const docId = `user-${username}`;
+        await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('users').doc(docId).delete();
+      } else {
+        systemUsers = systemUsers.filter(u => u.username !== username);
+        localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(systemUsers));
+        renderSystemUsersList();
+      }
+    }
+
+    function listenToFirestoreData() {
+      document.getElementById('families-loading-state').classList.remove('hidden');
+      const targetCollection = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('families');
+
+      targetCollection.onSnapshot((snapshot) => {
+        familiesData = [];
+        snapshot.forEach((doc) => {
+          familiesData.push(doc.data());
+        });
+        document.getElementById('families-loading-state').classList.add('hidden');
+        processStatisticsAndRender();
+      }, (error) => {
+        console.error("Firestore families synchronization error: ", error);
+        document.getElementById('families-loading-state').classList.add('hidden');
+      });
+    }
+
+    function listenToSystemUsers() {
+      const usersCollection = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('users');
+      usersCollection.onSnapshot((snapshot) => {
+        systemUsers = [];
+        snapshot.forEach((doc) => {
+          systemUsers.push(doc.data());
+        });
+        renderSystemUsersList();
+      }, (err) => {
+        console.error("Error loading system members", err);
+      });
+    }
+
+    function saveCustomFirebaseConfig() {
+      const configStr = document.getElementById('custom-firebase-config-input').value.trim();
+      if (!configStr) return;
+      try {
+        JSON.parse(configStr); 
+        localStorage.setItem(FIREBASE_CONFIG_KEY, configStr);
+        showToast("تم حفظ الإعدادات السحابية. جاري إعادة تنشيط الربط...", "success");
+        setTimeout(() => { window.location.reload(); }, 1500);
+      } catch (e) {
+        showToast("كود التكوين غير صحيح. يرجى لصق كود JSON صالح.", "error");
+      }
+    }
+
+    function clearCustomFirebaseConfig() {
+      localStorage.removeItem(FIREBASE_CONFIG_KEY);
+      showToast("تم حذف إعدادات الربط. جاري تفعيل المحاكي المحلي...", "info");
+      setTimeout(() => { window.location.reload(); }, 1500);
+    }
+
+    function processSystemLogin() {
+      const usernameInput = document.getElementById('login-username').value.trim();
+      const passwordInput = document.getElementById('login-password').value;
+      const errorMsg = document.getElementById('login-error');
+
+      if (usernameInput === 'mohanad' && passwordInput === '475321') {
+        currentUserProfile = {
+          username: 'mohanad',
+          fullName: 'المهندس مهند (المدير)',
+          role: 'admin'
+        };
+        grantUserSession();
+        return;
+      }
+
+      const userMatch = systemUsers.find(u => u.username === usernameInput && u.password === passwordInput);
+      if (userMatch) {
+        currentUserProfile = {
+          username: userMatch.username,
+          fullName: userMatch.username,
+          role: userMatch.role 
+        };
+        grantUserSession();
+        return;
+      }
+
+      errorMsg.classList.remove('hidden');
+      setTimeout(() => { errorMsg.classList.add('hidden'); }, 4000);
+    }
+
+    function grantUserSession() {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('main-app').classList.remove('hidden');
+      document.getElementById('main-app').classList.add('flex');
+
+      document.getElementById('nav-user-fullname').innerText = currentUserProfile.fullName;
+      
+      let roleLabel = "باحث قراءة فقط";
+      if (currentUserProfile.role === 'admin') roleLabel = "المدير العام";
+      if (currentUserProfile.role === 'entry') roleLabel = "باحث إدخال وتعديل";
+      document.getElementById('nav-user-role').innerText = roleLabel;
+
+      applyRoleRestrictions();
+      showToast(`مرحباً بك ${currentUserProfile.fullName} في نظام HAMS`, 'success');
+      switchTab('dashboard');
+    }
+
+    function applyRoleRestrictions() {
+      const role = currentUserProfile.role;
+      const seedBox = document.getElementById('admin-seed-box');
+      
+      if (role === 'admin') {
+        seedBox.classList.remove('hidden');
+        document.getElementById('settings-admin-panel').classList.remove('hidden');
+      } else {
+        seedBox.classList.add('hidden');
+        document.getElementById('settings-admin-panel').classList.add('hidden');
+      }
+
+      const addBtn1 = document.getElementById('dashboard-add-btn');
+      const addBtn2 = document.getElementById('families-add-btn');
+      const sidebarAddTab = document.getElementById('btn-add_family');
+
+      if (role === 'read') {
+        addBtn1.classList.add('hidden');
+        addBtn2.classList.add('hidden');
+        sidebarAddTab.classList.add('hidden');
+      } else {
+        addBtn1.classList.remove('hidden');
+        addBtn2.classList.remove('hidden');
+        sidebarAddTab.classList.remove('hidden');
+      }
+
+      performSearch();
+    }
+
+    function processSystemLogout() {
+      currentUserProfile = null;
+      document.getElementById('main-app').classList.remove('flex');
+      document.getElementById('main-app').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+    }
+
+    async function addNewSystemUser() {
+      if (currentUserProfile.role !== 'admin') {
+        showToast("خطأ: الصلاحيات الحالية لا تسمح بإضافة مستخدمين.", "error");
+        return;
+      }
+
+      const newUsername = document.getElementById('new-user-username').value.trim();
+      const newPassword = document.getElementById('new-user-password').value;
+      const newRole = document.getElementById('new-user-role').value;
+
+      if (!newUsername || !newPassword) {
+        showToast("يرجى تعبئة كافة الحقول بشكل صحيح.", "error");
+        return;
+      }
+
+      if (newUsername === 'mohanad' || systemUsers.some(u => u.username === newUsername)) {
+        showToast("اسم المستخدم هذا مكرر ومسجل بالفعل بالنظام.", "error");
+        return;
+      }
+
+      const userDoc = {
+        username: newUsername,
+        password: newPassword,
+        role: newRole,
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        await writeUserToDatabase(newUsername, userDoc);
+        showToast(`تم تسجيل المستخدم "${newUsername}" وتفعيل صلاحياته بنجاح.`, "success");
+        document.getElementById('new-user-username').value = '';
+        document.getElementById('new-user-password').value = '';
+      } catch (err) {
+        showToast("حدث خطأ أثناء حفظ الملف بالسحابة.", "error");
+      }
+    }
+
+    function renderSystemUsersList() {
+      const container = document.getElementById('users-list-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (systemUsers.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-400 py-3 text-center">لا يوجد مستخدمين إضافيين مسجلين حالياً بالحي.</div>';
+        return;
+      }
+
+      systemUsers.forEach(u => {
+        let roleText = u.role === 'entry' ? "باحث إدخال وتعديل" : "قراءة فقط";
+        const div = document.createElement('div');
+        div.className = "flex justify-between items-center py-2.5 text-xs text-slate-700 dark:text-slate-300";
+        div.innerHTML = `
+          <div>
+            <p class="font-bold font-mono text-slate-800 dark:text-slate-200">${u.username}</p>
+            <span class="text-[9px] text-slate-400">صلاحية: ${roleText} | كلمة المرور: ${u.password}</span>
+          </div>
+          <button onclick="deleteSystemUser('${u.username}')" class="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded transition-all">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        `;
+        container.appendChild(div);
+      });
+      try { lucide.createIcons(); } catch (e) {}
+    }
+
+    async function deleteSystemUser(username) {
+      if (currentUserProfile.role !== 'admin') return;
+      try {
+        await removeUserFromDatabase(username);
+        showToast(`تم مسح حساب الباحث "${username}" بنجاح فوري.`, "success");
+      } catch (err) {
+        showToast("فشلت عملية المسح السحابي.", "error");
+      }
+    }
+
+    function toggleLoginPassword() {
+      const passInput = document.getElementById('login-password');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (passInput.type === 'password') {
+        passInput.type = 'text';
+        eyeIcon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        passInput.type = 'password';
+        eyeIcon.setAttribute('data-lucide', 'eye');
+      }
+      try { lucide.createIcons(); } catch (e) {}
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('main > section').forEach(section => {
+        section.classList.add('hidden');
+      });
+      document.getElementById('screen-' + tabName).classList.remove('hidden');
+
+      document.querySelectorAll('.sidebar-btn').forEach(btn => {
+        btn.className = "sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50";
+      });
+      const activeBtn = document.getElementById('btn-' + tabName);
+      if (activeBtn) {
+        activeBtn.className = "sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400";
+      }
+
+      if (tabName === 'reports') {
+        renderReportsTable();
+      } else if (tabName === 'families') {
+        performSearch();
+      }
+    }
+
+    function processStatisticsAndRender() {
+      const total = familiesData.length;
+      let totalPeople = 0;
+      let needsSupport = 0;
+      let totalStudents = 0;
+      let totalElderly = 0;
+      let specialNeeds = 0;
+      let chronic = 0;
+      let highPriority = 0;
+      let widowsOrphans = 0;
+
+      familiesData.forEach(f => {
+        totalPeople += (parseInt(f.membersCount) || 1);
+        if (f.needsSupport) needsSupport++;
+        totalStudents += (parseInt(f.studentsCount) || 0);
+        totalElderly += (parseInt(f.elderlyCount) || 0);
+        if (f.specialNeeds) specialNeeds++;
+        if (f.chronicIllness) chronic++;
+        if (f.supportPriority === 'عالية جداً' || f.supportPriority === 'عالية') highPriority++;
+        widowsOrphans += ((parseInt(f.widowsCount) || 0) + (parseInt(f.orphansCount) || 0));
+      });
+
+      document.getElementById('stat-total-families').innerText = total;
+      document.getElementById('stat-total-people').innerText = totalPeople;
+      document.getElementById('stat-needing-support').innerText = needsSupport;
+      document.getElementById('stat-total-students').innerText = totalStudents;
+      
+      const supportPercent = total > 0 ? Math.round((needsSupport / total) * 100) : 0;
+      document.getElementById('stat-support-percentage').innerText = "بنسبة " + supportPercent + "% من الأسر";
+
+      document.getElementById('stat-elderly').innerText = totalElderly;
+      document.getElementById('stat-special-needs').innerText = specialNeeds;
+      document.getElementById('stat-chronic').innerText = chronic;
+      document.getElementById('stat-widows-orphans').innerText = widowsOrphans;
+
+      document.getElementById('stat-high-priority').innerText = highPriority + " أسرة";
+      document.getElementById('stat-normal-priority').innerText = (total - highPriority) + " أسرة";
+
+      const highPriorityPercent = total > 0 ? Math.round((highPriority / total) * 100) : 0;
+      document.getElementById('priority-chart-bar').setAttribute('stroke-dasharray', `${highPriorityPercent}, 100`);
+
+      const criticalContainer = document.getElementById('dashboard-critical-list');
+      criticalContainer.innerHTML = '';
+      
+      const criticalFamilies = familiesData.filter(f => f.needsSupport && f.supportPriority === 'عالية جداً');
+      if (criticalFamilies.length === 0) {
+        criticalContainer.innerHTML = '<div class="text-center py-10 text-xs text-slate-400">لا توجد حالات طارئة تتطلب تدخل حالياً.</div>';
+      } else {
+        criticalFamilies.slice(0, 3).forEach(fam => {
+          const div = document.createElement('div');
+          div.className = "p-3 rounded-xl bg-red-500/5 border border-red-500/10 flex justify-between items-center";
+          div.innerHTML = `
+            <div>
+              <p class="text-xs font-bold text-slate-800 dark:text-slate-200">${fam.headName}</p>
+              <span class="text-[9px] text-slate-400">${fam.familyId} | عدد الأفراد: ${fam.membersCount} | الهاتف: ${fam.headPhone}</span>
+            </div>
+            <span class="text-[9px] bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400 px-2 py-0.5 rounded font-black">حرج جداً</span>
+          `;
+          criticalContainer.appendChild(div);
+        });
+      }
+
+      performSearch();
+      renderReportsTable();
+    }
+
+    async function seedDemoData() {
+      document.getElementById('btn-seed').disabled = true;
+      document.getElementById('btn-seed').innerText = "جاري الحفظ والرفع...";
+
+      try {
+        for (let fam of DEMO_FAMILIES_PRESETS) {
+          await writeFamilyToDatabase(fam.familyId, fam);
+        }
+        showToast("تمت تغذية النظام بـ 4 أسر فئوية نموذجية بنجاح فوري!", "success");
+      } catch (err) {
+        showToast("فشلت عملية حفظ البيانات.", "error");
+      } finally {
+        document.getElementById('btn-seed').disabled = false;
+        document.getElementById('btn-seed').innerHTML = '<i data-lucide="refresh-cw" class="w-3 h-3"></i> رفع 4 أسر تجريبية';
+        try { lucide.createIcons(); } catch (e) {}
+      }
+    }
+
+    function performSearch() {
+      const queryStr = document.getElementById('search-input').value.toLowerCase().trim();
+      const filterType = document.getElementById('search-filter-type').value;
+
+      const filtered = familiesData.filter(fam => {
+        if (!queryStr) return true;
+
+        const matchesId = fam.familyId.toLowerCase().includes(queryStr);
+        const matchesName = fam.headName.toLowerCase().includes(queryStr) || (fam.wifeName && fam.wifeName.toLowerCase().includes(queryStr));
+        const matchesPhone = (fam.headPhone && fam.headPhone.includes(queryStr)) || (fam.wifePhone && fam.wifePhone.includes(queryStr));
+
+        if (filterType === 'id') return matchesId;
+        if (filterType === 'name') return matchesName;
+        if (filterType === 'phone') return matchesPhone;
+
+        return matchesId || matchesName || matchesPhone;
+      });
+
+      document.getElementById('search-results-count').innerText = filtered.length;
+      renderFamiliesList(filtered);
+    }
+
+    function renderFamiliesList(data) {
+      const container = document.getElementById('families-grid');
+      container.innerHTML = '';
+
+      if (data.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-20 border border-dashed rounded-3xl border-slate-300 dark:border-slate-800">
+            <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+              <i data-lucide="users" class="w-8 h-8"></i>
+            </div>
+            <h3 class="font-bold text-sm mb-1">لا توجد سجلات أسر مطابقة للمواصفات</h3>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">تأكد من كتابة أحرف البحث بشكل صحيح، أو اضغط على تغذية البيانات التجريبية لتوليد أسر فئوية نموذجية.</p>
+          </div>
+        `;
+        try { lucide.createIcons(); } catch (e) {}
+        return;
+      }
+
+      data.forEach(fam => {
+        const priorityColor = fam.supportPriority === 'عالية جداً' 
+          ? 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400' 
+          : fam.supportPriority === 'متوسطة' 
+          ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400' 
+          : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400';
+
+        const canDelete = currentUserProfile ? currentUserProfile.role === 'admin' : false;
+        const canEdit = currentUserProfile ? (currentUserProfile.role === 'admin' || currentUserProfile.role === 'entry') : false;
+
+        const div = document.createElement('div');
+        div.className = "p-5 rounded-2xl border transition-all hover:shadow-md bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700";
+        div.innerHTML = `
+          <div class="flex justify-between items-start mb-3">
+            <span class="text-[10px] font-mono font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded">${fam.familyId}</span>
+            <span class="text-[9px] px-2.5 py-0.5 rounded-full font-bold ${priorityColor}">${fam.supportPriority || 'عادية'}</span>
+          </div>
+
+          <h4 class="font-bold text-sm mb-1 line-clamp-1">${fam.headName}</h4>
+          <p class="text-[11px] text-slate-400 mb-4 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> سكن: ${fam.housingType} | ${fam.isDisplaced ? 'أسرة نازحة' : 'مقيم بالحي'}</p>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px] mb-4 border-t pt-3 border-slate-100 dark:border-slate-800 text-right">
+            <div>
+              <span class="text-slate-400 text-[9px] block font-bold">رقم الهاتف</span>
+              <p class="font-bold">${fam.headPhone || 'غير مدرج'}</p>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[9px] block font-bold">أفراد العائلة</span>
+              <p class="font-bold">${fam.membersCount} أفراد</p>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[9px] block font-bold">الدخل المادي</span>
+              <p class="font-bold text-emerald-500">${fam.monthlyIncome} ريال</p>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[9px] block font-bold">يحتاج دعم ومتابعة</span>
+              <p class="font-bold ${fam.needsSupport ? 'text-amber-500' : 'text-slate-400'}">${fam.needsSupport ? 'نعم' : 'لا'}</p>
+            </div>
+          </div>
+
+          <div class="flex gap-2 justify-end border-t border-slate-100 dark:border-slate-800 pt-3">
+            <button onclick="viewFamilyDetails('${fam.familyId}')" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all" title="عرض السجل الكامل">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+            ${canEdit ? `
+            <button onclick="editFamilyForm('${fam.familyId}')" class="p-1.5 rounded-lg text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all" title="تعديل السجل">
+              <i data-lucide="edit-2" class="w-4 h-4"></i>
+            </button>
+            ` : ''}
+            ${canDelete ? `
+            <button onclick="requestDeleteFamily('${fam.familyId}')" class="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all" title="مسح الملف">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+            ` : ''}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      try { lucide.createIcons(); } catch (e) {}
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function requestDeleteFamily(id) {
+      const family = familiesData.find(f => f.familyId === id);
+      if (!family) return;
+
+      selectedFamilyForDeletion = id;
+      document.getElementById('del-family-name').innerText = family.headName;
+      document.getElementById('modal-delete').classList.remove('hidden');
+
+      document.getElementById('btn-confirm-delete').onclick = async function() {
+        if (!selectedFamilyForDeletion) return;
+        try {
+          await removeFamilyFromDatabase(selectedFamilyForDeletion);
+          showToast(`تم مسح ملف الأسرة ${selectedFamilyForDeletion} بنجاح.`, "success");
+          closeModal('modal-delete');
+          selectedFamilyForDeletion = null;
+        } catch (err) {
+          showToast("فشلت عملية الحذف.", "error");
+        }
+      };
+    }
+
+    function viewFamilyDetails(id) {
+      const fam = familiesData.find(f => f.familyId === id);
+      if (!fam) return;
+
+      document.getElementById('md-familyId').innerText = fam.familyId;
+      document.getElementById('md-headName').innerText = fam.headName;
+      document.getElementById('md-wifeName').innerText = fam.wifeName || 'غير متوفر';
+      document.getElementById('md-headPhone').innerText = fam.headPhone || 'غير متوفر';
+      document.getElementById('md-wifePhone').innerText = fam.wifePhone || 'غير متوفر';
+      document.getElementById('md-membersCount').innerText = fam.membersCount;
+      document.getElementById('md-monthlyIncome').innerText = fam.monthlyIncome;
+      document.getElementById('md-incomeSource').innerText = fam.incomeSource || 'عمل حر';
+      document.getElementById('md-housingType').innerText = fam.housingType || 'إيجار';
+      document.getElementById('md-houseCondition').innerText = fam.houseCondition || 'جيد';
+      document.getElementById('md-needsSupport').innerText = fam.needsSupport ? 'نعم (يستحق)' : 'لا يحتاج';
+      document.getElementById('md-supportPriority').innerText = fam.supportPriority || 'عادية';
+      document.getElementById('md-familyCategory').innerText = "تصنيف (" + (fam.familyCategory || "ج") + ")";
+      document.getElementById('md-supportType').innerText = fam.supportType || 'لم يحدد بعد';
+      document.getElementById('md-studentsCount').innerText = fam.studentsCount || 0;
+      document.getElementById('md-elderlyCount').innerText = fam.elderlyCount || 0;
+      document.getElementById('md-orphansCount').innerText = (parseInt(fam.orphansCount) || 0);
+      document.getElementById('md-chronicIllness').innerText = fam.chronicIllness ? "نعم" : "لا";
+      document.getElementById('md-notes').innerText = fam.notes || 'لم يقم الباحث بتدوين ملاحظات إضافية.';
+      document.getElementById('md-updatedAt').innerText = fam.updatedAt ? new Date(fam.updatedAt).toLocaleDateString('ar-SA') : 'غير متوفر';
+
+      // Setup Targeted single PDF printing button dynamically
+      document.getElementById('md-btn-print-pdf').onclick = function() {
+        printSingleFamilyCard(fam.familyId);
+      };
+
+      const editBtn = document.getElementById('md-btn-edit');
+      const canEdit = currentUserProfile ? (currentUserProfile.role === 'admin' || currentUserProfile.role === 'entry') : false;
+      
+      if (canEdit) {
+        editBtn.classList.remove('hidden');
+        editBtn.onclick = function() {
+          closeModal('modal-details');
+          editFamilyForm(fam.familyId);
+        };
+      } else {
+        editBtn.classList.add('hidden');
+      }
+
+      document.getElementById('modal-details').classList.remove('hidden');
+      try { lucide.createIcons(); } catch (e) {}
+    }
+
+    // Prints beautifully formatted single-family document
+    function printSingleFamilyCard(id) {
+      const fam = familiesData.find(f => f.familyId === id);
+      if (!fam) return;
+
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html lang="ar" dir="rtl">
+        <head>
+          <meta charset="UTF-8">
+          <title>بطاقة الأسرة الرسمية - ${fam.familyId}</title>
+          <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+          <style>
+            body { font-family: 'Cairo', sans-serif; direction: rtl; padding: 40px; color: #1e293b; background: #fff; }
+            .header { text-align: center; border-bottom: 3px double #1e3a8a; padding-bottom: 20px; margin-bottom: 30px; }
+            .title { font-size: 24px; font-weight: 900; color: #1e3a8a; }
+            .subtitle { font-size: 12px; color: #64748b; margin-top: 5px; font-weight: bold; }
+            .grid { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
+            .card { border: 1px solid #cbd5e1; padding: 20px; border-radius: 16px; background: #f8fafc; }
+            h3 { font-size: 14px; color: #1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 8px; margin-top: 0; margin-bottom: 15px; }
+            p { font-size: 12px; margin: 8px 0; line-height: 1.6; }
+            .label { font-weight: bold; color: #475569; }
+            .value { color: #0f172a; font-weight: bold; float: left; }
+            .full-width { grid-column: span 2; }
+            .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; }
+            .badge-red { background: #fee2e2; color: #991b1b; }
+            .badge-green { background: #dcfce7; color: #166534; }
+            .notes-section { margin-top: 25px; padding: 15px; border-right: 4px solid #3b82f6; background: #eff6ff; border-radius: 4px; font-size: 12px; }
+            .footer-signature { margin-top: 60px; display: grid; grid-template-cols: 1fr 1fr; text-align: center; font-size: 12px; font-weight: bold; }
+          </style>
+        </head>
+        <body onload="window.print(); setTimeout(function(){ window.close(); }, 500);">
+          <div class="header">
+            <div class="title">نظام HAMS المتكامل لإدارة أسر حي العشر</div>
+            <div class="subtitle">بطاقة دراسة حالة الأسرة - مستخرج تلقائي رسمي</div>
+          </div>
+          
+          <div class="grid">
+            <div class="card">
+              <h3>المعلومات العامة والاتصال</h3>
+              <p><span class="label">رقم الأسرة بالنظام:</span> <span class="value" style="font-family: monospace;">${fam.familyId}</span></p>
+              <p><span class="label">اسم رب الأسرة:</span> <span class="value">${fam.headName}</span></p>
+              <p><span class="label">اسم الزوجة:</span> <span class="value">${fam.wifeName || 'غير متوفر'}</span></p>
+              <p><span class="label">عدد أفراد الأسرة:</span> <span class="value">${fam.membersCount} أفراد</span></p>
+              <p><span class="label">رقم جوال العائل:</span> <span class="value">${fam.headPhone || 'غير متوفر'}</span></p>
+            </div>
+            
+            <div class="card">
+              <h3>الوضع الاقتصادي والسكن</h3>
+              <p><span class="label">مصدر الدخل المادي:</span> <span class="value">${fam.incomeSource || 'عمل حر'}</span></p>
+              <p><span class="label">الدخل الشهري الإجمالي:</span> <span class="value">${fam.monthlyIncome} ريال</span></p>
+              <p><span class="label">نوع وحالة السكن:</span> <span class="value">${fam.housingType} (${fam.houseCondition})</span></p>
+              <p><span class="label">استحقاق الدعم والمساعدة:</span> <span class="value badge ${fam.needsSupport ? 'badge-red' : 'badge-green'}">${fam.needsSupport ? 'مستحق للدعم' : 'مكتفي ذاتياً'}</span></p>
+              <p><span class="label">أولوية تقديم الدعم:</span> <span class="value">${fam.supportPriority}</span></p>
+            </div>
+            
+            <div class="card full-width">
+              <h3>المؤشرات الديموغرافية والاجتماعية بالمنزل</h3>
+              <div style="display: grid; grid-template-cols: 1fr 1fr 1fr 1fr; text-align: center; gap: 10px;">
+                <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
+                  <span style="font-size: 10px; color: #64748b; block">طلاب المدارس</span><br>
+                  <strong style="color: #3b82f6;">${fam.studentsCount || 0}</strong>
+                </div>
+                <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
+                  <span style="font-size: 10px; color: #64748b; block">كبار السن (60+)</span><br>
+                  <strong style="color: #10b981;">${fam.elderlyCount || 0}</strong>
+                </div>
+                <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
+                  <span style="font-size: 10px; color: #64748b; block">أرامل وأيتام</span><br>
+                  <strong style="color: #ef4444;">${(parseInt(fam.orphansCount) || 0) + (parseInt(fam.widowsCount) || 0)}</strong>
+                </div>
+                <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
+                  <span style="font-size: 10px; color: #64748b; block">ذوي الاحتياجات</span><br>
+                  <strong style="color: #f59e0b;">${fam.specialNeeds ? 'نعم' : 'لا'}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="notes-section">
+            <strong>مرئيات وملاحظات الباحث الميداني للحي:</strong>
+            <p style="margin-top: 5px; font-style: italic;">"${fam.notes || 'لا توجد ملاحظات إضافية مسجلة.'}"</p>
+          </div>
+          
+          <div class="footer-signature">
+            <div>توقيع الباحث الميداني للحي<br><br>............................</div>
+            <div>توقيع واعتماد مشرف اللجنة<br><br>............................</div>
+          </div>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    function exportToCSV() {
+      if (familiesData.length === 0) {
+        showToast("لا توجد بيانات متاحة للتصدير حالياً", "error");
+        return;
+      }
+
+      let csv = 'data:text/csv;charset=utf-8,\uFEFF';
+      csv += 'رقم الأسرة,اسم رب الأسرة,الهاتف,عدد أفراد الأسرة,الدخل الشهري,يحتاج دعم,أولوية الدعم\r\n';
+
+      familiesData.forEach(f => {
+        csv += `"${f.familyId}","${f.headName}","${f.headPhone}",${f.membersCount},${f.monthlyIncome},"${f.needsSupport ? 'نعم' : 'لا'}","${f.supportPriority}"\r\n`;
+      });
+
+      const encodedUri = encodeURI(csv);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `HAMS_Report_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("تم توليد وتحميل الملف الرقمي بنجاح", "success");
+    }
+
+    function filterReport(type) {
+      currentReportTab = type;
+      
+      document.querySelectorAll('.report-tab').forEach(tab => {
+        tab.className = "report-tab px-3.5 py-2 text-xs font-bold rounded-t-xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-100";
+      });
+      document.getElementById('report-tab-' + type).className = "report-tab px-3.5 py-2 text-xs font-bold rounded-t-xl border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-500/5";
+
+      renderReportsTable();
+    }
+
+    function renderReportsTable() {
+      const tbody = document.getElementById('report-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const filtered = familiesData.filter(f => {
+        if (currentReportTab === 'support') return f.needsSupport;
+        if (currentReportTab === 'students') return (parseInt(f.studentsCount) || 0) > 0;
+        if (currentReportTab === 'elderly') return (parseInt(f.elderlyCount) || 0) > 0;
+        if (currentReportTab === 'special') return f.specialNeeds;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-10 text-slate-400">لا توجد سجلات مطابقة للمعايير المحددة بالتقرير حالياً.</td></tr>';
+        return;
+      }
+
+      filtered.forEach(fam => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-500/5 transition-all";
+        tr.innerHTML = `
+          <td class="py-3 px-2 font-mono font-bold text-blue-500">${fam.familyId}</td>
+          <td class="py-3 px-2 font-bold">${fam.headName}</td>
+          <td class="py-3 px-2">${fam.headPhone || 'غير مسجل'}</td>
+          <td class="py-3 px-2 text-center">${fam.membersCount} فرد</td>
+          <td class="py-3 px-2 text-center">${fam.housingType}</td>
+          <td class="py-3 px-2 text-center text-emerald-500 font-bold">${fam.monthlyIncome} ريال</td>
+          <td class="py-3 px-2 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${fam.supportPriority === 'عالية جداً' ? 'bg-red-100 text-red-700 dark:bg-red-950/40' : 'bg-slate-100 text-slate-600 dark:bg-slate-800'}">
+              ${fam.supportPriority}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function downloadBackupJSON() {
+      if (familiesData.length === 0) {
+        showToast("لا توجد بيانات مسجلة لحفظها", "error");
+        return;
+      }
+      const jsonStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(familiesData, null, 2))}`;
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", jsonStr);
+      dlAnchor.setAttribute("download", `HAMS_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(dlAnchor);
+      dlAnchor.click();
+      document.body.removeChild(dlAnchor);
+      showToast("تم تنزيل النسخة الاحتياطية بنجاح بنسق JSON", "success");
+    }
+
+    function toggleMobileMenu() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('drawer-overlay');
+      if (sidebar.classList.contains('translate-x-full')) {
+        sidebar.classList.remove('translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('theme-icon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        themeIcon.setAttribute('data-lucide', 'moon');
+      } else {
+        html.classList.add('dark');
+        themeIcon.setAttribute('data-lucide', 'sun');
+      }
+      try { lucide.createIcons(); } catch (e) {}
+    }
+
+    function toggleSupportTypeField() {
+      const checkbox = document.getElementById('f-needsSupport');
+      const container = document.getElementById('support-type-container');
+      if (checkbox.checked) {
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    function openAddFamilyForm() {
+      isEditingMode = false;
+      editingId = null;
+      document.getElementById('form-title').innerText = "نموذج تسجيل الأسر الجديد";
+      
+      let nextIdNum = 1;
+      if (familiesData.length > 0) {
+        const nums = familiesData.map(f => {
+          const m = f.familyId.match(/HA-(\d+)/);
+          return m ? parseInt(m[1]) : 0;
+        });
+        nextIdNum = Math.max(...nums) + 1;
+      }
+      const nextId = `HA-${nextIdNum.toString().padStart(4, '0')}`;
+      
+      resetStepperFormInputs(nextId);
+      switchTab('add_family');
+      goToStep(1);
+    }
+
+    function editFamilyForm(id) {
+      const fam = familiesData.find(f => f.familyId === id);
+      if (!fam) return;
+
+      isEditingMode = true;
+      editingId = id;
+      document.getElementById('form-title').innerText = `تعديل سجل العائلة: ${id}`;
+      
+      document.getElementById('f-familyId').value = fam.familyId;
+      document.getElementById('f-headName').value = fam.headName || '';
+      document.getElementById('f-wifeName').value = fam.wifeName || '';
+      document.getElementById('f-membersCount').value = fam.membersCount || 1;
+      document.getElementById('f-headPhone').value = fam.headPhone || '';
+      document.getElementById('f-wifePhone').value = fam.wifePhone || '';
+      document.getElementById('f-incomeSource').value = fam.incomeSource || 'عمل حر';
+      document.getElementById('f-monthlyIncome').value = fam.monthlyIncome || 0;
+      document.getElementById('f-workersCount').value = fam.workersCount || 1;
+      
+      document.getElementById('f-needsSupport').checked = fam.needsSupport || false;
+      toggleSupportTypeField();
+      document.getElementById('f-supportType').value = fam.supportType || '';
+      
+      document.getElementById('f-housingType').value = fam.housingType || 'إيجار';
+      document.getElementById('f-houseCondition').value = fam.houseCondition || 'جيد';
+      document.getElementById('f-hasElectricity').checked = fam.hasElectricity !== false;
+      document.getElementById('f-hasWater').checked = fam.hasWater !== false;
+      document.getElementById('f-isDisplaced').checked = fam.isDisplaced || false;
+      
+      document.getElementById('f-elderlyCount').value = fam.elderlyCount || 0;
+      document.getElementById('f-childrenUnder5').value = fam.childrenUnder5 || 0;
+      document.getElementById('f-studentsCount').value = fam.studentsCount || 0;
+      document.getElementById('f-graduatesCount').value = fam.graduatesCount || 0;
+      document.getElementById('f-widowsCount').value = fam.widowsCount || 0;
+      document.getElementById('f-orphansCount').value = fam.orphansCount || 0;
+      document.getElementById('f-divorceesCount').value = fam.divorceesCount || 0;
+      document.getElementById('f-specialNeeds').checked = fam.specialNeeds || false;
+      document.getElementById('f-chronicIllness').checked = fam.chronicIllness || false;
+      
+      document.getElementById('f-familyCategory').value = fam.familyCategory || 'ب';
+      document.getElementById('f-supportPriority').value = fam.supportPriority || 'متوسطة';
+      document.getElementById('f-notes').value = fam.notes || '';
+
+      switchTab('add_family');
+      goToStep(1);
+    }
+
+    function resetStepperFormInputs(nextId) {
+      document.getElementById('f-familyId').value = nextId;
+      document.getElementById('f-headName').value = '';
+      document.getElementById('f-wifeName').value = '';
+      document.getElementById('f-membersCount').value = 1;
+      document.getElementById('f-headPhone').value = '';
+      document.getElementById('f-wifePhone').value = '';
+      document.getElementById('f-incomeSource').value = 'عمل حر';
+      document.getElementById('f-monthlyIncome').value = 0;
+      document.getElementById('f-workersCount').value = 1;
+      document.getElementById('f-needsSupport').checked = false;
+      toggleSupportTypeField();
+      document.getElementById('f-supportType').value = '';
+      document.getElementById('f-housingType').value = 'إيجار';
+      document.getElementById('f-houseCondition').value = 'جيد';
+      document.getElementById('f-hasElectricity').checked = true;
+      document.getElementById('f-hasWater').checked = true;
+      document.getElementById('f-isDisplaced').checked = false;
+      document.getElementById('f-elderlyCount').value = 0;
+      document.getElementById('f-childrenUnder5').value = 0;
+      document.getElementById('f-studentsCount').value = 0;
+      document.getElementById('f-graduatesCount').value = 0;
+      document.getElementById('f-widowsCount').value = 0;
+      document.getElementById('f-orphansCount').value = 0;
+      document.getElementById('f-divorceesCount').value = 0;
+      document.getElementById('f-specialNeeds').checked = false;
+      document.getElementById('f-chronicIllness').checked = false;
+      document.getElementById('f-familyCategory').value = 'ب';
+      document.getElementById('f-supportPriority').value = 'متوسطة';
+      document.getElementById('f-notes').value = '';
+    }
+
+    function changeStep(dir) {
+      const nextStep = currentStep + dir;
+      if (nextStep >= 1 && nextStep <= 5) {
+        if (dir === 1 && currentStep === 1) {
+          if (!document.getElementById('f-headName').value.trim()) {
+            showToast("يرجى كتابة اسم رب الأسرة بشكل كامل قبل الانتقال.", "error");
+            return;
+          }
+        }
+        goToStep(nextStep);
+      }
+    }
+
+    function goToStep(step) {
+      currentStep = step;
+      for (let i = 1; i <= 5; i++) {
+        const badge = document.getElementById('step-badge-' + i);
+        const label = document.getElementById('step-label-' + i);
+        const content = document.getElementById('step-content-' + i);
+
+        if (i === step) {
+          badge.className = "w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs bg-blue-600 text-white";
+          label.className = "text-xs font-bold text-blue-600 dark:text-blue-400";
+          content.classList.remove('hidden');
+        } else if (i < step) {
+          badge.className = "w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs bg-emerald-500 text-white";
+          label.className = "text-xs font-bold text-slate-500 dark:text-slate-400";
+          content.classList.add('hidden');
+        } else {
+          badge.className = "w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs bg-slate-200 dark:bg-slate-800 text-slate-400";
+          label.className = "text-xs font-bold text-slate-400";
+          content.classList.add('hidden');
+        }
+      }
+
+      document.getElementById('btn-step-prev').disabled = (step === 1);
+      if (step === 5) {
+        document.getElementById('btn-step-next').classList.add('hidden');
+        document.getElementById('btn-step-save').classList.remove('hidden');
+        buildFinalFormReviewHTML();
+      } else {
+        document.getElementById('btn-step-next').classList.remove('hidden');
+        document.getElementById('btn-step-save').classList.add('hidden');
+      }
+    }
+
+    function buildFinalFormReviewHTML() {
+      const container = document.getElementById('form-review-container');
+      const headName = document.getElementById('f-headName').value;
+      const wifeName = document.getElementById('f-wifeName').value || 'غير مسجل';
+      const membersCount = document.getElementById('f-membersCount').value;
+      const headPhone = document.getElementById('f-headPhone').value || 'غير مسجل';
+      const incomeSource = document.getElementById('f-incomeSource').value;
+      const monthlyIncome = document.getElementById('f-monthlyIncome').value;
+      const needsSupport = document.getElementById('f-needsSupport').checked ? 'يستحق الدعم' : 'لا يستحق';
+      const housingType = document.getElementById('f-housingType').value;
+      const houseCondition = document.getElementById('f-houseCondition').value;
+      const priority = document.getElementById('f-supportPriority').value;
+      const category = document.getElementById('f-familyCategory').value;
+
+      container.innerHTML = `
+        <div><strong class="text-slate-400 font-bold">اسم رب الأسرة:</strong> ${headName}</div>
+        <div><strong class="text-slate-400 font-bold">اسم الزوجة:</strong> ${wifeName}</div>
+        <div><strong class="text-slate-400 font-bold">رقم هاتف رب الأسرة:</strong> ${headPhone}</div>
+        <div><strong class="text-slate-400 font-bold">عدد أفراد الأسرة:</strong> ${membersCount} فرد</div>
+        <div><strong class="text-slate-400 font-bold">مصدر ومستوى الدخل:</strong> ${incomeSource} (${monthlyIncome} ريال)</div>
+        <div><strong class="text-slate-400 font-bold">حالة الاستحقاق للدعم:</strong> ${needsSupport}</div>
+        <div><strong class="text-slate-400 font-bold">نوع وحالة المسكن:</strong> سكن ${housingType} بقيمة ${houseCondition}</div>
+        <div><strong class="text-slate-400 font-bold">التصنيف والأولوية:</strong> تصنيف (${category}) بأولوية (${priority})</div>
+      `;
+    }
+
+    async function saveFamilyToDatabase() {
+      const id = document.getElementById('f-familyId').value;
+      const docData = {
+        familyId: id,
+        headName: document.getElementById('f-headName').value,
+        wifeName: document.getElementById('f-wifeName').value,
+        membersCount: parseInt(document.getElementById('f-membersCount').value) || 1,
+        headPhone: document.getElementById('f-headPhone').value,
+        wifePhone: document.getElementById('f-wifePhone').value,
+        incomeSource: document.getElementById('f-incomeSource').value,
+        monthlyIncome: parseFloat(document.getElementById('f-monthlyIncome').value) || 0,
+        workersCount: parseInt(document.getElementById('f-workersCount').value) || 0,
+        needsSupport: document.getElementById('f-needsSupport').checked,
+        supportType: document.getElementById('f-supportType').value,
+        housingType: document.getElementById('f-housingType').value,
+        houseCondition: document.getElementById('f-houseCondition').value,
+        hasElectricity: document.getElementById('f-hasElectricity').checked,
+        hasWater: document.getElementById('f-hasWater').checked,
+        isDisplaced: document.getElementById('f-isDisplaced').checked,
+        elderlyCount: parseInt(document.getElementById('f-elderlyCount').value) || 0,
+        childrenUnder5: parseInt(document.getElementById('f-childrenUnder5').value) || 0,
+        studentsCount: parseInt(document.getElementById('f-studentsCount').value) || 0,
+        graduatesCount: parseInt(document.getElementById('f-graduatesCount').value) || 0,
+        widowsCount: parseInt(document.getElementById('f-widowsCount').value) || 0,
+        orphansCount: parseInt(document.getElementById('f-orphansCount').value) || 0,
+        divorceesCount: parseInt(document.getElementById('f-divorceesCount').value) || 0,
+        specialNeeds: document.getElementById('f-specialNeeds').checked,
+        chronicIllness: document.getElementById('f-chronicIllness').checked,
+        familyCategory: document.getElementById('f-familyCategory').value,
+        supportPriority: document.getElementById('f-supportPriority').value,
+        notes: document.getElementById('f-notes').value,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (!isEditingMode) docData.createdAt = new Date().toISOString();
+
+      try {
+        await writeFamilyToDatabase(id, docData);
+        showToast(isEditingMode ? "تم تحديث السجل بنجاح" : "تم حفظ الأسرة الجديدة بنجاح", "success");
+        switchTab('families');
+      } catch (err) {
+        showToast("فشلت محاولة حفظ البيانات.", "error");
+      }
+    }
+
+    function switchFlutterFile(fileName) {
+      document.querySelectorAll('.flutter-file-btn').forEach(btn => {
+        btn.className = "flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50";
+      });
+      document.getElementById('btn-f-' + fileName).className = "flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400";
+      
+      const fileLabels = {
+        pubspec: 'pubspec.yaml',
+        main: 'lib / main.dart',
+        model: 'models / family_model.dart',
+        service: 'services / firestore_service.dart'
+      };
+
+      document.getElementById('flutter-file-name').innerText = fileLabels[fileName];
+      document.getElementById('flutter-code-block').innerText = flutterCodes[fileName];
+    }
+
+    // Direct Copy to Clipboard utility
+    function copyFlutterCode() {
+      const code = document.getElementById('flutter-code-block').innerText;
+      const el = document.createElement('textarea');
+      el.value = code;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      showToast("تم نسخ الكود الكامل بنجاح إلى الحافظة!", "success");
+    }
+
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      const icon = document.getElementById('toast-icon');
+
+      text.innerText = msg;
+      toast.className = "fixed bottom-6 left-6 z-50 flex items-center gap-3 p-4 rounded-xl shadow-lg border transition-all duration-300 translate-y-0 opacity-100 bg-white dark:bg-slate-900";
+      
+      if (type === 'error') {
+        toast.classList.add('border-red-200', 'text-red-800', 'dark:border-red-900', 'dark:text-red-300');
+        icon.setAttribute('data-lucide', 'alert-triangle');
+      } else if (type === 'info') {
+        toast.classList.add('border-blue-200', 'text-blue-800', 'dark:border-blue-900', 'dark:text-blue-300');
+        icon.setAttribute('data-lucide', 'info');
+      } else {
+        toast.classList.add('border-emerald-200', 'text-emerald-800', 'dark:border-emerald-900', 'dark:text-emerald-300');
+        icon.setAttribute('data-lucide', 'check-circle');
+      }
+
+      try { lucide.createIcons(); } catch (e) {}
+
+      setTimeout(() => {
+        toast.className = "hidden fixed bottom-6 left-6 z-50 flex items-center gap-3 p-4 rounded-xl shadow-lg border transition-all duration-300 translate-y-20 opacity-0 bg-white dark:bg-slate-900";
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
