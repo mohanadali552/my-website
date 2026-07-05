@@ -65,7 +65,6 @@
     
     <div class="w-full max-w-md bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl border border-white/10 dark:border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6 text-center">
       
-      <!-- App Header inside Login -->
       <div class="space-y-2">
         <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg mx-auto">
           <i data-lucide="shield-check" class="w-7 h-7 stroke-[2.2]"></i>
@@ -110,7 +109,6 @@
         </div>
       </div>
 
-      <!-- Action Button -->
       <button onclick="processSystemLogin()" class="w-full py-3 bg-gradient-to-r from-blue-600 to-emerald-500 hover:opacity-90 text-white text-xs font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
         <i data-lucide="log-in" class="w-4 h-4"></i>
         <span>التحقق والدخول للنظام</span>
@@ -180,8 +178,8 @@
       <!-- Drawer Overlay for Mobile -->
       <div id="drawer-overlay" onclick="toggleMobileMenu()" class="hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-xs lg:hidden"></div>
 
-      <!-- Navigation Sidebar -->
-      <aside id="sidebar" class="no-print fixed lg:static right-0 top-0 bottom-0 z-30 w-64 transform translate-x-full lg:translate-x-0 transition-transform duration-300 flex-shrink-0 border-l bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 h-full flex flex-col justify-between p-4">
+      <!-- Navigation Sidebar (Modified top and height for mobile viewports) -->
+      <aside id="sidebar" class="no-print fixed lg:static right-0 top-0 bottom-0 z-30 w-64 transform translate-x-full lg:translate-x-0 transition-transform duration-300 flex-shrink-0 border-l bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 h-full flex flex-col justify-between p-4 pt-24 lg:pt-4">
         <nav class="space-y-1.5">
           <button onclick="switchTab('dashboard')" id="btn-dashboard" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
             <i data-lucide="layout-dashboard" class="w-4.5 h-4.5"></i>
@@ -201,14 +199,6 @@
           <button onclick="switchTab('reports')" id="btn-reports" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50">
             <i data-lucide="file-text" class="w-4.5 h-4.5"></i>
             <span>التقارير والإحصائيات</span>
-          </button>
-
-          <button onclick="switchTab('flutter_code')" id="btn-flutter_code" class="sidebar-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50">
-            <div class="flex items-center gap-3">
-              <i data-lucide="code" class="w-4.5 h-4.5 text-amber-500"></i>
-              <span>مستودع كود Flutter</span>
-            </div>
-            <span class="bg-amber-500 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">دارت</span>
           </button>
 
           <button onclick="switchTab('settings')" id="btn-settings" class="sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50">
@@ -421,7 +411,7 @@
             <span class="text-xs text-slate-400">جاري تحميل البيانات الحية...</span>
           </div>
 
-          <div id="families-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+          <div id="families-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 border-t pt-4 border-slate-100 dark:border-slate-900"></div>
         </section>
 
         <!-- ==================== SCREEN 3: STEPPER FORM (ADD/EDIT) ==================== -->
@@ -447,7 +437,7 @@
             </button>
             <button onclick="goToStep(4)" class="stepper-btn flex items-center gap-2 flex-shrink-0 text-right focus:outline-none">
               <span id="step-badge-4" class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs bg-slate-200 dark:bg-slate-800 text-slate-400">4</span>
-              <span id="step-label-4" class="text-xs font-bold text-slate-400">الصحة والتعليم</span>
+              <span id="step-label-4" class="text-xs font-bold text-slate-400">الصحة والخصوصية</span>
             </button>
             <button onclick="goToStep(5)" class="stepper-btn flex items-center gap-2 flex-shrink-0 text-right focus:outline-none">
               <span id="step-badge-5" class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs bg-slate-200 dark:bg-slate-800 text-slate-400">5</span>
@@ -467,7 +457,7 @@
                 </div>
                 <div class="space-y-1">
                   <label class="text-[10px] text-slate-400 block font-bold">اسم رب الأسرة كاملاً *</label>
-                  <input id="f-headName" type="text" placeholder="أدخل الاسم الرباعي لرب الأسرة" class="w-full pr-3 pl-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100 focus:border-blue-500" />
+                  <input id="f-headName" type="text" placeholder="أدخل الاسم الرباعي لرب الأسرة" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100 focus:border-blue-500" />
                 </div>
                 <div class="space-y-1">
                   <label class="text-[10px] text-slate-400 block font-bold">اسم الزوجة الكامل</label>
@@ -479,11 +469,11 @@
                 </div>
                 <div class="space-y-1">
                   <label class="text-[10px] text-slate-400 block font-bold">هاتف رب الأسرة</label>
-                  <input id="f-headPhone" type="text" placeholder="05xxxxxxxx" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                  <input id="f-headPhone" type="text" placeholder="09xxxxxxxx" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
                 </div>
                 <div class="space-y-1">
                   <label class="text-[10px] text-slate-400 block font-bold">هاتف الزوجة</label>
-                  <input id="f-wifePhone" type="text" placeholder="05xxxxxxxx" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
+                  <input id="f-wifePhone" type="text" placeholder="09xxxxxxxx" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
                 </div>
               </div>
             </div>
@@ -498,12 +488,12 @@
                     <option value="راتب شهري">وظيفة / راتب شهري ثابت</option>
                     <option value="تقاعد حكومي">معاش تقاعدي</option>
                     <option value="عمل حر">عمل حر أو متقطع</option>
-                    <option value="الضمان الاجتماعي">الضمان الاجتماعي والمساعدات فقط</option>
+                    <option value="الضمان الاجتماعي">ديوان الزكاة والمساعدات فقط</option>
                     <option value="بلا دخل">بلا دخل مادي ثابت</option>
                   </select>
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[10px] text-slate-400 block font-bold">الدخل الشهري الإجمالي (ريال سعودي)</label>
+                  <label class="text-[10px] text-slate-400 block font-bold">الدخل الشهري الإجمالي (بالجنيه السوداني)</label>
                   <input id="f-monthlyIncome" type="number" value="0" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100" />
                 </div>
                 <div class="space-y-1">
@@ -518,7 +508,7 @@
                 </div>
                 <div id="support-type-container" class="space-y-1 md:col-span-2 hidden">
                   <label class="text-[10px] text-slate-400 block font-bold">نوع ومقدار الدعم المقترح والمطلوب</label>
-                  <textarea id="f-supportType" rows="2" placeholder="مثال: سلة غذائية شهرية، رعاية طبية خاصة، سداد إيجار..." class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100"></textarea>
+                  <textarea id="f-supportType" rows="2" placeholder="مثال: سلة غذائية شهرية، دعم صحي خاص، سداد كفالة..." class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100"></textarea>
                 </div>
               </div>
             </div>
@@ -530,10 +520,10 @@
                 <div class="space-y-1">
                   <label class="text-[10px] text-slate-400 block font-bold">نوع السكن الحالي بالحي</label>
                   <select id="f-housingType" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100">
-                    <option value="إيجار">شقة مستأجرة</option>
-                    <option value="ملك">شقة أو منزل ملك</option>
+                    <option value="إيجار">منزل مستأجر</option>
+                    <option value="ملك">منزل ملك</option>
                     <option value="بيت شعبي">بيت شعبي تقليدي</option>
-                    <option value="سكن مع أقارب">سكن مشترك مع العائلة</option>
+                    <option value="سكن مع أقارب">سكن مشترك مع الأقارب</option>
                   </select>
                 </div>
                 <div class="space-y-1">
@@ -558,7 +548,7 @@
                 <div class="flex items-center py-2">
                   <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-amber-500">
                     <input id="f-isDisplaced" type="checkbox" />
-                    <span>هل الأسرة نازحة من منطقة أو حي آخر؟</span>
+                    <span>هل الأسرة نازحة من منطقة أو ولاية أخرى؟</span>
                   </label>
                 </div>
               </div>
@@ -566,7 +556,7 @@
 
             <!-- STEP 4 Form -->
             <div id="step-content-4" class="step-content space-y-4 hidden">
-              <h3 class="text-xs font-bold pb-2 border-b border-slate-100 dark:border-slate-800">4. الحالة الصحية، التعليمية والفئات الاجتماعية الخاصة</h3>
+              <h3 class="text-xs font-bold pb-2 border-b border-slate-100 dark:border-slate-800">4. الحالة الصحية، التعليمية والخصوصية الإدارية</h3>
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="space-y-1">
                   <label class="text-[10px] text-slate-400 block font-bold">كبار السن (60+ سنة)</label>
@@ -610,7 +600,7 @@
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 border-slate-100 dark:border-slate-800">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t pt-4 border-slate-100 dark:border-slate-800">
                 <div class="space-y-1">
                   <label class="text-[10px] text-slate-400 block font-bold">تصنيف الأسرة العام</label>
                   <select id="f-familyCategory" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100">
@@ -627,7 +617,15 @@
                     <option value="عادية">عادية جداً</option>
                   </select>
                 </div>
-                <div class="space-y-1 md:col-span-2">
+                <!-- Director Privilege Settings Level -->
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 block font-bold text-red-500">حالة الخصوصية الإدارية (صلاحية المدير)</label>
+                  <select id="f-adminPrivilege" class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border border-red-200 bg-red-50/10 text-red-600 dark:border-red-950 dark:bg-red-950/20 dark:text-red-400 font-bold">
+                    <option value="open">ملف مفتوح (متاح لجميع الباحثين والمشرفين)</option>
+                    <option value="sensitive">حساس جداً (خاص بصلاحيات المدير العام فقط)</option>
+                  </select>
+                </div>
+                <div class="space-y-1 md:col-span-3">
                   <label class="text-[10px] text-slate-400 block font-bold">مرئيات وملاحظات الباحث الميداني</label>
                   <textarea id="f-notes" rows="2" placeholder="اكتب هنا أي ملاحظات إضافية حول وضع المنزل، أو الاحتياجات الخاصة..." class="w-full px-3 py-2 text-xs rounded-xl focus:outline-none border bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100"></textarea>
                 </div>
@@ -717,45 +715,6 @@
           </div>
         </section>
 
-        <!-- ==================== SCREEN 5: FLUTTER REPOSITORY ==================== -->
-        <section id="screen-flutter_code" class="space-y-6 hidden">
-          <div>
-            <h2 class="text-xl font-bold flex items-center gap-2">
-              <i data-lucide="code" class="text-amber-500"></i>
-              مستودع كود Flutter المرفق لـ HAMS
-            </h2>
-            <p class="text-xs text-slate-400">لقد تم تصميم كود Flutter متطابق تماماً وبشكل احترافي متناسق مع نفس قاعدة بيانات Firestore لحي العشر لتتمكن من تشغيل التطبيق بالهاتف.</p>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div class="p-4 rounded-2xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 space-y-1.5 lg:col-span-1">
-              <h3 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 pb-2 border-b border-slate-100 dark:border-slate-800">هيكل ملفات Flutter</h3>
-              <button onclick="switchFlutterFile('pubspec')" id="btn-f-pubspec" class="flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                <i data-lucide="file-code" class="w-4 h-4"></i>pubspec.yaml
-              </button>
-              <button onclick="switchFlutterFile('main')" id="btn-f-main" class="flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50">
-                <i data-lucide="folder" class="w-4 h-4"></i>lib / main.dart
-              </button>
-              <button onclick="switchFlutterFile('model')" id="btn-f-model" class="flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50">
-                <i data-lucide="folder" class="w-4 h-4"></i>models / family_model.dart
-              </button>
-              <button onclick="switchFlutterFile('service')" id="btn-f-service" class="flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50">
-                <i data-lucide="folder" class="w-4 h-4"></i>services / firestore_service.dart
-              </button>
-            </div>
-
-            <div class="p-4 rounded-2xl border bg-slate-900 border-slate-800 lg:col-span-3 overflow-hidden shadow-inner flex flex-col text-right">
-              <div class="flex justify-between items-center pb-3 border-b border-slate-800 mb-4" dir="ltr">
-                <span id="flutter-file-name" class="text-xs font-mono text-slate-400">pubspec.yaml</span>
-                <button onclick="copyFlutterCode()" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 text-[10px] font-bold rounded-lg transition-all flex items-center gap-1">
-                  <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>نسخ الكود الكامل
-                </button>
-              </div>
-              <pre class="text-left text-xs font-mono p-4 bg-slate-950 text-emerald-400 rounded-xl overflow-x-auto max-h-[420px] leading-relaxed"><code id="flutter-code-block"></code></pre>
-            </div>
-          </div>
-        </section>
-
         <!-- ==================== SCREEN 6: SYSTEM SETTINGS ==================== -->
         <section id="screen-settings" class="max-w-2xl mx-auto space-y-6 hidden">
           <div>
@@ -765,27 +724,6 @@
 
           <div class="p-6 rounded-3xl border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 space-y-6">
             
-            <!-- Firebase Custom Link Manual Panel -->
-            <div class="space-y-3 pb-6 border-b border-slate-100 dark:border-slate-800 text-right">
-              <h3 class="text-sm font-bold flex items-center gap-2">
-                <i data-lucide="database" class="w-4.5 h-4.5 text-blue-600"></i>
-                ربط حساب Firebase Firestore الخاص بك
-              </h3>
-              <p class="text-xs text-slate-400">انسخ والصق كود الـ Config من لوحة تحكم Firebase للتحول الفوري من نمط "المحاكاة المحلي" إلى "البث السحابي".</p>
-              
-              <div class="space-y-2">
-                <textarea id="custom-firebase-config-input" rows="4" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "...", "storageBucket": "..."}' class="w-full p-3 font-mono text-[11px] rounded-xl border bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 focus:outline-none"></textarea>
-                <div class="flex gap-2">
-                  <button onclick="saveCustomFirebaseConfig()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black rounded-xl transition-all shadow-md">
-                    حفظ وربط سحابي فوري
-                  </button>
-                  <button onclick="clearCustomFirebaseConfig()" class="px-4 py-2 bg-red-600/10 hover:bg-red-600 hover:text-white text-red-500 text-[10px] font-bold rounded-xl transition-all">
-                    مسح الإعدادات والعودة للمحاكي
-                  </button>
-                </div>
-              </div>
-            </div>
-
             <!-- User management panel (Visible only to Admin/mohanad) -->
             <div id="settings-admin-panel" class="space-y-4 pb-6 border-b border-slate-100 dark:border-slate-800 hidden">
               <h3 class="text-sm font-bold flex items-center gap-2">
@@ -800,6 +738,7 @@
                   <input id="new-user-username" type="text" placeholder="اسم المستخدم" class="px-3 py-2 text-xs rounded-xl focus:outline-none border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100" />
                   <input id="new-user-password" type="password" placeholder="كلمة المرور" class="px-3 py-2 text-xs rounded-xl focus:outline-none border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100" />
                   <select id="new-user-role" class="px-3 py-2 text-xs rounded-xl focus:outline-none border bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100">
+                    <option value="admin">مدير عام (صلاحية كاملة)</option>
                     <option value="entry">إدخال وتعديل البيانات</option>
                     <option value="read">قراءة وتقارير فقط</option>
                   </select>
@@ -852,7 +791,7 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border dark:border-slate-800">
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border dark:border-slate-800 text-right">
           <span class="text-xs text-slate-400 font-bold block mb-1.5">معلومات عامة</span>
           <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">اسم الزوجة:</strong> <span id="md-wifeName">--</span></p>
           <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">هاتف الزوج:</strong> <span id="md-headPhone">--</span></p>
@@ -860,15 +799,15 @@
           <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">عدد الأفراد:</strong> <span id="md-membersCount">0</span></p>
         </div>
 
-        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border dark:border-slate-800">
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border dark:border-slate-800 text-right">
           <span class="text-xs text-slate-400 font-bold block mb-1.5">الوضع المالي والسكن</span>
-          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">الدخل الشهري:</strong> <span id="md-monthlyIncome">0</span> ريال</p>
+          <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">الدخل الشهري:</strong> <span id="md-monthlyIncome">0</span> جنيه سوداني</p>
           <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">مصدر الدخل:</strong> <span id="md-incomeSource">--</span></p>
           <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">نوع السكن:</strong> <span id="md-housingType">--</span></p>
           <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">حالة المنزل:</strong> <span id="md-houseCondition">--</span></p>
         </div>
 
-        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border dark:border-slate-800">
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border dark:border-slate-800 text-right">
           <span class="text-xs text-slate-400 font-bold block mb-1.5">الاحتياج والدعم</span>
           <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">يحتاج لدعم؟</strong> <span id="md-needsSupport">--</span></p>
           <p class="text-xs leading-relaxed"><strong class="text-slate-400 font-bold">أولوية التدخل:</strong> <span id="md-supportPriority">--</span></p>
@@ -896,16 +835,16 @@
         </div>
       </div>
 
-      <div class="space-y-1.5">
+      <div class="space-y-1.5 text-right">
         <span class="text-xs text-slate-400 font-bold block">ملاحظات ومرئيات الباحث الميداني:</span>
         <p id="md-notes" class="text-xs p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border dark:border-slate-800 italic text-slate-600 dark:text-slate-300">
           لا توجد ملاحظات إضافية مسجلة حالياً حول هذه الأسرة.
         </p>
       </div>
 
-      <div class="flex flex-wrap gap-2 justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
-        <!-- New Dedicated PDF Print button -->
-        <button id="md-btn-print-pdf" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+      <!-- PDF Individual Export Feature -->
+      <div class="flex gap-2 justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+        <button id="md-btn-print" onclick="printSingleFamilyPDF()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5">
           <i data-lucide="printer" class="w-4 h-4"></i>
           طباعة كرت الأسرة (PDF)
         </button>
@@ -944,7 +883,7 @@
   <script>
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'hams-system-app';
     
-    // Config default loaded in-memory directly
+    // Core engine variables
     let db = null;
     let auth = null;
     let isFirebaseActive = false;
@@ -957,20 +896,31 @@
     let currentStep = 1;
     let currentReportTab = 'all';
 
+    // LocalStorage Fallback Storage Keys
     const LOCAL_FAMILIES_KEY = 'hams_local_families';
     const LOCAL_USERS_KEY = 'hams_local_users';
     const FIREBASE_CONFIG_KEY = 'hams_custom_firebase_config';
+
+    // Embedded real-time Firebase Config (Preserved)
+    const defaultFirebaseConfig = {
+      apiKey: "AIzaSyAuA6XbPRyh1YETTweEv0OoRCs2VWWwJMU",
+      authDomain: "hams-system-app.firebaseapp.com",
+      projectId: "hams-system-app",
+      storageBucket: "hams-system-app.firebasestorage.app",
+      messagingSenderId: "1075846677118",
+      appId: "1:1075846677118:web:2f3e56ffb9f7f4c1704e2f"
+    };
 
     const DEMO_FAMILIES_PRESETS = [
       {
         familyId: "HA-0001",
         headName: "محمد بن أحمد العتيبي",
         wifeName: "فاطمة صالح الحربي",
-        headPhone: "0501234567",
-        wifePhone: "0559876543",
+        headPhone: "0912345678",
+        wifePhone: "0998765432",
         membersCount: 6,
         incomeSource: "تقاعد حكومي",
-        monthlyIncome: 4200,
+        monthlyIncome: 420000,
         workersCount: 1,
         needsSupport: true,
         supportType: "دعم مالي وسلة غذائية شهرياً",
@@ -990,7 +940,8 @@
         isDisplaced: false,
         familyCategory: "أ",
         supportPriority: "عالية جداً",
-        notes: "يعاني رب الأسرة من أمراض مزمنة كالسكر، ولديهم إيجار شقة مستمر.",
+        adminPrivilege: "open",
+        notes: "يعاني رب الأسرة من أمراض مزمنة كالسكر، ولديهم إيجار منزل مستمر.",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       },
@@ -998,11 +949,11 @@
         familyId: "HA-0002",
         headName: "خالد بن عبد الله الدوسري",
         wifeName: "سارة محمد السبيعي",
-        headPhone: "0543210987",
-        wifePhone: "0567890123",
+        headPhone: "0913210987",
+        wifePhone: "0917890123",
         membersCount: 8,
         incomeSource: "عمل حر",
-        monthlyIncome: 2500,
+        monthlyIncome: 250000,
         workersCount: 1,
         needsSupport: true,
         supportType: "سداد فاتورة الكهرباء وتأمين كسوة المدارس",
@@ -1022,6 +973,7 @@
         isDisplaced: true,
         familyCategory: "ب",
         supportPriority: "متوسطة",
+        adminPrivilege: "open",
         notes: "أحد الأطفال مسجل رسمياً من ذوي الاحتياجات الخاصة (حركي خفيف).",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -1030,11 +982,11 @@
         familyId: "HA-0003",
         headName: "نورة مسفر القحطاني (أرملة)",
         wifeName: "المرحوم علي الشهري",
-        headPhone: "0533334444",
+        headPhone: "0913334444",
         wifePhone: "",
         membersCount: 5,
         incomeSource: "الضمان الاجتماعي",
-        monthlyIncome: 1800,
+        monthlyIncome: 180000,
         workersCount: 0,
         needsSupport: true,
         supportType: "كفالة أيتام ودعم تعليمي شهري للطلاب",
@@ -1054,19 +1006,20 @@
         isDisplaced: false,
         familyCategory: "أ",
         supportPriority: "عالية جداً",
+        adminPrivilege: "open",
         notes: "ترعى الأرامل أربعة أطفال أيتام دون وجود معيل مادي ثابت للأسرة.",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       },
       {
         familyId: "HA-0004",
-        headName: "عبد العزيز فهد الشمري",
+        headName: "عبد العزيز فهد الشمري (ملف حساس)",
         wifeName: "منى خالد التميمي",
-        headPhone: "0505556666",
-        wifePhone: "0506667777",
+        headPhone: "0915556666",
+        wifePhone: "0916667777",
         membersCount: 4,
         incomeSource: "راتب شهري",
-        monthlyIncome: 9200,
+        monthlyIncome: 920000,
         workersCount: 2,
         needsSupport: false,
         supportType: "",
@@ -1086,54 +1039,22 @@
         isDisplaced: false,
         familyCategory: "ج",
         supportPriority: "عادية",
-        notes: "حالة الأسرة ممتازة ولا تطلب المساعدة حالياً بفضل الله.",
+        adminPrivilege: "sensitive",
+        notes: "حالة الأسرة ممتازة وتم تشفير الملف برغبة الإدارة لحساسية الموقف.",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
     ];
 
-    const flutterCodes = {
-      pubspec: `name: hams_system\ndescription: "Hay Al-Ashr Families Management System (HAMS) in Flutter."\npublish_to: 'none'\nversion: 1.0.0+1\n\nenvironment:\n  sdk: '>=3.0.0 <4.0.0'\n\ndependencies:\n  flutter:\n    sdk: flutter\n  cupertino_icons: ^1.0.5\n  firebase_core: ^2.24.0\n  firebase_auth: ^4.15.0\n  cloud_firestore: ^4.13.0\n  provider: ^6.1.1\n  google_fonts: ^6.1.0\n  intl: ^0.18.1\n\ndev_dependencies:\n  flutter_test:\n    sdk: flutter\n  flutter_lints: ^3.0.0\n\nflutter:\n  uses-material-design: true`,
-
-      main: `import 'package:flutter/material.dart';\nimport 'package:flutter_localizations/flutter_localizations.dart';\nimport 'package:google_fonts/google_fonts.dart';\nimport 'package:provider/provider.dart';\nimport 'package:firebase_core/firebase_core.dart';\nimport 'models/family_model.dart';\nimport 'services/firestore_service.dart';\nimport 'views/login_screen.dart';\nimport 'views/dashboard_screen.dart';\n\nvoid main() async {\n  WidgetsFlutterBinding.ensureInitialized();\n  await Firebase.initializeApp();\n  runApp(\n    MultiProvider(\n      providers: [\n        ChangeNotifierProvider(create: (_) => FirestoreService()),\n      ],\n      child: const HamsApp(),\n    ),\n  );\n}\n\nclass HamsApp extends StatelessWidget {\n  const HamsApp({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return MaterialApp(\n      title: 'HAMS | نظام أسر حي العشر',\n      debugShowCheckedModeBanner: false,\n      locale: const Locale('ar', 'SA'),\n      supportedLocales: const [\n        Locale('ar', 'SA'),\n      ],\n      localizationsDelegates: const [\n        GlobalMaterialLocalizations.delegate,\n        GlobalWidgetsLocalizations.delegate,\n        GlobalCupertinoLocalizations.delegate,\n      ],\n      theme: ThemeData(\n        useMaterial3: true,\n        colorScheme: ColorScheme.fromSeed(\n          seedColor: const Color(0xFF1E3A8A),\n          primary: const Color(0xFF1E3A8A),\n          secondary: const Color(0xFF047857),\n          brightness: Brightness.light,\n        ),\n        textTheme: GoogleFonts.cairoTextTheme(Theme.of(context).textTheme),\n      ),\n      darkTheme: ThemeData(\n        useMaterial3: true,\n        colorScheme: ColorScheme.fromSeed(\n          seedColor: const Color(0xFF1E3A8A),\n          primary: const Color(0xFF3B82F6),\n          secondary: const Color(0xFF10B981),\n          brightness: Brightness.dark,\n        ),\n        textTheme: GoogleFonts.cairoTextTheme(Theme.of(context).primaryTextTheme),\n      ),\n      themeMode: ThemeMode.system,\n      home: const LoginScreen(),\n    );\n  }\n}`,
-
-      model: `class FamilyModel {\n  final String familyId;\n  final String headName;\n  final String wifeName;\n  final String headPhone;\n  final String wifePhone;\n  final int membersCount;\n  final String incomeSource;\n  final double monthlyIncome;\n  final int workersCount;\n  final bool needsSupport;\n  final String supportType;\n  final String housingType;\n  final String houseCondition;\n  final bool hasElectricity;\n  final bool hasWater;\n  final bool chronicIllness;\n  final bool specialNeeds;\n  final int elderlyCount;\n  final int childrenUnder5;\n  final int studentsCount;\n  final int graduatesCount;\n  final int widowsCount;\n  final int orphansCount;\n  final int divorceesCount;\n  final bool isDisplaced;\n  final String familyCategory;\n  final String supportPriority;\n  final String notes;\n  final String createdAt;\n  final String updatedAt;\n\n  FamilyModel({\n    required this.familyId,\n    required this.headName,\n    required this.wifeName,\n    required this.headPhone,\n    required this.wifePhone,\n    required this.membersCount,\n    required this.incomeSource,\n    required this.monthlyIncome,\n    required this.workersCount,\n    required this.needsSupport,\n    required this.supportType,\n    required this.housingType,\n    required this.houseCondition,\n    required this.hasElectricity,\n    required this.hasWater,\n    required this.chronicIllness,\n    required this.specialNeeds,\n    required this.elderlyCount,\n    required this.childrenUnder5,\n    required this.studentsCount,\n    required this.graduatesCount,\n    required this.widowsCount,\n    required this.orphansCount,\n    required this.divorceesCount,\n    required this.isDisplaced,\n    required this.familyCategory,\n    required this.supportPriority,\n    required this.notes,\n    required this.createdAt,\n    required this.updatedAt,\n  });\n\n  Map<String, dynamic> toMap() {\n    return {\n      'familyId': familyId,\n      'headName': headName,\n      'wifeName': wifeName,\n      'headPhone': headPhone,\n      'wifePhone': wifePhone,\n      'membersCount': membersCount,\n      'incomeSource': incomeSource,\n      'monthlyIncome': monthlyIncome,\n      'workersCount': workersCount,\n      'needsSupport': needsSupport,\n      'supportType': supportType,\n      'housingType': housingType,\n      'houseCondition': houseCondition,\n      'hasElectricity': hasElectricity,\n      'hasWater': hasWater,\n      'chronicIllness': chronicIllness,\n      'specialNeeds': specialNeeds,\n      'elderlyCount': elderlyCount,\n      'childrenUnder5': childrenUnder5,\n      'studentsCount': studentsCount,\n      'graduatesCount': graduatesCount,\n      'widowsCount': widowsCount,\n      'orphansCount': orphansCount,\n      'divorceesCount': divorceesCount,\n      'isDisplaced': isDisplaced,\n      'familyCategory': familyCategory,\n      'supportPriority': supportPriority,\n      'notes': notes,\n      'createdAt': createdAt,\n      'updatedAt': updatedAt,\n    };\n  }\n\n  factory FamilyModel.fromMap(Map<String, dynamic> map) {\n    return FamilyModel( \n      familyId: map['familyId'] ?? '',\n      headName: map['headName'] ?? '',\n      wifeName: map['wifeName'] ?? '',\n      headPhone: map['headPhone'] ?? '',\n      wifePhone: map['wifePhone'] ?? '',\n      membersCount: map['membersCount']?.toInt() ?? 0,\n      incomeSource: map['incomeSource'] ?? '',\n      monthlyIncome: map['monthlyIncome']?.toDouble() ?? 0.0,\n      workersCount: map['workersCount']?.toInt() ?? 0,\n      needsSupport: map['needsSupport'] ?? false,\n      supportType: map['supportType'] ?? '',\n      housingType: map['housingType'] ?? '',\n      houseCondition: map['houseCondition'] ?? '',\n      hasElectricity: map['hasElectricity'] ?? false,\n      hasWater: map['hasWater'] ?? false,\n      chronicIllness: map['chronicIllness'] ?? false,\n      specialNeeds: map['specialNeeds'] ?? false,\n      elderlyCount: map['elderlyCount']?.toInt() ?? 0,\n      childrenUnder5: map['childrenUnder5']?.toInt() ?? 0,\n      studentsCount: map['studentsCount']?.toInt() ?? 0,\n      graduatesCount: map['graduatesCount']?.toInt() ?? 0,\n      widowsCount: map['widowsCount']?.toInt() ?? 0,\n      orphansCount: map['orphansCount']?.toInt() ?? 0,\n      divorceesCount: map['divorceesCount']?.toInt() ?? 0,\n      isDisplaced: map['isDisplaced'] ?? false,\n      familyCategory: map['familyCategory'] ?? '',\n      supportPriority: map['supportPriority'] ?? '',\n      notes: map['notes'] ?? '',\n      createdAt: map['createdAt'] ?? '',\n      updatedAt: map['updatedAt'] ?? '',\n    );\n  }\n}`,
-
-      service: `import 'package:cloud_firestore/cloud_firestore.dart';\nimport 'package:flutter/foundation.dart';\nimport '../models/family_model.dart';\n\nclass FirestoreService extends ChangeNotifier {\n  final FirebaseFirestore _db = FirebaseFirestore.instance;\n  final String _appId = "hams-system-app";\n  \n  List<FamilyModel> _families = [];\n  bool _isLoading = false;\n\n  List<FamilyModel> get families => _families;\n  bool get isLoading => _isLoading;\n\n  CollectionReference get _collectionRef => \n      _db.collection('artifacts').doc(_appId).collection('public').doc('data').collection('families');\n\n  void listenToFamilies() {\n    _isLoading = true;\n    notifyListeners();\n    _collectionRef.snapshots().listen((snapshot) {\n      _families = snapshot.docs\n          .map((doc) => FamilyModel.fromMap(doc.data() as Map<String, dynamic>))\n          .toList();\n      _isLoading = false;\n      notifyListeners();\n    }, onError: (e) {\n      _isLoading = false;\n      notifyListeners();\n    });\n  }\n\n  Future<void> saveFamily(FamilyModel family) async {\n    await _collectionRef.doc(family.familyId).set(family.toMap());\n  }\n\n  Future<void> deleteFamily(String familyId) async {\n    await _collectionRef.doc(familyId).delete();\n  }\n}`
-    };
-
     // System Startup: Safe detection of Firebase SDK & config
     window.onload = async function() {
       try { lucide.createIcons(); } catch (e) { console.warn("Lucide icons failed to load", e); }
-      switchFlutterFile('pubspec');
-      
       detectAndInitializeDatabase();
     };
 
     function detectAndInitializeDatabase() {
       const isSDKLoaded = (typeof firebase !== 'undefined');
-      
-      // Default embedded configurations
-      let fbConfig = {
-        apiKey: "AIzaSyAuA6XbPRyh1YETTweEv0OoRCs2VWWwJMU",
-        authDomain: "hams-system-app.firebaseapp.com",
-        projectId: "hams-system-app",
-        storageBucket: "hams-system-app.firebasestorage.app",
-        messagingSenderId: "1075846677118",
-        appId: "1:1075846677118:web:2f3e56ffb9f7f4c1704e2f"
-      };
-
-      try {
-        const saved = localStorage.getItem(FIREBASE_CONFIG_KEY);
-        if (saved) {
-          fbConfig = JSON.parse(saved);
-          document.getElementById('custom-firebase-config-input').value = saved;
-        } else {
-          document.getElementById('custom-firebase-config-input').value = JSON.stringify(fbConfig, null, 2);
-        }
-      } catch (e) {
-        console.warn("Could not load saved configuration override", e);
-      }
+      let fbConfig = defaultFirebaseConfig; 
 
       const badge = document.getElementById('system-status-badge');
       const badgeText = document.getElementById('system-status-text');
@@ -1176,6 +1097,7 @@
       renderSystemUsersList();
     }
 
+    // Database interaction abstraction wrappers
     async function writeFamilyToDatabase(id, docData) {
       if (isFirebaseActive) {
         await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('families').doc(id).set(docData);
@@ -1253,25 +1175,6 @@
       });
     }
 
-    function saveCustomFirebaseConfig() {
-      const configStr = document.getElementById('custom-firebase-config-input').value.trim();
-      if (!configStr) return;
-      try {
-        JSON.parse(configStr); 
-        localStorage.setItem(FIREBASE_CONFIG_KEY, configStr);
-        showToast("تم حفظ الإعدادات السحابية. جاري إعادة تنشيط الربط...", "success");
-        setTimeout(() => { window.location.reload(); }, 1500);
-      } catch (e) {
-        showToast("كود التكوين غير صحيح. يرجى لصق كود JSON صالح.", "error");
-      }
-    }
-
-    function clearCustomFirebaseConfig() {
-      localStorage.removeItem(FIREBASE_CONFIG_KEY);
-      showToast("تم حذف إعدادات الربط. جاري تفعيل المحاكي المحلي...", "info");
-      setTimeout(() => { window.location.reload(); }, 1500);
-    }
-
     function processSystemLogin() {
       const usernameInput = document.getElementById('login-username').value.trim();
       const passwordInput = document.getElementById('login-password').value;
@@ -1291,7 +1194,7 @@
       if (userMatch) {
         currentUserProfile = {
           username: userMatch.username,
-          fullName: userMatch.username,
+          fullName: userMatch.username + (userMatch.role === 'admin' ? ' (المدير)' : ''),
           role: userMatch.role 
         };
         grantUserSession();
@@ -1386,7 +1289,7 @@
 
       try {
         await writeUserToDatabase(newUsername, userDoc);
-        showToast(`تم تسجيل المستخدم "${newUsername}" وتفعيل صلاحياته بنجاح.`, "success");
+        showToast(`تم تسجيل الحساب الجديد بنجاح.`, "success");
         document.getElementById('new-user-username').value = '';
         document.getElementById('new-user-password').value = '';
       } catch (err) {
@@ -1405,11 +1308,14 @@
       }
 
       systemUsers.forEach(u => {
-        let roleText = u.role === 'entry' ? "باحث إدخال وتعديل" : "قراءة فقط";
+        let roleText = "قراءة فقط";
+        if (u.role === 'admin') roleText = "مدير عام (صلاحية كاملة)";
+        else if (u.role === 'entry') roleText = "باحث إدخال وتعديل";
+        
         const div = document.createElement('div');
         div.className = "flex justify-between items-center py-2.5 text-xs text-slate-700 dark:text-slate-300";
         div.innerHTML = `
-          <div>
+          <div class="text-right">
             <p class="font-bold font-mono text-slate-800 dark:text-slate-200">${u.username}</p>
             <span class="text-[9px] text-slate-400">صلاحية: ${roleText} | كلمة المرور: ${u.password}</span>
           </div>
@@ -1426,7 +1332,7 @@
       if (currentUserProfile.role !== 'admin') return;
       try {
         await removeUserFromDatabase(username);
-        showToast(`تم مسح حساب الباحث "${username}" بنجاح فوري.`, "success");
+        showToast("تم مسح الحساب الفردي بنجاح.", "success");
       } catch (err) {
         showToast("فشلت عملية المسح السحابي.", "error");
       }
@@ -1446,11 +1352,14 @@
     }
 
     function switchTab(tabName) {
+      // Hide all screens
       document.querySelectorAll('main > section').forEach(section => {
         section.classList.add('hidden');
       });
+      // Show active screen
       document.getElementById('screen-' + tabName).classList.remove('hidden');
 
+      // Update sidebar styling
       document.querySelectorAll('.sidebar-btn').forEach(btn => {
         btn.className = "sidebar-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50";
       });
@@ -1464,10 +1373,26 @@
       } else if (tabName === 'families') {
         performSearch();
       }
+
+      // Auto-close mobile drawer on link click
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('drawer-overlay');
+      if (sidebar && overlay) {
+        sidebar.classList.add('translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    function canViewFamily(fam) {
+      if (!currentUserProfile) return false;
+      if (fam.adminPrivilege === 'sensitive' && currentUserProfile.role !== 'admin') {
+        return false;
+      }
+      return true;
     }
 
     function processStatisticsAndRender() {
-      const total = familiesData.length;
+      const total = familiesData.filter(canViewFamily).length;
       let totalPeople = 0;
       let needsSupport = 0;
       let totalStudents = 0;
@@ -1477,7 +1402,7 @@
       let highPriority = 0;
       let widowsOrphans = 0;
 
-      familiesData.forEach(f => {
+      familiesData.filter(canViewFamily).forEach(f => {
         totalPeople += (parseInt(f.membersCount) || 1);
         if (f.needsSupport) needsSupport++;
         totalStudents += (parseInt(f.studentsCount) || 0);
@@ -1510,7 +1435,7 @@
       const criticalContainer = document.getElementById('dashboard-critical-list');
       criticalContainer.innerHTML = '';
       
-      const criticalFamilies = familiesData.filter(f => f.needsSupport && f.supportPriority === 'عالية جداً');
+      const criticalFamilies = familiesData.filter(canViewFamily).filter(f => f.needsSupport && f.supportPriority === 'عالية جداً');
       if (criticalFamilies.length === 0) {
         criticalContainer.innerHTML = '<div class="text-center py-10 text-xs text-slate-400">لا توجد حالات طارئة تتطلب تدخل حالياً.</div>';
       } else {
@@ -1518,7 +1443,7 @@
           const div = document.createElement('div');
           div.className = "p-3 rounded-xl bg-red-500/5 border border-red-500/10 flex justify-between items-center";
           div.innerHTML = `
-            <div>
+            <div class="text-right">
               <p class="text-xs font-bold text-slate-800 dark:text-slate-200">${fam.headName}</p>
               <span class="text-[9px] text-slate-400">${fam.familyId} | عدد الأفراد: ${fam.membersCount} | الهاتف: ${fam.headPhone}</span>
             </div>
@@ -1554,7 +1479,7 @@
       const queryStr = document.getElementById('search-input').value.toLowerCase().trim();
       const filterType = document.getElementById('search-filter-type').value;
 
-      const filtered = familiesData.filter(fam => {
+      const filtered = familiesData.filter(canViewFamily).filter(fam => {
         if (!queryStr) return true;
 
         const matchesId = fam.familyId.toLowerCase().includes(queryStr);
@@ -1605,11 +1530,14 @@
         div.innerHTML = `
           <div class="flex justify-between items-start mb-3">
             <span class="text-[10px] font-mono font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded">${fam.familyId}</span>
-            <span class="text-[9px] px-2.5 py-0.5 rounded-full font-bold ${priorityColor}">${fam.supportPriority || 'عادية'}</span>
+            <div class="flex items-center gap-1.5">
+              ${fam.adminPrivilege === 'sensitive' ? `<span class="bg-red-500/10 text-red-500 text-[8px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5"><i data-lucide="lock" class="w-2.5 h-2.5"></i> خاص بالمدير</span>` : ''}
+              <span class="text-[9px] px-2.5 py-0.5 rounded-full font-bold ${priorityColor}">${fam.supportPriority || 'عادية'}</span>
+            </div>
           </div>
 
-          <h4 class="font-bold text-sm mb-1 line-clamp-1">${fam.headName}</h4>
-          <p class="text-[11px] text-slate-400 mb-4 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> سكن: ${fam.housingType} | ${fam.isDisplaced ? 'أسرة نازحة' : 'مقيم بالحي'}</p>
+          <h4 class="font-bold text-sm mb-1 line-clamp-1 text-right">${fam.headName}</h4>
+          <p class="text-[11px] text-slate-400 mb-4 flex items-center gap-1.5 justify-start" dir="rtl"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> سكن: ${fam.housingType} | ${fam.isDisplaced ? 'نازح' : 'مقيم بالحي'}</p>
 
           <div class="grid grid-cols-2 gap-2 text-[11px] mb-4 border-t pt-3 border-slate-100 dark:border-slate-800 text-right">
             <div>
@@ -1622,7 +1550,7 @@
             </div>
             <div>
               <span class="text-slate-400 text-[9px] block font-bold">الدخل المادي</span>
-              <p class="font-bold text-emerald-500">${fam.monthlyIncome} ريال</p>
+              <p class="font-bold text-emerald-500">${fam.monthlyIncome ? (fam.monthlyIncome.toLocaleString() + ' ج.س') : '0 ج.س'}</p>
             </div>
             <div>
               <span class="text-slate-400 text-[9px] block font-bold">يحتاج دعم ومتابعة</span>
@@ -1687,7 +1615,7 @@
       document.getElementById('md-headPhone').innerText = fam.headPhone || 'غير متوفر';
       document.getElementById('md-wifePhone').innerText = fam.wifePhone || 'غير متوفر';
       document.getElementById('md-membersCount').innerText = fam.membersCount;
-      document.getElementById('md-monthlyIncome').innerText = fam.monthlyIncome;
+      document.getElementById('md-monthlyIncome').innerText = fam.monthlyIncome ? fam.monthlyIncome.toLocaleString() : '0';
       document.getElementById('md-incomeSource').innerText = fam.incomeSource || 'عمل حر';
       document.getElementById('md-housingType').innerText = fam.housingType || 'إيجار';
       document.getElementById('md-houseCondition').innerText = fam.houseCondition || 'جيد';
@@ -1701,11 +1629,6 @@
       document.getElementById('md-chronicIllness').innerText = fam.chronicIllness ? "نعم" : "لا";
       document.getElementById('md-notes').innerText = fam.notes || 'لم يقم الباحث بتدوين ملاحظات إضافية.';
       document.getElementById('md-updatedAt').innerText = fam.updatedAt ? new Date(fam.updatedAt).toLocaleDateString('ar-SA') : 'غير متوفر';
-
-      // Setup Targeted single PDF printing button dynamically
-      document.getElementById('md-btn-print-pdf').onclick = function() {
-        printSingleFamilyCard(fam.familyId);
-      };
 
       const editBtn = document.getElementById('md-btn-edit');
       const canEdit = currentUserProfile ? (currentUserProfile.role === 'admin' || currentUserProfile.role === 'entry') : false;
@@ -1724,102 +1647,91 @@
       try { lucide.createIcons(); } catch (e) {}
     }
 
-    // Prints beautifully formatted single-family document
-    function printSingleFamilyCard(id) {
+    function printSingleFamilyPDF() {
+      const id = document.getElementById('md-familyId').innerText;
       const fam = familiesData.find(f => f.familyId === id);
       if (!fam) return;
 
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(`
+      const printWindow = window.open('', '_blank', 'width=800,height=900');
+      const content = `
         <html lang="ar" dir="rtl">
         <head>
-          <meta charset="UTF-8">
-          <title>بطاقة الأسرة الرسمية - ${fam.familyId}</title>
-          <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+          <title>تقرير كرت الأسرة - ${fam.familyId}</title>
           <style>
-            body { font-family: 'Cairo', sans-serif; direction: rtl; padding: 40px; color: #1e293b; background: #fff; }
-            .header { text-align: center; border-bottom: 3px double #1e3a8a; padding-bottom: 20px; margin-bottom: 30px; }
-            .title { font-size: 24px; font-weight: 900; color: #1e3a8a; }
-            .subtitle { font-size: 12px; color: #64748b; margin-top: 5px; font-weight: bold; }
-            .grid { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; }
-            .card { border: 1px solid #cbd5e1; padding: 20px; border-radius: 16px; background: #f8fafc; }
-            h3 { font-size: 14px; color: #1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 8px; margin-top: 0; margin-bottom: 15px; }
-            p { font-size: 12px; margin: 8px 0; line-height: 1.6; }
-            .label { font-weight: bold; color: #475569; }
-            .value { color: #0f172a; font-weight: bold; float: left; }
-            .full-width { grid-column: span 2; }
-            .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; }
-            .badge-red { background: #fee2e2; color: #991b1b; }
-            .badge-green { background: #dcfce7; color: #166534; }
-            .notes-section { margin-top: 25px; padding: 15px; border-right: 4px solid #3b82f6; background: #eff6ff; border-radius: 4px; font-size: 12px; }
-            .footer-signature { margin-top: 60px; display: grid; grid-template-cols: 1fr 1fr; text-align: center; font-size: 12px; font-weight: bold; }
+            body { font-family: 'Cairo', sans-serif; padding: 40px; color: #1e293b; background-color: #fff; }
+            .header { text-align: center; border-bottom: 3px double #0f172a; padding-bottom: 20px; margin-bottom: 30px; }
+            .header h1 { margin: 0; font-size: 24px; color: #1e3a8a; }
+            .header p { margin: 5px 0 0 0; font-size: 14px; color: #64748b; }
+            .meta-info { display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 13px; }
+            .section-title { font-size: 16px; font-weight: bold; border-right: 4px solid #10b981; padding-right: 10px; margin-top: 25px; margin-bottom: 15px; color: #0f172a; }
+            .grid { display: grid; grid-template-cols: 1fr 1fr; gap: 15px; font-size: 12px; }
+            .grid-item { background: #f8fafc; padding: 10px 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+            .grid-item strong { color: #475569; }
+            .footer { margin-top: 60px; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 20px; font-size: 11px; color: #94a3b8; }
+            .signature-block { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 40px; }
+            .signature { text-align: center; font-size: 12px; font-weight: bold; }
           </style>
         </head>
-        <body onload="window.print(); setTimeout(function(){ window.close(); }, 500);">
+        <body onload="window.print(); window.close();">
           <div class="header">
-            <div class="title">نظام HAMS المتكامل لإدارة أسر حي العشر</div>
-            <div class="subtitle">بطاقة دراسة حالة الأسرة - مستخرج تلقائي رسمي</div>
+            <h1>نظام HAMS المتكامل | كرت الأسرة الرسمي</h1>
+            <p>لجنة رعاية وأسر حي العشر - ولاية البحر الأحمر</p>
+          </div>
+          <div class="meta-info">
+            <span><strong>رقم الملف السحابي:</strong> ${fam.familyId}</span>
+            <span><strong>تصنيف الحالة:</strong> تصنيف (${fam.familyCategory || 'ج'})</span>
+            <span><strong>أولوية التدخل:</strong> ${fam.supportPriority || 'عادية'}</span>
           </div>
           
+          <div class="section-title">المعلومات والبيانات الأساسية للأسرة</div>
           <div class="grid">
-            <div class="card">
-              <h3>المعلومات العامة والاتصال</h3>
-              <p><span class="label">رقم الأسرة بالنظام:</span> <span class="value" style="font-family: monospace;">${fam.familyId}</span></p>
-              <p><span class="label">اسم رب الأسرة:</span> <span class="value">${fam.headName}</span></p>
-              <p><span class="label">اسم الزوجة:</span> <span class="value">${fam.wifeName || 'غير متوفر'}</span></p>
-              <p><span class="label">عدد أفراد الأسرة:</span> <span class="value">${fam.membersCount} أفراد</span></p>
-              <p><span class="label">رقم جوال العائل:</span> <span class="value">${fam.headPhone || 'غير متوفر'}</span></p>
-            </div>
-            
-            <div class="card">
-              <h3>الوضع الاقتصادي والسكن</h3>
-              <p><span class="label">مصدر الدخل المادي:</span> <span class="value">${fam.incomeSource || 'عمل حر'}</span></p>
-              <p><span class="label">الدخل الشهري الإجمالي:</span> <span class="value">${fam.monthlyIncome} ريال</span></p>
-              <p><span class="label">نوع وحالة السكن:</span> <span class="value">${fam.housingType} (${fam.houseCondition})</span></p>
-              <p><span class="label">استحقاق الدعم والمساعدة:</span> <span class="value badge ${fam.needsSupport ? 'badge-red' : 'badge-green'}">${fam.needsSupport ? 'مستحق للدعم' : 'مكتفي ذاتياً'}</span></p>
-              <p><span class="label">أولوية تقديم الدعم:</span> <span class="value">${fam.supportPriority}</span></p>
-            </div>
-            
-            <div class="card full-width">
-              <h3>المؤشرات الديموغرافية والاجتماعية بالمنزل</h3>
-              <div style="display: grid; grid-template-cols: 1fr 1fr 1fr 1fr; text-align: center; gap: 10px;">
-                <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
-                  <span style="font-size: 10px; color: #64748b; block">طلاب المدارس</span><br>
-                  <strong style="color: #3b82f6;">${fam.studentsCount || 0}</strong>
-                </div>
-                <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
-                  <span style="font-size: 10px; color: #64748b; block">كبار السن (60+)</span><br>
-                  <strong style="color: #10b981;">${fam.elderlyCount || 0}</strong>
-                </div>
-                <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
-                  <span style="font-size: 10px; color: #64748b; block">أرامل وأيتام</span><br>
-                  <strong style="color: #ef4444;">${(parseInt(fam.orphansCount) || 0) + (parseInt(fam.widowsCount) || 0)}</strong>
-                </div>
-                <div style="border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px;">
-                  <span style="font-size: 10px; color: #64748b; block">ذوي الاحتياجات</span><br>
-                  <strong style="color: #f59e0b;">${fam.specialNeeds ? 'نعم' : 'لا'}</strong>
-                </div>
-              </div>
-            </div>
+            <div class="grid-item"><strong>اسم رب الأسرة الكامل:</strong> ${fam.headName}</div>
+            <div class="grid-item"><strong>اسم الزوجة الكامل:</strong> ${fam.wifeName || 'غير متوفر'}</div>
+            <div class="grid-item"><strong>هاتف التواصل (الأساسي):</strong> ${fam.headPhone || 'غير متوفر'}</div>
+            <div class="grid-item"><strong>هاتف الزوجة:</strong> ${fam.wifePhone || 'غير متوفر'}</div>
+            <div class="grid-item"><strong>إجمالي أفراد العائلة المقيمين:</strong> ${fam.membersCount} فرد</div>
+            <div class="grid-item"><strong>نوع وحالة المسكن الحالي:</strong> سكن ${fam.housingType} (${fam.houseCondition})</div>
           </div>
-          
-          <div class="notes-section">
-            <strong>مرئيات وملاحظات الباحث الميداني للحي:</strong>
-            <p style="margin-top: 5px; font-style: italic;">"${fam.notes || 'لا توجد ملاحظات إضافية مسجلة.'}"</p>
+
+          <div class="section-title">الحالة الاقتصادية ومستوى الاستحقاق</div>
+          <div class="grid">
+            <div class="grid-item"><strong>مصدر الدخل المالي:</strong> ${fam.incomeSource}</div>
+            <div class="grid-item"><strong>إجمالي الدخل الشهري:</strong> ${fam.monthlyIncome ? (fam.monthlyIncome.toLocaleString() + ' جنيه سوداني') : '0 ج.س'}</div>
+            <div class="grid-item"><strong>عدد العاملين بالأسرة:</strong> ${fam.workersCount} أفراد</div>
+            <div class="grid-item"><strong>يحتاج دعم ورعاية:</strong> ${fam.needsSupport ? 'نعم (يستحق رعاية شهرية)' : 'لا يحتاج'}</div>
           </div>
-          
-          <div class="footer-signature">
-            <div>توقيع الباحث الميداني للحي<br><br>............................</div>
-            <div>توقيع واعتماد مشرف اللجنة<br><br>............................</div>
+
+          <div class="section-title">الحالة التعليمية والصحية والفئات المستهدفة</div>
+          <div class="grid">
+            <div class="grid-item"><strong>عدد طلاب المدارس والجامعات:</strong> ${fam.studentsCount || 0}</div>
+            <div class="grid-item"><strong>كبار السن (60+ سنة):</strong> ${fam.elderlyCount || 0}</div>
+            <div class="grid-item"><strong>عدد الأيتام والأرامل:</strong> ${ (parseInt(fam.orphansCount) || 0) + (parseInt(fam.widowsCount) || 0) }</div>
+            <div class="grid-item"><strong>ذوو احتياجات خاصة / مرضى مزمنين:</strong> ${fam.specialNeeds ? 'نعم' : 'لا'} / ${fam.chronicIllness ? 'نعم' : 'لا'}</div>
+          </div>
+
+          <div class="section-title">مرئيات وتوصيات الباحث الميداني</div>
+          <div style="background: #fffbeb; padding: 15px; border-radius: 8px; border: 1px solid #fef3c7; font-size: 12px; font-style: italic; line-height: 1.6;">
+            ${fam.notes || 'لم يدون الباحث أي توصيات مضافة.'}
+          </div>
+
+          <div class="signature-block">
+            <div class="signature">توقيع الباحث الميداني:<br/><br/>...........................</div>
+            <div class="signature">اعتماد مشرف ومقرر الحي:<br/><br/>...........................</div>
+          </div>
+
+          <div class="footer">
+            تم استخراج هذا الكرت إلكترونياً من قاعدة بيانات نظام HAMS السحابية في تاريخ: ${new Date().toLocaleDateString('ar-SA')}
           </div>
         </body>
         </html>
-      `);
+      `;
+
+      printWindow.document.write(content);
       printWindow.document.close();
     }
 
     function exportToCSV() {
-      if (familiesData.length === 0) {
+      if (familiesData.filter(canViewFamily).length === 0) {
         showToast("لا توجد بيانات متاحة للتصدير حالياً", "error");
         return;
       }
@@ -1827,7 +1739,7 @@
       let csv = 'data:text/csv;charset=utf-8,\uFEFF';
       csv += 'رقم الأسرة,اسم رب الأسرة,الهاتف,عدد أفراد الأسرة,الدخل الشهري,يحتاج دعم,أولوية الدعم\r\n';
 
-      familiesData.forEach(f => {
+      familiesData.filter(canViewFamily).forEach(f => {
         csv += `"${f.familyId}","${f.headName}","${f.headPhone}",${f.membersCount},${f.monthlyIncome},"${f.needsSupport ? 'نعم' : 'لا'}","${f.supportPriority}"\r\n`;
       });
 
@@ -1857,7 +1769,7 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      const filtered = familiesData.filter(f => {
+      const filtered = familiesData.filter(canViewFamily).filter(f => {
         if (currentReportTab === 'support') return f.needsSupport;
         if (currentReportTab === 'students') return (parseInt(f.studentsCount) || 0) > 0;
         if (currentReportTab === 'elderly') return (parseInt(f.elderlyCount) || 0) > 0;
@@ -1879,7 +1791,7 @@
           <td class="py-3 px-2">${fam.headPhone || 'غير مسجل'}</td>
           <td class="py-3 px-2 text-center">${fam.membersCount} فرد</td>
           <td class="py-3 px-2 text-center">${fam.housingType}</td>
-          <td class="py-3 px-2 text-center text-emerald-500 font-bold">${fam.monthlyIncome} ريال</td>
+          <td class="py-3 px-2 text-center text-emerald-500 font-bold">${fam.monthlyIncome ? (fam.monthlyIncome.toLocaleString() + ' ج.س') : '0 ج.س'}</td>
           <td class="py-3 px-2 text-center">
             <span class="px-2 py-0.5 rounded text-[10px] font-bold ${fam.supportPriority === 'عالية جداً' ? 'bg-red-100 text-red-700 dark:bg-red-950/40' : 'bg-slate-100 text-slate-600 dark:bg-slate-800'}">
               ${fam.supportPriority}
@@ -1891,11 +1803,11 @@
     }
 
     function downloadBackupJSON() {
-      if (familiesData.length === 0) {
+      if (familiesData.filter(canViewFamily).length === 0) {
         showToast("لا توجد بيانات مسجلة لحفظها", "error");
         return;
       }
-      const jsonStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(familiesData, null, 2))}`;
+      const jsonStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(familiesData.filter(canViewFamily), null, 2))}`;
       const dlAnchor = document.createElement('a');
       dlAnchor.setAttribute("href", jsonStr);
       dlAnchor.setAttribute("download", `HAMS_Backup_${new Date().toISOString().split('T')[0]}.json`);
@@ -2000,6 +1912,7 @@
       
       document.getElementById('f-familyCategory').value = fam.familyCategory || 'ب';
       document.getElementById('f-supportPriority').value = fam.supportPriority || 'متوسطة';
+      document.getElementById('f-adminPrivilege').value = fam.adminPrivilege || 'open';
       document.getElementById('f-notes').value = fam.notes || '';
 
       switchTab('add_family');
@@ -2035,6 +1948,7 @@
       document.getElementById('f-chronicIllness').checked = false;
       document.getElementById('f-familyCategory').value = 'ب';
       document.getElementById('f-supportPriority').value = 'متوسطة';
+      document.getElementById('f-adminPrivilege').value = 'open';
       document.getElementById('f-notes').value = '';
     }
 
@@ -2097,16 +2011,18 @@
       const houseCondition = document.getElementById('f-houseCondition').value;
       const priority = document.getElementById('f-supportPriority').value;
       const category = document.getElementById('f-familyCategory').value;
+      const privilege = document.getElementById('f-adminPrivilege').value === 'sensitive' ? 'حساس (خاص بالمدير)' : 'مفتوح للعامة';
 
       container.innerHTML = `
         <div><strong class="text-slate-400 font-bold">اسم رب الأسرة:</strong> ${headName}</div>
         <div><strong class="text-slate-400 font-bold">اسم الزوجة:</strong> ${wifeName}</div>
         <div><strong class="text-slate-400 font-bold">رقم هاتف رب الأسرة:</strong> ${headPhone}</div>
         <div><strong class="text-slate-400 font-bold">عدد أفراد الأسرة:</strong> ${membersCount} فرد</div>
-        <div><strong class="text-slate-400 font-bold">مصدر ومستوى الدخل:</strong> ${incomeSource} (${monthlyIncome} ريال)</div>
+        <div><strong class="text-slate-400 font-bold">مصدر ومستوى الدخل:</strong> ${incomeSource} (${parseInt(monthlyIncome).toLocaleString()} ج.س)</div>
         <div><strong class="text-slate-400 font-bold">حالة الاستحقاق للدعم:</strong> ${needsSupport}</div>
         <div><strong class="text-slate-400 font-bold">نوع وحالة المسكن:</strong> سكن ${housingType} بقيمة ${houseCondition}</div>
         <div><strong class="text-slate-400 font-bold">التصنيف والأولوية:</strong> تصنيف (${category}) بأولوية (${priority})</div>
+        <div class="col-span-2"><strong class="text-red-500 font-bold">نوع الخصوصية إدارياً:</strong> ${privilege}</div>
       `;
     }
 
@@ -2140,6 +2056,7 @@
         chronicIllness: document.getElementById('f-chronicIllness').checked,
         familyCategory: document.getElementById('f-familyCategory').value,
         supportPriority: document.getElementById('f-supportPriority').value,
+        adminPrivilege: document.getElementById('f-adminPrivilege').value,
         notes: document.getElementById('f-notes').value,
         updatedAt: new Date().toISOString()
       };
@@ -2153,35 +2070,6 @@
       } catch (err) {
         showToast("فشلت محاولة حفظ البيانات.", "error");
       }
-    }
-
-    function switchFlutterFile(fileName) {
-      document.querySelectorAll('.flutter-file-btn').forEach(btn => {
-        btn.className = "flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50";
-      });
-      document.getElementById('btn-f-' + fileName).className = "flutter-file-btn w-full text-right p-2.5 text-xs rounded-xl flex items-center gap-2 font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400";
-      
-      const fileLabels = {
-        pubspec: 'pubspec.yaml',
-        main: 'lib / main.dart',
-        model: 'models / family_model.dart',
-        service: 'services / firestore_service.dart'
-      };
-
-      document.getElementById('flutter-file-name').innerText = fileLabels[fileName];
-      document.getElementById('flutter-code-block').innerText = flutterCodes[fileName];
-    }
-
-    // Direct Copy to Clipboard utility
-    function copyFlutterCode() {
-      const code = document.getElementById('flutter-code-block').innerText;
-      const el = document.createElement('textarea');
-      el.value = code;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      showToast("تم نسخ الكود الكامل بنجاح إلى الحافظة!", "success");
     }
 
     function showToast(msg, type = 'success') {
@@ -2212,3 +2100,4 @@
   </script>
 </body>
 </html>
+
