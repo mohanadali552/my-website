@@ -1,0 +1,2641 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAMS - نظام إدارة حي العشر السحابي</title>
+    <!-- Google Fonts: Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase Legacy/Compat SDKs (Best suited for CDN single-file integration) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        },
+                        navy: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full overflow-hidden text-slate-800">
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="h-full flex flex-col md:flex-row overflow-hidden">
+
+        <!-- ==================== LOGIN SCREEN ==================== -->
+        <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-tr from-navy-900 via-brand-900 to-emerald-950 p-4 transition-all duration-300">
+            <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl max-w-md w-full p-8 border border-white/20 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <div class="absolute bottom-0 left-0 w-32 h-32 bg-navy-500/10 rounded-full blur-2xl -ml-10 -mb-10"></div>
+                
+                <div class="text-center mb-8 relative z-10">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-500 text-white mb-4 shadow-lg shadow-brand-500/20">
+                        <i class="fa-solid fa-hotel text-2xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-black text-slate-900">نظام هَمس | HAMS</h1>
+                    <p class="text-slate-500 text-sm mt-1">بوابة الدخول الآمن لمنتسبي إدارة حي العشر</p>
+                </div>
+                
+                <div id="login-error" class="hidden mb-4 p-3 bg-red-50 border-r-4 border-red-500 text-red-700 text-xs rounded-xl font-bold">
+                    فشل تسجيل الدخول! اسم المستخدم أو كلمة المرور غير صحيحة.
+                </div>
+
+                <form onsubmit="handleLoginSubmit(event)" class="space-y-4 relative z-10">
+                    <div>
+                        <label class="block text-slate-700 text-xs font-bold mb-1.5">اسم المستخدم</label>
+                        <input type="text" id="login-username" required placeholder="مثال: mohanad" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm font-medium transition-all">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-slate-700 text-xs font-bold mb-1.5">كلمة المرور</label>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm font-medium transition-all">
+                    </div>
+                    
+                    <button type="submit" class="w-full py-3 bg-gradient-to-l from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 text-white font-bold rounded-xl shadow-lg shadow-brand-500/20 transition-all transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <i class="fa-solid fa-right-to-bracket ml-2"></i> دخول آمن للشبكة السحابية
+                    </button>
+                </form>
+                
+                <div class="mt-8 text-center text-xs text-slate-400 relative z-10">
+                    اللجنة التنفيذية لحي العشر © 2026
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== MAIN LAYOUT ==================== -->
+        <!-- SIDEBAR -->
+        <aside id="main-sidebar" class="hidden w-72 bg-gradient-to-b from-slate-900 to-slate-950 text-slate-300 md:flex flex-col flex-shrink-0 border-l border-slate-800 relative z-40">
+            <!-- Sidebar Header -->
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-brand-500 to-emerald-400 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-hotel text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-extrabold text-sm tracking-wide">نظام هَمس HAMS</h2>
+                        <span class="text-[10px] text-brand-400 font-bold bg-brand-900/40 px-1.5 py-0.5 rounded">إدارة حي العشر</span>
+                    </div>
+                </div>
+                <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <!-- User Profile in Sidebar -->
+            <div class="p-4 mx-4 my-3 bg-slate-800/40 rounded-xl border border-slate-800/60 flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-brand-400 border border-slate-600 relative">
+                    <i class="fa-solid fa-user-shield text-lg" id="user-avatar-icon"></i>
+                    <!-- Active Status Dot Indicator -->
+                    <span class="absolute bottom-0 left-0 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full animate-pulse"></span>
+                </div>
+                <div class="overflow-hidden">
+                    <h4 class="text-white font-bold text-xs truncate" id="user-display-name">جاري التحميل...</h4>
+                    <div class="flex items-center gap-1 mt-0.5">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                        <span class="text-[9px] text-emerald-400 font-black">متصل الآن</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 truncate mt-0.5" id="user-display-role">الرتبة والمستوى</p>
+                </div>
+            </div>
+
+            <!-- Sidebar Navigation Links -->
+            <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+                <p class="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">الرئيسية</p>
+                
+                <a onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer">
+                    <i class="fa-solid fa-chart-line ml-3 w-5 text-center text-slate-400"></i>
+                    <span>لوحة التحكم الرئيسية</span>
+                </a>
+
+                <p class="px-3 py-2 pt-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">السجلات والأسر</p>
+
+                <a onclick="switchView('families-list')" id="nav-families-list" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer">
+                    <i class="fa-solid fa-users-rectangle ml-3 w-5 text-center text-slate-400"></i>
+                    <span>قاعدة بيانات الأسر</span>
+                </a>
+
+                <a onclick="switchView('add-family')" id="nav-add-family" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer">
+                    <i class="fa-solid fa-user-plus ml-3 w-5 text-center text-slate-400"></i>
+                    <span>إضافة أسرة جديدة</span>
+                </a>
+
+                <p class="px-3 py-2 pt-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">برامج الدعم والمشاريع</p>
+
+                <a onclick="switchView('projects-hub')" id="nav-projects-hub" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer">
+                    <i class="fa-solid fa-boxes-packing ml-3 w-5 text-center text-slate-400"></i>
+                    <span>دليل المشاريع الكلي</span>
+                </a>
+
+                <a onclick="switchView('food-basket')" id="nav-food-basket" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer">
+                    <i class="fa-solid fa-basket-shopping ml-3 w-5 text-center text-slate-400"></i>
+                    <span>السلة الغذائية</span>
+                </a>
+
+                <a onclick="switchView('emergency-committee')" id="nav-emergency-committee" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer">
+                    <i class="fa-solid fa-kit-medical ml-3 w-5 text-center text-slate-400"></i>
+                    <span>لجنة الطوارئ والقطاعات</span>
+                </a>
+
+                <p id="admin-section-header" class="px-3 py-2 pt-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">إدارة وصلاحيات</p>
+
+                <a onclick="switchView('manager-approvals')" id="nav-manager-approvals" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer relative">
+                    <i class="fa-solid fa-envelope-open-text ml-3 w-5 text-center text-slate-400"></i>
+                    <span>طلبات الموافقة المعلقة</span>
+                    <span id="badge-approvals" class="hidden absolute left-3 top-2.5 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+                </a>
+
+                <a onclick="switchView('users-mgmt')" id="nav-users-mgmt" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer">
+                    <i class="fa-solid fa-users-gear ml-3 w-5 text-center text-slate-400"></i>
+                    <span>إدارة المستخدمين الجدد</span>
+                </a>
+
+                <a onclick="switchView('reports-page')" id="nav-reports-page" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer">
+                    <i class="fa-solid fa-file-invoice ml-3 w-5 text-center text-slate-400"></i>
+                    <span>التقارير والإحصائيات</span>
+                </a>
+
+                <a onclick="switchView('settings-page')" id="nav-settings-page" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer">
+                    <i class="fa-solid fa-sliders ml-3 w-5 text-center text-slate-400"></i>
+                    <span>إعدادات النظام</span>
+                </a>
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="p-4 border-t border-slate-800 bg-slate-950/50">
+                <button onclick="handleLogout()" class="w-full flex items-center justify-center px-4 py-2.5 bg-red-950/30 hover:bg-red-900/40 border border-red-900/50 text-red-400 hover:text-red-300 rounded-lg text-xs font-bold transition-all">
+                    <i class="fa-solid fa-arrow-right-from-bracket ml-2"></i> تسجيل الخروج من هَمس
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            
+            <!-- TOP BAR -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 flex-shrink-0 z-30">
+                <!-- Right Side: Hamburger Mobile & Title -->
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <button onclick="toggleMobileSidebar()" class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-lg font-black text-slate-900" id="current-view-title">لوحة التحكم</h1>
+                        <p class="hidden sm:block text-xs text-slate-400" id="current-view-subtitle">إحصائيات عامة ومؤشرات حية للأسر المستفيدة</p>
+                    </div>
+                </div>
+
+                <!-- Left Side: Custom Search & Quick Actions -->
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <!-- Global Search Simulator -->
+                    <div class="relative hidden lg:block w-64">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs"></i>
+                        </span>
+                        <input type="text" onkeyup="globalSearch(this.value)" placeholder="البحث برقم الهاتف أو اسم رب الأسرة..." class="w-full pr-9 pl-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                    </div>
+
+                    <!-- Sector Badge Info -->
+                    <div class="bg-navy-50 border border-navy-100 text-navy-700 px-3 py-1.5 rounded-xl flex items-center space-x-1.5 space-x-reverse text-xs font-bold">
+                        <i class="fa-solid fa-building-circle-check"></i>
+                        <span id="header-active-sector-label">الكل</span>
+                    </div>
+
+                    <!-- Notifications Dropdown Simulation -->
+                    <div class="relative">
+                        <button onclick="toggleNotifications()" class="p-2 text-slate-600 hover:bg-slate-100 rounded-xl relative">
+                            <i class="fa-regular fa-bell text-lg"></i>
+                            <span id="notification-dot" class="absolute top-1.5 left-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                        <!-- Notifications Dropdown Box -->
+                        <div id="notifications-box" class="hidden absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
+                            <div class="px-4 py-2 border-b border-slate-100 flex justify-between items-center">
+                                <span class="font-bold text-xs text-slate-900">آخر الإشعارات والعمليات</span>
+                                <button onclick="clearNotifications()" class="text-[10px] text-brand-600 hover:underline">مسح الكل</button>
+                            </div>
+                            <div class="max-h-60 overflow-y-auto text-xs text-slate-600 divide-y divide-slate-50" id="notifications-list">
+                                <!-- Dynamic notifications inject here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Exit Top bar Logout Button -->
+                    <button onclick="handleLogout()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5" title="تسجيل الخروج">
+                        <i class="fa-solid fa-power-off"></i>
+                        <span class="hidden sm:inline">خروج</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- INNER CANVAS VIEW CONTAINER -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 relative" id="canvas-view-container">
+
+                <!-- Toast Alerts Placeholder -->
+                <div id="toast" class="hidden fixed bottom-5 left-5 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3 space-x-reverse max-w-sm transition-all duration-300">
+                    <span id="toast-icon-wrapper" class="text-emerald-400"><i class="fa-solid fa-circle-check"></i></span>
+                    <span id="toast-message" class="text-xs font-medium">تمت العملية بنجاح!</span>
+                </div>
+
+                <!-- ==================== 1. DASHBOARD VIEW ==================== -->
+                <section id="view-dashboard" class="space-y-6">
+                    <!-- Statistics Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                        <!-- Card 1 -->
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400">إجمالي الأسر المسجلة</p>
+                                <h3 class="text-2xl font-black text-slate-900 mt-1" id="stat-total-families">0</h3>
+                                <span class="text-[9px] text-brand-600 font-bold bg-brand-50 px-1 rounded mt-1 inline-block">محدث حياً</span>
+                            </div>
+                            <div class="w-11 h-11 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-lg shadow-inner">
+                                <i class="fa-solid fa-house-chimney"></i>
+                            </div>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400">إجمالي المشاريع الفعالة</p>
+                                <h3 class="text-2xl font-black text-slate-900 mt-1" id="stat-total-projects">5</h3>
+                                <span class="text-[9px] text-navy-600 font-bold bg-navy-50 px-1 rounded mt-1 inline-block">كفالات ودعم</span>
+                            </div>
+                            <div class="w-11 h-11 bg-navy-50 text-navy-600 rounded-xl flex items-center justify-center text-lg shadow-inner">
+                                <i class="fa-solid fa-hand-holding-hand"></i>
+                            </div>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400">مستخدمي النظام</p>
+                                <h3 class="text-2xl font-black text-slate-900 mt-1" id="stat-total-users">4</h3>
+                                <span class="text-[9px] text-indigo-600 font-bold bg-indigo-50 px-1 rounded mt-1 inline-block">صلاحيات محددة</span>
+                            </div>
+                            <div class="w-11 h-11 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg shadow-inner">
+                                <i class="fa-solid fa-users-gear"></i>
+                            </div>
+                        </div>
+                        <!-- Card 4 -->
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400">الأسر المستلمة (السلة)</p>
+                                <h3 class="text-2xl font-black text-slate-900 mt-1" id="stat-received">0</h3>
+                                <span class="text-[9px] text-emerald-600 font-bold bg-emerald-50 px-1 rounded mt-1 inline-block" id="stat-received-pct">0%</span>
+                            </div>
+                            <div class="w-11 h-11 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg shadow-inner">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                        </div>
+                        <!-- Card 5 -->
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400">الأسر لم تستلم (السلة)</p>
+                                <h3 class="text-2xl font-black text-slate-900 mt-1" id="stat-not-received">0</h3>
+                                <span class="text-[9px] text-amber-600 font-bold bg-amber-50 px-1 rounded mt-1 inline-block" id="stat-not-received-pct">0%</span>
+                            </div>
+                            <div class="w-11 h-11 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-lg shadow-inner">
+                                <i class="fa-solid fa-hourglass-half"></i>
+                            </div>
+                        </div>
+                        <!-- Card 6 -->
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400">طلبات الموافقة المعلقة</p>
+                                <h3 class="text-2xl font-black text-rose-600 mt-1" id="stat-pending-approvals">0</h3>
+                                <span class="text-[9px] text-rose-600 font-bold bg-rose-50 px-1 rounded mt-1 inline-block">تحتاج موافقة</span>
+                            </div>
+                            <div class="w-11 h-11 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-lg shadow-inner">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Quick Charts and Actions -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Circular Status Chart (Custom SVG & Progress representation) -->
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 lg:col-span-1">
+                            <h3 class="font-extrabold text-xs text-slate-400 uppercase tracking-wider mb-4">توزيع الأسر على القطاعات</h3>
+                            <div class="flex flex-col items-center justify-center h-48 space-y-4">
+                                <div class="flex justify-around w-full text-center">
+                                    <div>
+                                        <span class="block text-xs text-slate-400 font-medium">القطاع الشرقي</span>
+                                        <span class="block text-lg font-black text-brand-600" id="sector-east-count">0</span>
+                                    </div>
+                                    <div class="border-l border-slate-100"></div>
+                                    <div>
+                                        <span class="block text-xs text-slate-400 font-medium">القطاع الجنوبي</span>
+                                        <span class="block text-lg font-black text-navy-600" id="sector-south-count">0</span>
+                                    </div>
+                                    <div class="border-l border-slate-100"></div>
+                                    <div>
+                                        <span class="block text-xs text-slate-400 font-medium">القطاع الشمالي</span>
+                                        <span class="block text-lg font-black text-indigo-600" id="sector-north-count">0</span>
+                                    </div>
+                                </div>
+                                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex">
+                                    <div id="bar-east" class="bg-brand-500 h-full" style="width: 33%"></div>
+                                    <div id="bar-south" class="bg-navy-500 h-full" style="width: 33%"></div>
+                                    <div id="bar-north" class="bg-indigo-500 h-full" style="width: 34%"></div>
+                                </div>
+                                <p class="text-[11px] text-slate-400 text-center">نسبة توزيع المستفيدين تعبر عن التغطية الجغرافية في المربعات</p>
+                            </div>
+                        </div>
+
+                        <!-- System Announcements & Quick Access -->
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 lg:col-span-2 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-extrabold text-xs text-slate-400 uppercase tracking-wider">الإجراءات السريعة والمهمات</h3>
+                                <span class="text-xs text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full font-bold">نشط</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <button onclick="switchView('add-family')" class="p-4 bg-slate-50 hover:bg-brand-50/50 border border-slate-100 hover:border-brand-200 rounded-xl text-right transition-all group">
+                                    <div class="w-9 h-9 bg-brand-100 text-brand-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-user-plus"></i>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-slate-900">إضافة أسرة</h4>
+                                    <p class="text-[11px] text-slate-400 mt-1">إدخال بيانات رب الأسرة الجديد لمرة واحدة في النظام.</p>
+                                </button>
+                                <button id="quick-action-food" onclick="switchView('food-basket')" class="p-4 bg-slate-50 hover:bg-navy-50/50 border border-slate-100 hover:border-navy-200 rounded-xl text-right transition-all group">
+                                    <div class="w-9 h-9 bg-navy-100 text-navy-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-basket-shopping"></i>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-slate-900">توزيع السلة الغذائية</h4>
+                                    <p class="text-[11px] text-slate-400 mt-1">تحديث حالات الاستلام والرفض والتأجيل للأسر.</p>
+                                </button>
+                                <button id="quick-action-approvals" onclick="switchView('manager-approvals')" class="p-4 bg-slate-50 hover:bg-rose-50/50 border border-slate-100 hover:border-rose-200 rounded-xl text-right transition-all group">
+                                    <div class="w-9 h-9 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-slate-900">إدارة الموافقات</h4>
+                                    <p class="text-[11px] text-slate-400 mt-1">مراجعة طلبات التسجيل المكرر ونقل القطاعات.</p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Actions Table Grid -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 class="font-black text-slate-900 text-sm">أحدث الأسر المضافة حديثاً في النظام</h3>
+                            <button onclick="switchView('families-list')" class="text-xs text-brand-600 hover:text-brand-700 font-bold flex items-center">
+                                عرض الكل <i class="fa-solid fa-arrow-left mr-1"></i>
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead class="bg-slate-100/50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-3.5">اسم رب الأسرة</th>
+                                        <th class="px-6 py-3.5">رقم الهاتف</th>
+                                        <th class="px-6 py-3.5">القطاع الجغرافي</th>
+                                        <th class="px-6 py-3.5">المربع</th>
+                                        <th class="px-6 py-3.5">عدد الأفراد</th>
+                                        <th class="px-6 py-3.5">تاريخ الإدخال</th>
+                                        <th class="px-6 py-3.5 text-center">الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-recent-families" class="divide-y divide-slate-100">
+                                    <!-- Dynamic elements inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== 2. FAMILIES LIST VIEW ==================== -->
+                <section id="view-families-list" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div class="flex-1 w-full relative">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                            </span>
+                            <input type="text" id="families-search-input" onkeyup="filterFamiliesTable()" placeholder="ابحث برقم هاتف الأسرة، الاسم، أو المربع..." class="w-full pr-10 pl-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                        </div>
+                        <div class="flex space-x-2 space-x-reverse w-full sm:w-auto">
+                            <select id="filter-sector-select" onchange="filterFamiliesTable()" class="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <option value="all">كل القطاعات</option>
+                                <option value="الشرقي">القطاع الشرقي</option>
+                                <option value="الجنوبي">القطاع الجنوبي</option>
+                                <option value="الشمالي">القطاع الشمالي</option>
+                            </select>
+                            <button onclick="switchView('add-family')" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> إضافة أسرة
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead class="bg-slate-100/50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-4">اسم رب الأسرة</th>
+                                        <th class="px-6 py-4">رقم الهاتف</th>
+                                        <th class="px-6 py-4">القطاع الجغرافي</th>
+                                        <th class="px-6 py-4">المربع</th>
+                                        <th class="px-6 py-4">عدد أفراد الأسرة</th>
+                                        <th class="px-6 py-4">ملاحظات هامة</th>
+                                        <th class="px-6 py-4 text-center">إجراءات التحكم</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="families-table-body" class="divide-y divide-slate-100">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== 3. ADD FAMILY VIEW ==================== -->
+                <section id="view-add-family" class="max-w-3xl mx-auto hidden">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden">
+                        <div class="bg-gradient-to-r from-brand-700 to-brand-600 p-6 text-white">
+                            <h3 class="text-lg font-black">نموذج تسجيل أسرة جديدة لأول مرة</h3>
+                            <p class="text-xs text-brand-100 mt-1">يتم تسجيل الأسرة لمرة واحدة كقاعدة عامة تُستخدم لاحقاً في جميع المشاريع</p>
+                        </div>
+                        
+                        <form id="add-family-form" onsubmit="handleNewFamilySubmit(event)" class="p-6 space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-slate-700 text-xs font-bold mb-2">اسم رب الأسرة رباعياً <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="add-name" required placeholder="مثال: أحمد عبد الله حسن علي" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 text-xs font-bold mb-2">رقم الهاتف للتواصل <span class="text-rose-500">*</span></label>
+                                    <input type="tel" id="add-phone" required placeholder="مثال: 0912345678" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-right focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 text-xs font-bold mb-2">القطاع الجغرافي <span class="text-rose-500">*</span></label>
+                                    <select id="add-sector" onchange="adaptSquares()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all font-bold">
+                                        <option value="الشرقي">القطاع الشرقي</option>
+                                        <option value="الجنوبي">القطاع الجنوبي</option>
+                                        <option value="الشمالي">القطاع الشمالي</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 text-xs font-bold mb-2">المربع المحدد <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="add-square" required placeholder="مثال: مربع 1، مربع 3..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all font-bold">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 text-xs font-bold mb-2">عدد أفراد الأسرة <span class="text-rose-500">*</span></label>
+                                    <input type="number" id="add-members" min="1" required placeholder="مثال: 5" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all font-bold">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-slate-700 text-xs font-bold mb-2">الحالة الصحية لرب الأسرة <span class="text-rose-500">*</span></label>
+                                    <select id="add-health-status" onchange="toggleIllnessField()" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all font-bold">
+                                        <option value="سليم">سليم معافى</option>
+                                        <option value="مريض">مريض</option>
+                                    </select>
+                                </div>
+
+                                <div id="illness-type-container" class="hidden col-span-1 md:col-span-2">
+                                    <label class="block text-slate-700 text-xs font-bold mb-2">نوع المرض بالتفصيل <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="add-illness-type" placeholder="مثال: مرض سكري، فشل كلوي، شلل حركي..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all font-medium">
+                                </div>
+
+                                <div>
+                                    <label class="block text-slate-700 text-xs font-bold mb-2">الحالة الاجتماعية لرب الأسرة <span class="text-rose-500">*</span></label>
+                                    <select id="add-social-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all font-bold">
+                                        <option value="متزوج">متزوج</option>
+                                        <option value="أعزب">أعزب</option>
+                                        <option value="أرملة">أرملة</option>
+                                        <option value="مطلقة">مطلقة</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-slate-700 text-xs font-bold mb-2">ملاحظات إضافية وهامة</label>
+                                <textarea id="add-notes" rows="3" placeholder="اكتب أي ملاحظات تتعلق بالسكن أو الحالة المادية هنا..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"></textarea>
+                            </div>
+
+                            <div class="border-t border-slate-100 pt-5 flex justify-end space-x-2 space-x-reverse">
+                                <button type="button" onclick="switchView('families-list')" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">إلغاء وتراجع</button>
+                                <button type="submit" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-brand-500/20 transition-all flex items-center">
+                                    <i class="fa-solid fa-floppy-disk ml-1.5"></i> حفظ وتسجيل الأسرة بالنظام
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- ==================== 4. FAMILY DETAILS VIEW ==================== -->
+                <section id="view-family-details" class="max-w-4xl mx-auto hidden space-y-6">
+                    <button onclick="switchView('families-list')" class="text-xs text-slate-500 hover:text-slate-800 font-bold flex items-center">
+                        <i class="fa-solid fa-arrow-right ml-1"></i> العودة لقاعدة البيانات
+                    </button>
+
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden">
+                        <div class="bg-gradient-to-l from-navy-900 to-navy-800 p-6 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <span class="bg-brand-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" id="detail-badge-status">متزوج</span>
+                                <h2 class="text-xl font-black mt-2" id="detail-name">...</h2>
+                                <p class="text-xs text-navy-200 mt-1"><i class="fa-solid fa-phone ml-1"></i> رقم الهاتف: <span id="detail-phone">...</span></p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur px-4 py-3 rounded-xl border border-white/10 text-right">
+                                <p class="text-[10px] text-navy-200">القطاع والمنطقة</p>
+                                <h4 class="text-sm font-bold mt-1" id="detail-sector-square">...</h4>
+                            </div>
+                        </div>
+
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Left: stats details -->
+                            <div class="md:col-span-1 space-y-4">
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <span class="block text-slate-400 text-[10px]">عدد أفراد الأسرة</span>
+                                    <span class="block text-2xl font-black text-slate-800 mt-1" id="detail-members">0 أفراد</span>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <span class="block text-slate-400 text-[10px]">الحالة الصحية</span>
+                                    <span class="block text-sm font-bold text-slate-800 mt-1" id="detail-health-label">سليم</span>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <span class="block text-slate-400 text-[10px]">القطاع المسئول</span>
+                                    <span class="block text-sm font-bold text-slate-800 mt-1" id="detail-sector-label">القطاع الشرقي</span>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <span class="block text-slate-400 text-[10px]">ملاحظات مسجلة</span>
+                                    <p class="text-xs text-slate-600 mt-2" id="detail-notes">لا توجد ملاحظات خاصة بهذه الأسرة.</p>
+                                </div>
+                            </div>
+
+                            <!-- Right: Project status list for this family -->
+                            <div class="md:col-span-2 space-y-4">
+                                <h3 class="font-extrabold text-xs text-slate-400 uppercase tracking-wider">حالات دعم المشاريع للأسرة</h3>
+                                <div class="space-y-3" id="detail-project-status-list">
+                                    <!-- Dynamic statuses inject here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== 5. PROJECTS HUB VIEW ==================== -->
+                <section id="view-projects-hub" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <div>
+                            <h3 class="font-black text-slate-900 text-sm">مستودع المبادرات والمشاريع</h3>
+                            <p class="text-xs text-slate-400">تابع المبادرات السحابية المعتمدة أو قم بتأسيس مشروع جديد مخصص وتوزيع الأسر المستهدفة عليه.</p>
+                        </div>
+                        <button onclick="openAddProjectView()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-md shadow-indigo-500/10">
+                            <i class="fa-solid fa-folder-plus text-sm"></i>
+                            <span>إضافة مشروع مخصص</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projects-grid-container">
+                        <!-- Dynamic and static projects will load here -->
+                    </div>
+                </section>
+
+                <!-- ==================== 5B. ADD PROJECT VIEW ==================== -->
+                <section id="view-add-project" class="max-w-3xl mx-auto hidden">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden">
+                        <div class="bg-gradient-to-r from-indigo-800 to-indigo-700 p-6 text-white flex justify-between items-center">
+                            <div>
+                                <h3 class="text-lg font-black">نموذج إنشاء مشروع جديد ومستهدفين</h3>
+                                <p class="text-xs text-indigo-100 mt-1">تحديد نطاق المشروع وسحب الأسر المسجلة لربطها كهدف مباشر للصرف</p>
+                            </div>
+                            <button onclick="switchView('projects-hub')" class="text-white hover:text-indigo-200">
+                                <i class="fa-solid fa-circle-xmark text-xl"></i>
+                            </button>
+                        </div>
+
+                        <form id="add-project-form" onsubmit="handleNewProjectSubmit(event)" class="p-6 space-y-6">
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label class="block text-slate-700 text-xs font-bold mb-2">اسم المشروع الجديد <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="project-name" required placeholder="مثال: مبادرة دعم الحليب للأطفال والرضع" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 text-xs font-bold mb-2">وصف المشروع ونطاق الاستهداف <span class="text-rose-500">*</span></label>
+                                    <textarea id="project-desc" required rows="3" placeholder="اكتب أهداف الدعم والآلية المخطط لها لتسليم هذا المشروع للمستهدفين..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Targeted Checklist selection -->
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <label class="block text-slate-700 text-xs font-bold">تحديد الأسر المستهدفة (قائمة تفاعلية) <span class="text-rose-500">*</span></label>
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="selectAllFamiliesForProject(true)" class="text-[10px] text-brand-600 hover:underline font-bold">تحديد الكل</button>
+                                        <span class="text-slate-300">|</span>
+                                        <button type="button" onclick="selectAllFamiliesForProject(false)" class="text-[10px] text-slate-400 hover:underline font-bold">إلغاء التحديد</button>
+                                    </div>
+                                </div>
+
+                                <!-- Mini filter bar -->
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <i class="fa-solid fa-filter text-slate-400 text-xs"></i>
+                                    </span>
+                                    <input type="text" onkeyup="filterProjectTargetFamilies(this.value)" placeholder="فلترة الأسر لتسهيل البحث والتعيين..." class="w-full pr-9 pl-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                                </div>
+
+                                <div class="border border-slate-200 rounded-xl max-h-56 overflow-y-auto divide-y divide-slate-100 p-2 space-y-1 bg-slate-50" id="project-families-checklist">
+                                    <!-- Dynamic checklist loaded on demand -->
+                                </div>
+                            </div>
+
+                            <div class="border-t border-slate-100 pt-5 flex justify-end space-x-2 space-x-reverse">
+                                <button type="button" onclick="switchView('projects-hub')" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">إلغاء</button>
+                                <button type="submit" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-brand-500/20 transition-all flex items-center">
+                                    <i class="fa-solid fa-floppy-disk ml-1.5"></i> اعتماد وحفظ المشروع سحابياً
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- ==================== 6. FOOD BASKET VIEW ==================== -->
+                <section id="view-food-basket" class="space-y-6 hidden">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <h3 class="font-black text-slate-900 text-sm">تتبع حالات السلة الغذائية لحي العشر</h3>
+                                <p class="text-xs text-slate-400">ابحث عن الأسرة بالاسم أو الهاتف لتحديث حالة التسليم فوراً</p>
+                            </div>
+                            <div class="w-full md:w-80 relative">
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                                </span>
+                                <input type="text" id="food-search-input" onkeyup="filterFoodBasketTable()" placeholder="بحث سريع برب الأسرة أو الهاتف..." class="w-full pr-10 pl-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead class="bg-slate-100/50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-4">اسم رب الأسرة</th>
+                                        <th class="px-6 py-4">القطاع الجغرافي</th>
+                                        <th class="px-6 py-4">المربع</th>
+                                        <th class="px-6 py-4">حالة مشروع السلة</th>
+                                        <th class="px-6 py-4">تاريخ التحديث / الاستلام</th>
+                                        <th class="px-6 py-4">ملاحظات المستلم</th>
+                                        <th class="px-6 py-4 text-center">تحديث الحالة</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="food-basket-table-body" class="divide-y divide-slate-100">
+                                    <!-- Dynamic food status loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== 7. EMERGENCY COMMITTEE VIEW ==================== -->
+                <section id="view-emergency-committee" class="space-y-6 hidden">
+                    <!-- Sector Privacy Notice -->
+                    <div id="sector-access-banner" class="bg-blue-50 border-r-4 border-blue-500 p-4 rounded-xl text-xs text-blue-800 flex items-start space-x-3 space-x-reverse">
+                        <i class="fa-solid fa-shield-halved mt-0.5 text-sm"></i>
+                        <div>
+                            <span class="font-extrabold block">قانون حجب وعرض بيانات القطاعات الفعّال</span>
+                            <span class="block mt-1">يُسمح فقط لمسؤول القطاع برؤية وتعديل الأسر التي تقع في قطاعه. بينما يملك المدير العام الصلاحية الحصرية لرؤية والتحكم في القطاعات الثلاثة كاملة.</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Eastern Sector Panel -->
+                        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col h-[500px]" id="panel-sector-east">
+                            <div class="bg-brand-900 text-white p-4 flex justify-between items-center">
+                                <span class="font-black text-sm">القطاع الشرقي</span>
+                                <span class="bg-brand-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full" id="east-sec-total">0 أسر</span>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-4 space-y-3 text-xs" id="list-sector-east">
+                                <!-- Families in east sector -->
+                            </div>
+                        </div>
+
+                        <!-- Southern Sector Panel -->
+                        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col h-[500px]" id="panel-sector-south">
+                            <div class="bg-navy-900 text-white p-4 flex justify-between items-center">
+                                <span class="font-black text-sm">القطاع الجنوبي</span>
+                                <span class="bg-navy-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full" id="south-sec-total">0 أسر</span>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-4 space-y-3 text-xs" id="list-sector-south">
+                                <!-- Families in south sector -->
+                            </div>
+                        </div>
+
+                        <!-- Northern Sector Panel -->
+                        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col h-[500px]" id="panel-sector-north">
+                            <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
+                                <span class="font-black text-sm">القطاع الشمالي</span>
+                                <span class="bg-slate-50 text-white text-[10px] font-bold px-2 py-0.5 rounded-full" id="north-sec-total">0 أسر</span>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-4 space-y-3 text-xs" id="list-sector-north">
+                                <!-- Families in north sector -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== 8. MANAGER APPROVALS VIEW ==================== -->
+                <section id="view-manager-approvals" class="space-y-6 hidden">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                        <h3 class="font-black text-slate-900 text-sm">طلبات الموافقة المعلقة (خاصة بالمدير فقط)</h3>
+                        <p class="text-xs text-slate-400 mt-1">عند محاولة تسجيل رب أسرة مسجل سابقاً في قطاع آخر، يتم حظر العملية تلقائياً ورفع طلب هنا لتفادي تكرار الصرف المزدوج.</p>
+                    </div>
+
+                    <div class="space-y-4" id="approvals-container">
+                        <!-- Dynamic approvals layout here -->
+                    </div>
+                </section>
+
+                <!-- ==================== 9. USERS MANAGEMENT VIEW ==================== -->
+                <section id="view-users-mgmt" class="space-y-6 hidden">
+                    <!-- Form to add users -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+                        <div class="border-b border-slate-100 pb-4 mb-4">
+                            <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-user-plus text-brand-600"></i>
+                                إضافة مستخدم أو عضو إدارة جديد بالنظام
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-1">قم بإنشاء حساب جديد وتعيين صلاحيات جغرافية مخصصة للتحكم بالقطاعات والمشاريع.</p>
+                        </div>
+
+                        <form id="add-user-form" onsubmit="handleNewUserSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+                            <div>
+                                <label class="block text-slate-700 text-xs font-bold mb-2">الاسم الكامل للمستخدم</label>
+                                <input type="text" id="user-full-name" required placeholder="مثال: مهند علي" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 text-xs font-bold mb-2">اسم المستخدم (للدخول)</label>
+                                <input type="text" id="user-username-input" required placeholder="مثال: mohanad" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-left focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 text-xs font-bold mb-2">كلمة المرور</label>
+                                <input type="password" id="user-password-input" required placeholder="رمز المرور الخاص به" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 text-xs font-bold mb-2">المشروع المسؤول عنه</label>
+                                <select id="user-project-select" onchange="toggleUserSectorField()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-bold">
+                                    <option value="الكل">كل المشاريع المشتركة</option>
+                                    <option value="لجنة الطوارئ">لجنة الطوارئ والقطاعات</option>
+                                    <option value="السلة الغذائية">مشروع السلة الغذائية</option>
+                                    <option value="الزكاة والصدقات">مشروع الزكاة والصدقات</option>
+                                    <option value="كفالة الأيتام">برنامج كفالة الأيتام</option>
+                                    <option value="الأرامل والمطلقات">برنامج الأرامل والمطلقات</option>
+                                </select>
+                            </div>
+                            <div id="user-sector-container" class="hidden">
+                                <label class="block text-slate-700 text-xs font-bold mb-2">نطاق الصلاحيات الجغرافية</label>
+                                <select id="user-sector-select" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-bold">
+                                    <option value="الشرقي">القطاع الشرقي فقط</option>
+                                    <option value="الجنوبي">القطاع الجنوبي فقط</option>
+                                    <option value="الشمالي">القطاع الشمالي فقط</option>
+                                    <option value="الكل">المدير العام (الوصول الشامل للكل)</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-3 lg:col-span-4 flex justify-end">
+                                <button type="submit" class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-brand-500/20 transition-all flex items-center gap-1.5">
+                                    <i class="fa-solid fa-check"></i>
+                                    تأكيد وحفظ المستخدم الجديد
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Users List Table -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 class="font-black text-slate-900 text-sm">المستخدمين المسجلين في النظام حالياً</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead class="bg-slate-100/50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-4">اسم المستخدم</th>
+                                        <th class="px-6 py-4">اسم الدخول</th>
+                                        <th class="px-6 py-4">الصلاحيات</th>
+                                        <th class="px-6 py-4">النطاق الجغرافي المخول</th>
+                                        <th class="px-6 py-4">المشروع المسؤول عنه</th>
+                                        <th class="px-6 py-4">حالة الحساب</th>
+                                        <th class="px-6 py-4 text-center">أمن الحساب</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body" class="divide-y divide-slate-100">
+                                    <!-- Dynamic Users List Loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== 10. REPORTS VIEW ==================== -->
+                <section id="view-reports-page" class="space-y-6 hidden">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 class="font-black text-slate-900 text-sm">مستخرج التقارير الميدانية الشاملة</h3>
+                            <p class="text-xs text-slate-400">أنشئ تقريراً فورياً بناءً على إحصائيات الحي الحالية</p>
+                        </div>
+                        <button onclick="window.print()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-print"></i> طباعة / حفظ كملف PDF
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                            <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider">معدل كفاءة توزيع السلة الغذائية</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span>الأسر التي استلمت الدعم فعلياً</span>
+                                    <span id="report-rec-pct">0%</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                    <div id="report-rec-bar" class="bg-brand-500 h-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-slate-400">يهدف الحي للوصول إلى تغطية شاملة بنسبة 100% لجميع الأسر المستهدفة والمستحقة.</p>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                            <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider">الحالات الاستثنائية المسجلة</h4>
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div class="p-3 bg-slate-50 rounded-xl">
+                                    <span class="block text-lg font-black text-slate-800" id="report-widows-count">0</span>
+                                    <span class="text-[10px] text-slate-400 block mt-1">أرملة / مطلقة</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl">
+                                    <span class="block text-lg font-black text-slate-800" id="report-orphans-count">0</span>
+                                    <span class="text-[10px] text-slate-400 block mt-1">كفالة أيتام</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl">
+                                    <span class="block text-lg font-black text-slate-800" id="report-disabled-count">0</span>
+                                    <span class="text-[10px] text-slate-400 block mt-1">حالات مرضية</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==================== 11. SETTINGS VIEW ==================== -->
+                <section id="view-settings-page" class="max-w-2xl mx-auto space-y-6 hidden">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="p-5 border-b border-slate-100 bg-slate-50/50">
+                            <h3 class="font-black text-slate-900 text-sm">إعدادات النظام العامة</h3>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <div>
+                                <label class="block text-slate-700 text-xs font-bold mb-2">اسم الحي المعتمد بالنظام</label>
+                                <input type="text" value="حي العشر - الإدارة المحلية" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-500 focus:outline-none" disabled>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-slate-700 text-xs font-bold mb-2">مربعات القطاع الشرقي المعرفة</label>
+                                <input type="text" value="مربع 1، مربع 2، مربع 3" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-500 focus:outline-none" disabled>
+                            </div>
+
+                            <div>
+                                <label class="block text-slate-700 text-xs font-bold mb-2">مربعات القطاع الجنوبي المعرفة</label>
+                                <input type="text" value="مربع 4، مربع 5، مربع 6" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-500 focus:outline-none" disabled>
+                            </div>
+
+                            <div>
+                                <label class="block text-slate-700 text-xs font-bold mb-2">مربعات القطاع الشمالي المعرفة</label>
+                                <input type="text" value="مربع 7، مربع 8" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-500 focus:outline-none" disabled>
+                            </div>
+
+                            <div class="border-t border-slate-100 pt-5 flex justify-between items-center">
+                                <span class="text-xs text-slate-400">نسخة النظام الفعّالة: v1.3.0 (Firebase Symmetrical Engine)</span>
+                                <button onclick="confirmResetWithPassword()" class="px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-xl text-xs font-bold transition-all">
+                                    قطع الاتصال ومسح بيانات الخادم
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== 12. PROJECT STATUS UPDATE MODAL ==================== -->
+    <div id="status-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Modal Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeStatusModal()"></div>
+        <!-- Modal Box -->
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative z-10 border border-slate-100">
+            <div class="bg-slate-950 p-5 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="font-extrabold text-sm" id="modal-title-family">تعديل حالة السلة الغذائية</h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5" id="modal-subtitle-family">تحديث حالة صرف السلة لرب الأسرة</p>
+                </div>
+                <button onclick="closeStatusModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <form id="status-update-form" onsubmit="handleStatusUpdate(event)" class="p-5 space-y-4">
+                <input type="hidden" id="modal-family-phone">
+                
+                <div>
+                    <label class="block text-slate-700 text-xs font-bold mb-1.5">حالة المشروع الحالية</label>
+                    <select id="modal-status-select" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="مستهدف">مستهدف</option>
+                        <option value="تم الاستلام">تم الاستلام</option>
+                        <option value="لم يستلم">لم يستلم</option>
+                        <option value="مؤجل">مؤجل</option>
+                        <option value="غير مستحق">غير مستحق</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 text-xs font-bold mb-1.5">تاريخ الاستلام / التحديث</label>
+                    <input type="date" id="modal-date-input" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 text-right">
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 text-xs font-bold mb-1.5">ملاحظات الصرف والتحقق</label>
+                    <textarea id="modal-notes-input" rows="3" placeholder="ملاحظات توضيحية حول التسليم..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+                </div>
+
+                <div class="pt-2 border-t border-slate-100 flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="closeStatusModal()" class="px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl text-xs font-bold">إلغاء</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-brand-500/20">تأكيد التحديث</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== STREAMING_CHUNK: Binding Firestore Real-Time Snapshots... ==================== -->
+    <script>
+        // Default Google Firebase Configuration provided by the user
+        const DEFAULT_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyBAFSl_WcnJdt9OBmr-gOqIL4mYSYhk-2s",
+            authDomain: "hams552.firebaseapp.com",
+            projectId: "hams552",
+            storageBucket: "hams552.firebasestorage.app",
+            messagingSenderId: "971883830054",
+            appId: "1:971883830054:web:32f9c2214a5630a998bfe7"
+        };
+
+        // System state variables (Persistent per session)
+        let db;
+        let currentUser = null;
+        let families = [];
+        let projectStatuses = {};
+        let approvals = [];
+        let systemUsers = [];
+        let projects = [];
+        let notifications = [];
+
+        // Seeded Default Administrators to write on database if empty
+        const DEFAULT_USERS = [
+            { username: "mohanad", password: "475321", name: "مهند علي", role: "المدير العام", allowedSector: "الكل", assignedProject: "الكل", icon: "fa-user-shield" },
+            { username: "abubakr", password: "123456Aa", name: "أبوبكر الأحيدب", role: "المدير العام", allowedSector: "الكل", assignedProject: "الكل", icon: "fa-user-shield" },
+            { username: "east", password: "123456", name: "مسؤول القطاع الشرقي", role: "مشرف قطاع", allowedSector: "الشرقي", assignedProject: "لجنة الطوارئ", icon: "fa-user-tag" },
+            { username: "south", password: "123456", name: "مسؤول القطاع الجنوبي", role: "مشرف قطاع", allowedSector: "الجنوبي", assignedProject: "لجنة الطوارئ", icon: "fa-user-tag" },
+            { username: "north", password: "123456", name: "مسؤول القطاع الشمالي", role: "مشرف قطاع", allowedSector: "الشمالي", assignedProject: "لجنة الطوارئ", icon: "fa-user-tag" }
+        ];
+        
+        // Check for Firebase Config on startup (auto-init)
+        window.onload = function() {
+            // Automatically initialize using the provided Firebase config
+            try {
+                initializeFirebaseConnection(DEFAULT_FIREBASE_CONFIG);
+            } catch(e) {
+                console.error("Auto Firebase init failed: ", e);
+            }
+        };
+
+        // Custom Password Prompt for sensitive database reset actions
+        function confirmResetWithPassword() {
+            showPasswordPromptDialog(
+                "تأكيد مسح البيانات سحابياً", 
+                "تحذير: أنت على وشك حذف الاتصال السحابي وإعادة تعيين النظام. يرجى كتابة رمز المرور الخاص بالإدارة لتأكيد الإجراء:", 
+                (password) => {
+                    if (password === "0909929802Mm@") {
+                        resetFirebaseConfiguration();
+                    } else {
+                        showToast("كلمة المرور غير صحيحة! تم حظر عملية الحذف.", "error");
+                    }
+                }
+            );
+        }
+
+        function showPasswordPromptDialog(title, text, callback) {
+            const modalDiv = document.createElement('div');
+            modalDiv.className = "fixed inset-0 z-50 flex items-center justify-center p-4";
+            modalDiv.innerHTML = `
+                <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>
+                <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative z-10 p-6 space-y-4 border border-slate-100">
+                    <div class="flex items-center space-x-3 space-x-reverse text-red-600">
+                        <i class="fa-solid fa-shield-halved text-2xl"></i>
+                        <h4 class="font-black text-slate-900 text-base">${title}</h4>
+                    </div>
+                    <div class="text-xs text-slate-600 leading-relaxed">${text}</div>
+                    <input type="password" id="dialog-prompt-password" placeholder="رمز مرور الحماية الإداري" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-red-500 transition-all font-bold">
+                    <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2 space-x-reverse">
+                        <button id="prompt-cancel-btn" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">إلغاء</button>
+                        <button id="prompt-ok-btn" class="px-5 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl transition-all">تأكيد الإجراء</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalDiv);
+
+            setTimeout(() => {
+                const input = modalDiv.querySelector('#dialog-prompt-password');
+                if (input) input.focus();
+            }, 100);
+
+            modalDiv.querySelector('#prompt-ok-btn').addEventListener('click', () => {
+                const passVal = modalDiv.querySelector('#dialog-prompt-password').value;
+                callback(passVal);
+                modalDiv.remove();
+            });
+
+            modalDiv.querySelector('#prompt-cancel-btn').addEventListener('click', () => {
+                modalDiv.remove();
+            });
+        }
+
+        // ==================== STREAMING_CHUNK: Binding Firestore Real-Time Snapshots... ====================
+        function initializeFirebaseConnection(config) {
+            // Initialize Firebase App
+            firebase.initializeApp(config);
+            db = firebase.firestore();
+
+            // Hide Setup if shown, Show Login
+            document.getElementById('login-view').classList.remove('hidden');
+
+            // Trigger Database Autoseeding
+            seedDatabaseIfEmpty();
+
+            // Bind Real-Time Database Listeners for instantaneous collaboration
+            bindRealtimeListeners();
+            showToast("تم الاتصال السحابي بنجاح!", "success");
+        }
+
+        function resetFirebaseConfiguration() {
+            showToast("تم إعادة تعيين إعدادات الاتصال.", "info");
+            setTimeout(() => { window.location.reload(); }, 1500);
+        }
+
+        // Seed default users if the Firestore collection is completely blank
+        async function seedDatabaseIfEmpty() {
+            try {
+                const usersRef = db.collection('users');
+                const snapshot = await usersRef.limit(1).get();
+                if (snapshot.empty) {
+                    const batch = db.batch();
+                    DEFAULT_USERS.forEach(user => {
+                        const docRef = usersRef.doc(user.username);
+                        batch.set(docRef, user);
+                    });
+                    await batch.commit();
+                    pushNotification("تمت تهيئة مستخدمي الإدارة والقطاعات الافتراضية بنجاح.");
+                }
+            } catch (e) {
+                console.error("Auto seeding failed: ", e);
+            }
+        }
+
+        function bindRealtimeListeners() {
+            // 1. Real-time Listen for Families
+            db.collection('families').onSnapshot(snapshot => {
+                families = [];
+                snapshot.forEach(doc => {
+                    families.push(doc.data());
+                });
+                renderAllViews();
+            });
+
+            // 2. Real-time Listen for Project Statuses
+            db.collection('project_statuses').onSnapshot(snapshot => {
+                projectStatuses = {};
+                snapshot.forEach(doc => {
+                    projectStatuses[doc.id] = doc.data();
+                });
+                renderAllViews();
+            });
+
+            // 3. Real-time Listen for Approvals
+            db.collection('approvals').onSnapshot(snapshot => {
+                approvals = [];
+                snapshot.forEach(doc => {
+                    approvals.push(doc.data());
+                });
+                renderAllViews();
+            });
+
+            // 4. Real-time Listen for Users
+            db.collection('users').onSnapshot(snapshot => {
+                systemUsers = [];
+                snapshot.forEach(doc => {
+                    systemUsers.push(doc.data());
+                });
+                renderUsersList();
+            });
+
+            // Real-time Listen for Custom Projects
+            db.collection('projects').onSnapshot(snapshot => {
+                projects = [];
+                snapshot.forEach(doc => {
+                    projects.push(doc.data());
+                });
+                renderProjectsHub();
+            });
+
+            // 5. Real-time Listen for Notifications
+            db.collection('notifications').orderBy('timestamp', 'desc').limit(15).onSnapshot(snapshot => {
+                notifications = [];
+                snapshot.forEach(doc => {
+                    notifications.push(doc.data());
+                });
+                renderNotifications();
+            });
+        }
+
+        // --- AUTHENTICATION LOGIC ---
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById('login-username').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('login-password').value;
+
+            try {
+                const userDoc = await db.collection('users').doc(usernameInput).get();
+                if (userDoc.exists && userDoc.data().password === passwordInput) {
+                    currentUser = userDoc.data();
+                    document.getElementById('login-error').classList.add('hidden');
+                    
+                    // Hide Login View
+                    document.getElementById('login-view').classList.add('hidden');
+                    document.getElementById('main-sidebar').classList.remove('hidden');
+                    document.getElementById('main-sidebar').classList.add('flex');
+                    
+                    // Update Layout Info
+                    document.getElementById('user-display-name').innerText = currentUser.name;
+                    document.getElementById('user-display-role').innerText = currentUser.role;
+                    document.getElementById('header-active-sector-label').innerText = "القطاع: " + currentUser.allowedSector;
+
+                    // Adjust Sidebar avatar
+                    const avatarIcon = document.getElementById('user-avatar-icon');
+                    avatarIcon.className = `fa-solid ${currentUser.icon || 'fa-user'} text-lg`;
+
+                    // Apply strict role-based view and sidebar filtering
+                    applyUserPermissions();
+
+                    showToast(`مرحباً بك مجدداً، ${currentUser.name}`, "success");
+                    
+                    // Switch to default view Dashboard
+                    switchView('dashboard');
+                    // Adapt add family form square defaults
+                    adaptSquares();
+                    // Clear fields
+                    document.getElementById('login-username').value = "";
+                    document.getElementById('login-password').value = "";
+                } else {
+                    document.getElementById('login-error').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Login Query Failed: ", err);
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function applyUserPermissions() {
+            if (!currentUser) return;
+
+            const isManager = (currentUser.allowedSector === 'الكل' && currentUser.role === 'المدير العام');
+
+            // 1. Sidebar Links Visibility Enforcements
+            if (isManager) {
+                document.getElementById('nav-manager-approvals').classList.remove('hidden');
+                document.getElementById('badge-approvals').classList.remove('hidden');
+                document.getElementById('nav-settings-page').classList.remove('hidden');
+                document.getElementById('nav-users-mgmt').classList.remove('hidden');
+                document.getElementById('nav-reports-page').classList.remove('hidden');
+                document.getElementById('admin-section-header').classList.remove('hidden');
+                document.getElementById('nav-projects-hub').classList.remove('hidden');
+                
+                // Show all standard projects for managers
+                document.getElementById('nav-food-basket').classList.remove('hidden');
+                document.getElementById('nav-emergency-committee').classList.remove('hidden');
+            } else {
+                // Strictly Hide all Admin/Management views from non-managers
+                document.getElementById('badge-approvals').classList.add('hidden');
+                document.getElementById('nav-manager-approvals').classList.add('hidden');
+                document.getElementById('nav-settings-page').classList.add('hidden');
+                document.getElementById('nav-users-mgmt').classList.add('hidden');
+                document.getElementById('nav-reports-page').classList.add('hidden');
+                document.getElementById('admin-section-header').classList.add('hidden');
+                document.getElementById('nav-projects-hub').classList.add('hidden');
+
+                // Filter Sidebar Project Links so user ONLY sees their assigned project
+                const assignedProj = currentUser.assignedProject;
+
+                if (assignedProj === 'السلة الغذائية') {
+                    document.getElementById('nav-food-basket').classList.remove('hidden');
+                    document.getElementById('nav-emergency-committee').classList.add('hidden');
+                } else if (assignedProj === 'لجنة الطوارئ') {
+                    document.getElementById('nav-food-basket').classList.add('hidden');
+                    document.getElementById('nav-emergency-committee').classList.remove('hidden');
+                } else {
+                    // Hide both standard ones if the user is in another custom project
+                    document.getElementById('nav-food-basket').classList.add('hidden');
+                    document.getElementById('nav-emergency-committee').classList.add('hidden');
+                }
+            }
+
+            // 2. Dashboard Quick Actions Visibility Filtering
+            const quickActionFood = document.getElementById('quick-action-food');
+            const quickActionApprovals = document.getElementById('quick-action-approvals');
+
+            if (isManager) {
+                if (quickActionFood) quickActionFood.classList.remove('hidden');
+                if (quickActionApprovals) quickActionApprovals.classList.remove('hidden');
+            } else {
+                if (quickActionApprovals) quickActionApprovals.classList.add('hidden');
+
+                if (currentUser.assignedProject === 'السلة الغذائية') {
+                    if (quickActionFood) quickActionFood.classList.remove('hidden');
+                } else {
+                    if (quickActionFood) quickActionFood.classList.add('hidden');
+                }
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('main-sidebar').classList.remove('flex');
+            document.getElementById('main-sidebar').classList.add('hidden');
+            showToast("تم تسجيل الخروج بنجاح.", "info");
+        }
+
+        // --- SPA ROUTING/TAB-SWITCHING ---
+        function switchView(viewId) {
+            // Guard restricted views for non-managers
+            if (currentUser) {
+                const isManager = (currentUser.allowedSector === 'الكل' && currentUser.role === 'المدير العام');
+                const restrictedViews = ['manager-approvals', 'users-mgmt', 'settings-page', 'reports-page', 'projects-hub'];
+                
+                if (!isManager && restrictedViews.includes(viewId)) {
+                    showToast("عذراً، هذه الصفحة تتطلب صلاحيات المدير العام فقط.", "info");
+                    return; // Prevent switching
+                }
+            }
+
+            // Close mobile sidebar if open
+            const sidebar = document.getElementById('main-sidebar');
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('hidden');
+            }
+
+            // Hide all views inside canvas-view-container
+            const views = document.querySelectorAll('#canvas-view-container > section');
+            views.forEach(view => view.classList.add('hidden'));
+
+            // Show selected view
+            const targetView = document.getElementById(`view-${viewId}`);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+            }
+
+            // Update Navigation Menu highlights
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.className = "nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer";
+            });
+
+            const activeNav = document.getElementById(`nav-${viewId}`);
+            if (activeNav) {
+                activeNav.className = "nav-item flex items-center px-3 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer bg-brand-600 text-white shadow-md shadow-brand-500/10";
+            }
+
+            // Titles & breadcrumbs updates
+            const viewTitles = {
+                'dashboard': { main: "لوحة التحكم الرئيسية", sub: "إحصائيات عامة ومؤشرات حية للأسر المستفيدة" },
+                'families-list': { main: "قاعدة بيانات أسر حي العشر", sub: "عرض وتحديث والبحث في سجلات الأسر المسجلة لمرة واحدة" },
+                'add-family': { main: "إضافة أسرة جديدة", sub: "تسجيل بيانات رب الأسرة وإسنادها لقطاع ومربع" },
+                'family-details': { main: "ملف تفاصيل الأسرة", sub: "متابعة شاملة لتاريخ ومستجدات صرف الدعم والمشاريع للأسرة" },
+                'projects-hub': { main: "دليل المشاريع الكلي", sub: "استعراض كافة مبادرات ومشاريع حي العشر الخيرية والميدانية" },
+                'food-basket': { main: "السلة الغذائية", sub: "تحديث وجدولة كشوف استحقاق السلة الغذائية لجميع الأسر" },
+                'emergency-committee': { main: "لجنة الطوارئ والقطاعات", sub: "إدارة الحالات الطارئة مقسمة جغرافياً بشكل مستقل ومحجوب" },
+                'manager-approvals': { main: "طلبات موافقة المدير العام", sub: "الطلبات المعلقة للتحقق من التكرار أو تداخل النطاقات" },
+                'users-mgmt': { main: "إدارة المستخدمين الجدد", sub: "التحكم وإضافة المشرفين وصلاحيات وصولهم بالقطاعات" },
+                'reports-page': { main: "مستخرج التقارير الميدانية", sub: "تحليل وتوليد التقارير الإحصائية وطباعتها لتسهيل اتخاذ القرار" },
+                'settings-page': { main: "إعدادات نظام هَمس", sub: "تكوين وتعريف المربعات والقطاعات وضبط النظام" }
+            };
+
+            const titleObj = viewTitles[viewId] || { main: "النظام الموحد", sub: "لوحة تحكم هَمس" };
+            document.getElementById('current-view-title').innerText = titleObj.main;
+            document.getElementById('current-view-subtitle').innerText = titleObj.sub;
+
+            // Trigger data-binding refresh for the newly selected view
+            renderAllViews();
+        }
+
+        // Responsive mobile sidebar toggle
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('main-sidebar');
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('flex');
+            } else {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('flex');
+            }
+        }
+
+        // --- ADAPTIVE FORM DROPDOWNS ---
+        function adaptSquares() {
+            const sectorSelect = document.getElementById('add-sector');
+            if (!sectorSelect) return;
+            
+            // Auto-lock or allow sector selection based on permissions
+            if (currentUser && currentUser.allowedSector !== "الكل") {
+                sectorSelect.value = currentUser.allowedSector;
+                sectorSelect.disabled = true;
+            } else {
+                sectorSelect.disabled = false;
+            }
+        }
+
+        // --- CONDITIONALLY SHOW ILLNESS FIELD ---
+        function toggleIllnessField() {
+            const healthSelect = document.getElementById('add-health-status');
+            const illnessContainer = document.getElementById('illness-type-container');
+            if (healthSelect && illnessContainer) {
+                if (healthSelect.value === 'مريض') {
+                    illnessContainer.classList.remove('hidden');
+                } else {
+                    illnessContainer.classList.add('hidden');
+                    const illnessInput = document.getElementById('add-illness-type');
+                    if (illnessInput) illnessInput.value = "";
+                }
+            }
+        }
+
+        // --- USERS MANAGEMENT (Add & Read Users via Cloud) ---
+        function toggleUserSectorField() {
+            const projectSelect = document.getElementById('user-project-select');
+            const sectorContainer = document.getElementById('user-sector-container');
+            if (projectSelect.value === 'لجنة الطوارئ') {
+                sectorContainer.classList.remove('hidden');
+            } else {
+                sectorContainer.classList.add('hidden');
+                document.getElementById('user-sector-select').value = 'الكل';
+            }
+        }
+
+        async function handleNewUserSubmit(e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById('user-full-name').value.trim();
+            const username = document.getElementById('user-username-input').value.trim().toLowerCase();
+            const password = document.getElementById('user-password-input').value;
+            const assignedProject = document.getElementById('user-project-select').value;
+            
+            // If project is not Emergency Committee, sector scope is automatically set to All ("الكل")
+            const sectorScope = assignedProject === 'لجنة الطوارئ' ? document.getElementById('user-sector-select').value : 'الكل';
+
+            try {
+                // Check if username already exists in Firestore
+                const existsDoc = await db.collection('users').doc(username).get();
+                if (existsDoc.exists) {
+                    showModalMessage("خطأ في التسجيل", "اسم المستخدم هذا مسجل مسبقاً! يرجى اختيار اسم مستخدم فريد.");
+                    return;
+                }
+
+                // Create new user object
+                const newUser = {
+                    username: username,
+                    password: password,
+                    name: fullName,
+                    role: sectorScope === "الكل" ? "المدير العام" : "مشرف قطاع",
+                    allowedSector: sectorScope,
+                    assignedProject: assignedProject,
+                    icon: sectorScope === "الكل" ? "fa-user-shield" : "fa-user-tag"
+                };
+
+                await db.collection('users').doc(username).set(newUser);
+
+                showToast("تم إنشاء وإضافة المستخدم الجديد بنجاح!", "success");
+                pushNotification(`تم إضافة مستخدم جديد: ${fullName} وصلاحيته: ${sectorScope} بمشروع: ${assignedProject}`);
+                
+                // Reset fields
+                document.getElementById('add-user-form').reset();
+                toggleUserSectorField();
+            } catch(err) {
+                console.error("Save User Failed: ", err);
+                showToast("فشلت عملية الحفظ بالسحاب.", "error");
+            }
+        }
+
+        function renderUsersList() {
+            const container = document.getElementById('users-table-body');
+            if (!container) return;
+            container.innerHTML = "";
+
+            systemUsers.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-all";
+                
+                // Color badges based on sector
+                const sectorBadge = u.allowedSector === "الكل" 
+                    ? `<span class="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded text-[10px] font-bold">كل حي العشر</span>`
+                    : `<span class="bg-navy-50 text-navy-700 px-2.5 py-1 rounded text-[10px] font-bold">القطاع ${u.allowedSector}</span>`;
+
+                // Color badges based on assigned project
+                const projectColors = {
+                    "الكل": "bg-slate-100 text-slate-800",
+                    "السلة الغذائية": "bg-emerald-50 text-emerald-700 border border-emerald-100",
+                    "الزكاة والصدقات": "bg-amber-50 text-amber-700 border border-amber-100",
+                    "كفالة الأيتام": "bg-rose-50 text-rose-700 border border-rose-100",
+                    "الأرامل والمطلقات": "bg-indigo-50 text-indigo-700 border border-indigo-100"
+                };
+                const assignedProj = u.assignedProject || "الكل";
+                const projectColorClass = projectColors[assignedProj] || "bg-slate-100 text-slate-800";
+                const projectBadge = `<span class="${projectColorClass} px-2.5 py-1 rounded text-[10px] font-bold">${assignedProj}</span>`;
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4 flex items-center space-x-2 space-x-reverse">
+                        <div class="w-8 h-8 rounded bg-brand-100 text-brand-600 flex items-center justify-center font-bold">
+                            ${u.name ? u.name.charAt(0) : 'م'}
+                        </div>
+                        <div>
+                            <span class="font-bold block text-slate-900">${u.name || ''}</span>
+                            <span class="text-[10px] text-slate-400">${u.username || ''}@hams.gov</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 font-mono font-bold text-slate-700 select-all">${u.username || ''}</td>
+                    <td class="px-6 py-4"><span class="bg-slate-100 text-slate-800 px-2.5 py-1 rounded text-[10px] font-bold">${u.role || ''}</span></td>
+                    <td class="px-6 py-4">${sectorBadge}</td>
+                    <td class="px-6 py-4">${projectBadge}</td>
+                    <td class="px-6 py-4">
+                        <span class="text-emerald-600 font-bold flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 block animate-ping"></span>
+                            نشط بالخادم
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="deleteUser('${u.username}')" class="text-red-500 hover:text-red-700 font-bold transition-all" title="حذف المستخدم">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        async function deleteUser(username) {
+            // Prevent self deletion
+            if (currentUser && currentUser.username === username) {
+                showModalMessage("حظر إجراء", "لا يمكنك حذف حسابك الذي قمت بتسجيل الدخول به حالياً!");
+                return;
+            }
+            // Prevent deleting the main system administrators
+            if (username === "mohanad" || username === "Abubakr") {
+                showModalMessage("حظر إجراء", "حسابات الإدارة الرئيسية (مهند / أبوبكر) لا يمكن حذفها لضمان استقرار الخادم.");
+                return;
+            }
+
+            showModalMessage("تأكيد حذف مستخدم", `هل أنت متأكد من حذف الحساب [${username}] كلياً من النظام؟`, async () => {
+                try {
+                    await db.collection('users').doc(username).delete();
+                    showToast("تم إزالة الحساب والمستخدم بنجاح.", "info");
+                } catch(err) {
+                    console.error("Delete user failed: ", err);
+                    showToast("فشل الحذف السحابي.", "error");
+                }
+            });
+        }
+
+        // --- CORE DATABASE OPERATIONS ---
+
+        // ==================== STREAMING_CHUNK: Processing Cloud Writes for Families... ====================
+        // Form Submit: Add Family
+        async function handleNewFamilySubmit(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('add-name').value.trim();
+            const phone = document.getElementById('add-phone').value.trim();
+            const sector = document.getElementById('add-sector').value;
+            const square = document.getElementById('add-square').value;
+            const members = parseInt(document.getElementById('add-members').value) || 1;
+            const healthStatus = document.getElementById('add-health-status').value;
+            const illnessType = healthStatus === 'مريض' ? document.getElementById('add-illness-type').value.trim() : "";
+            const socialStatus = document.getElementById('add-social-status').value;
+            const notes = document.getElementById('add-notes').value.trim() || "لا توجد ملاحظات";
+
+            // Check health conditions validation
+            if (healthStatus === 'مريض' && !illnessType) {
+                showModalMessage("خطأ في الإدخال", "يرجى كتابة نوع وتفاصيل المرض لرب الأسرة لتتمكن من التسجيل.");
+                return;
+            }
+
+            // CHECK DUPLICATION RULES (By Phone Number or Name Match)
+            const duplicatedFamily = families.find(f => f.phone === phone || f.name.toLowerCase() === name.toLowerCase());
+
+            if (duplicatedFamily) {
+                // If family exists in DIFFERENT sector, create a pending approval request for manager
+                if (duplicatedFamily.sector !== sector) {
+                    const reqId = "req-" + Date.now();
+                    const newApproval = {
+                        id: reqId,
+                        requestor: currentUser ? currentUser.name : "مشرف ميداني",
+                        familyName: name,
+                        phone: phone,
+                        requestedSector: sector,
+                        existingSector: duplicatedFamily.sector,
+                        square: square,
+                        members: members,
+                        reason: `محاولة تسجيل مكررة برقم هاتف مسجل مسبقاً في القطاع ${duplicatedFamily.sector} (المربع: ${duplicatedFamily.square}).`
+                    };
+                    
+                    try {
+                        await db.collection('approvals').doc(reqId).set(newApproval);
+                        showModalMessage(
+                            "تنبيه: محاولة تسجيل مكررة ومقيدة!",
+                            `اسم رب الأسرة أو رقم الهاتف هذا مسجل مسبقاً في القطاع [${duplicatedFamily.sector}] بمربع [${duplicatedFamily.square}]. لتفادي الازدواجية والصرف العشوائي، تم حظر التسجيل ورفع طلب موافقة فوري للمدير العام للنظام لنقل القطاعات.`
+                        );
+                        pushNotification(`محاولة تسجيل مكررة للأسرة: ${name} رفعت للموافقة.`);
+                        document.getElementById('add-family-form').reset();
+                        switchView('families-list');
+                    } catch (e) {
+                        console.error("Save Approval failed: ", e);
+                    }
+                    return;
+                } else {
+                    // Same sector duplication
+                    showModalMessage(
+                        "حظر تسجيل!",
+                        `هذه الأسرة مسجلة بالفعل في نظام قطاعكم الحالي في [${duplicatedFamily.square}] تحت رقم هاتف: ${duplicatedFamily.phone}. لا يمكن تسجيل الأسرة مرتين.`
+                    );
+                    return;
+                }
+            }
+
+            // Normal Flow: Save Family to database
+            const newFamily = {
+                name: name,
+                phone: phone,
+                sector: sector,
+                square: square,
+                members: members,
+                healthStatus: healthStatus,
+                illnessType: illnessType,
+                socialStatus: socialStatus,
+                notes: notes,
+                dateAdded: new Date().toISOString().split('T')[0]
+            };
+
+            try {
+                const batch = db.batch();
+                
+                // Write family record
+                const famRef = db.collection('families').doc(phone);
+                batch.set(famRef, newFamily);
+
+                // Write default project status (Target orphans if head of family is widow/divorced)
+                const isOrphanTarget = (socialStatus === "أرملة" || socialStatus === "مطلقة") ? "مستهدف" : "غير مستهدف";
+                const statusRef = db.collection('project_statuses').doc(phone);
+                batch.set(statusRef, {
+                    food: { status: "مستهدف", date: "", notes: "" },
+                    zakat: "مستحق",
+                    orphans: isOrphanTarget
+                });
+
+                await batch.commit();
+
+                pushNotification(`تم إضافة الأسرة الجديدة بنجاح: ${name}`);
+                showToast("تم تسجيل وحفظ الأسرة بنجاح في نظام هَمس!", "success");
+
+                // Reset Form and Redirect
+                document.getElementById('add-family-form').reset();
+                toggleIllnessField(); // hide illness field if shown
+                switchView('families-list');
+            } catch(e) {
+                console.error("Save Family failed: ", e);
+                showToast("فشلت عملية المزامنة السحابية.", "error");
+            }
+        }
+
+        // Update Project Status (Food Basket Modal flow)
+        function openStatusModal(phone) {
+            const family = families.find(f => f.phone === phone);
+            if (!family) return;
+
+            const projState = projectStatuses[phone] || { food: { status: "مستهدف", date: "", notes: "" } };
+
+            document.getElementById('modal-title-family').innerText = `تعديل حالة السلة الغذائية: ${family.name}`;
+            document.getElementById('modal-subtitle-family').innerText = `المربع: ${family.square} | القطاع: ${family.sector}`;
+            document.getElementById('modal-family-phone').value = phone;
+            document.getElementById('modal-status-select').value = projState.food ? projState.food.status : "مستهدف";
+            
+            // Set current date if empty
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('modal-date-input').value = (projState.food && projState.food.date) ? projState.food.date : today;
+            document.getElementById('modal-notes-input').value = (projState.food && projState.food.notes) ? projState.food.notes : "";
+
+            document.getElementById('status-modal').classList.remove('hidden');
+        }
+
+        function closeStatusModal() {
+            document.getElementById('status-modal').classList.add('hidden');
+        }
+
+        async function handleStatusUpdate(e) {
+            e.preventDefault();
+            const phone = document.getElementById('modal-family-phone').value;
+            const newStatus = document.getElementById('modal-status-select').value;
+            const newDate = document.getElementById('modal-date-input').value;
+            const newNotes = document.getElementById('modal-notes-input').value;
+
+            try {
+                await db.collection('project_statuses').doc(phone).set({
+                    food: {
+                        status: newStatus,
+                        date: newDate,
+                        notes: newNotes
+                    },
+                    zakat: projectStatuses[phone]?.zakat || "مستحق",
+                    orphans: projectStatuses[phone]?.orphans || "غير مستهدف"
+                }, { merge: true });
+
+                showToast("تم تحديث حالة استلام السلة الغذائية بنجاح!", "success");
+                closeStatusModal();
+            } catch(e) {
+                console.error("Status Update failed: ", e);
+                showToast("فشل التحديث بالخادم السحابي.", "error");
+            }
+        }
+
+        // Manager Approval Decisions (Approve / Reject)
+        async function handleApproval(id, decision) {
+            const req = approvals.find(a => a.id === id);
+            if (!req) return;
+
+            try {
+                if (decision === 'approve') {
+                    const batch = db.batch();
+
+                    // Update existing family or write new one
+                    const famRef = db.collection('families').doc(req.phone);
+                    batch.set(famRef, {
+                        name: req.familyName,
+                        phone: req.phone,
+                        sector: req.requestedSector,
+                        square: req.square,
+                        members: req.members,
+                        healthStatus: "سليم",
+                        illnessType: "",
+                        socialStatus: "متزوج",
+                        notes: "تم نقله وتأكيده بموافقة الإدارة العامة",
+                        dateAdded: new Date().toISOString().split('T')[0]
+                    });
+
+                    // Update status
+                    const statusRef = db.collection('project_statuses').doc(req.phone);
+                    batch.set(statusRef, {
+                        food: { status: "مستهدف", date: "", notes: "" },
+                        zakat: "مستحق",
+                        orphans: "غير مستهدف"
+                    });
+
+                    // Delete the approval request
+                    const appRef = db.collection('approvals').doc(id);
+                    batch.delete(appRef);
+
+                    await batch.commit();
+                    showToast(`تم الموافقة على نقل الأسرة وتثبيتها بنجاح.`, "success");
+                } else {
+                    // Just reject and delete request
+                    await db.collection('approvals').doc(id).delete();
+                    showToast(`تم رفض طلب تسجيل الأسرة في القطاع الآخر لتفادي الازدواجية.`, "info");
+                }
+                
+                pushNotification(`قام المدير العام باتخاذ قرار [${decision === 'approve' ? 'موافقة' : 'رفض'}] لطلب الأسرة: ${req.familyName}`);
+            } catch(e) {
+                console.error("Approval flow failed: ", e);
+                showToast("فشل اتخاذ القرار بالخادم السحابي.", "error");
+            }
+        }
+
+        // --- RENDER VIEWS & BIND DATA ---
+        function renderAllViews() {
+            updateDashboardCounters();
+            renderDashboardRecentFamilies();
+            renderFamiliesTable();
+            renderFoodBasketTable();
+            renderEmergencySectors();
+            renderApprovals();
+            renderReports();
+            renderProjectsHub();
+        }
+
+        // Counters Calculation
+        function updateDashboardCounters() {
+            let filteredFamilies = families;
+            if (currentUser && currentUser.allowedSector !== "الكل") {
+                filteredFamilies = families.filter(f => f.sector === currentUser.allowedSector);
+            }
+
+            const totalFamiliesElem = document.getElementById('stat-total-families');
+            if (totalFamiliesElem) totalFamiliesElem.innerText = filteredFamilies.length;
+            
+            const totalUsersElem = document.getElementById('stat-total-users');
+            if (totalUsersElem) totalUsersElem.innerText = systemUsers.length;
+
+            // Food status stats calculations
+            let recCount = 0;
+            let notRecCount = 0;
+
+            filteredFamilies.forEach(fam => {
+                const statusObj = projectStatuses[fam.phone]?.food;
+                if (statusObj) {
+                    if (statusObj.status === "تم الاستلام") recCount++;
+                    if (statusObj.status === "لم يستلم") notRecCount++;
+                }
+            });
+
+            const receivedElem = document.getElementById('stat-received');
+            if (receivedElem) receivedElem.innerText = recCount;
+            
+            const notReceivedElem = document.getElementById('stat-not-received');
+            if (notReceivedElem) notReceivedElem.innerText = notRecCount;
+
+            const recPct = filteredFamilies.length ? Math.round((recCount / filteredFamilies.length) * 100) : 0;
+            const notRecPct = filteredFamilies.length ? Math.round((notRecCount / filteredFamilies.length) * 100) : 0;
+
+            const recPctElem = document.getElementById('stat-received-pct');
+            if (recPctElem) recPctElem.innerText = `${recPct}% مستلم`;
+            
+            const notRecPctElem = document.getElementById('stat-not-received-pct');
+            if (notRecPctElem) notRecPctElem.innerText = `${notRecPct}% لم يستلم`;
+
+            // Sector distributions
+            const eastCount = families.filter(f => f.sector === 'الشرقي').length;
+            const southCount = families.filter(f => f.sector === 'الجنوبي').length;
+            const northCount = families.filter(f => f.sector === 'الشمالي').length;
+            const grandTotal = families.length || 1;
+
+            const eastCountElem = document.getElementById('sector-east-count');
+            if (eastCountElem) eastCountElem.innerText = eastCount;
+            
+            const southCountElem = document.getElementById('sector-south-count');
+            if (southCountElem) southCountElem.innerText = southCount;
+            
+            const northCountElem = document.getElementById('sector-north-count');
+            if (northCountElem) northCountElem.innerText = northCount;
+
+            const barEast = document.getElementById('bar-east');
+            if (barEast) barEast.style.width = `${Math.round((eastCount / grandTotal) * 100)}%`;
+            
+            const barSouth = document.getElementById('bar-south');
+            if (barSouth) barSouth.style.width = `${Math.round((southCount / grandTotal) * 100)}%`;
+            
+            const barNorth = document.getElementById('bar-north');
+            if (barNorth) barNorth.style.width = `${Math.round((northCount / grandTotal) * 100)}%`;
+
+            // Pending Approvals count
+            const pendingApprovalsElem = document.getElementById('stat-pending-approvals');
+            if (pendingApprovalsElem) pendingApprovalsElem.innerText = approvals.length;
+            
+            const badgeApprovalsElem = document.getElementById('badge-approvals');
+            if (badgeApprovalsElem) {
+                badgeApprovalsElem.innerText = approvals.length;
+                if (approvals.length > 0 && currentUser && currentUser.allowedSector === 'الكل') {
+                    badgeApprovalsElem.classList.remove('hidden');
+                } else {
+                    badgeApprovalsElem.classList.add('hidden');
+                }
+            }
+        }
+
+        // Render: Recent Families (Dashboard)
+        function renderDashboardRecentFamilies() {
+            const container = document.getElementById('dashboard-recent-families');
+            if (!container) return;
+            container.innerHTML = "";
+
+            let displayList = [...families].sort((a, b) => (b.dateAdded || '').localeCompare(a.dateAdded || '')); // newest first
+            if (currentUser && currentUser.allowedSector !== "الكل") {
+                displayList = displayList.filter(f => f.sector === currentUser.allowedSector);
+            }
+
+            // show max 4 elements
+            const sliceList = displayList.slice(0, 4);
+
+            if (sliceList.length === 0) {
+                container.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-slate-400 font-medium">لا توجد أسر مسجلة سحابياً حتى الآن. ابدأ بإضافة أسرة.</td></tr>`;
+                return;
+            }
+
+            sliceList.forEach(fam => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-all";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold text-slate-900">${fam.name}</td>
+                    <td class="px-6 py-4 font-mono text-slate-500">${fam.phone}</td>
+                    <td class="px-6 py-4"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold">${fam.sector}</span></td>
+                    <td class="px-6 py-4 text-slate-600 font-medium">${fam.square}</td>
+                    <td class="px-6 py-4 font-bold text-slate-800">${fam.members} أفراد</td>
+                    <td class="px-6 py-4 text-slate-400 font-mono text-[11px]">${fam.dateAdded || ''}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="viewFamilyProfile('${fam.phone}')" class="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-600 font-bold rounded-lg text-[11px] transition-all">الملف الكامل</button>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        // Render: General Families Table
+        function renderFamiliesTable() {
+            const container = document.getElementById('families-table-body');
+            if (!container) return;
+            container.innerHTML = "";
+
+            let filtered = [...families];
+            
+            // Global level restriction based on sector role
+            if (currentUser && currentUser.allowedSector !== "الكل") {
+                filtered = filtered.filter(f => f.sector === currentUser.allowedSector);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-slate-400 font-medium">قاعدة البيانات السحابية فارغة حالياً. قم بإضافة الأسر للبدء.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(fam => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-all";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold text-slate-900 flex items-center space-x-2 space-x-reverse">
+                        <div class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-[10px]"><i class="fa-solid fa-user"></i></div>
+                        <span>${fam.name}</span>
+                    </td>
+                    <td class="px-6 py-4 font-mono text-slate-500">${fam.phone}</td>
+                    <td class="px-6 py-4"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold text-[10px]">${fam.sector}</span></td>
+                    <td class="px-6 py-4 text-slate-600 font-medium">${fam.square}</td>
+                    <td class="px-6 py-4 font-bold text-slate-800">${fam.members} أفراد</td>
+                    <td class="px-6 py-4 text-slate-400 max-w-xs truncate">${fam.notes || ""}</td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="viewFamilyProfile('${fam.phone}')" class="px-2.5 py-1.5 bg-navy-50 hover:bg-navy-100 text-navy-600 font-bold rounded-lg transition-all" title="استعراض الملف"><i class="fa-regular fa-folder-open"></i></button>
+                            <button onclick="triggerDeleteFamily('${fam.phone}')" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-lg transition-all" title="حذف السجل"><i class="fa-regular fa-trash-can"></i></button>
+                        </div>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        // Live filtration on General Families list
+        function filterFamiliesTable() {
+            const searchInput = document.getElementById('families-search-input');
+            const sectorSelect = document.getElementById('filter-sector-select');
+            if (!searchInput || !sectorSelect) return;
+            const searchVal = searchInput.value.toLowerCase();
+            const sectorVal = sectorSelect.value;
+            const rows = document.querySelectorAll('#families-table-body tr');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                const matchesSearch = text.includes(searchVal);
+                
+                // check sector column content
+                const sectorCell = row.children[2]?.innerText || "";
+                const matchesSector = (sectorVal === 'all' || sectorCell.includes(sectorVal));
+
+                if (matchesSearch && matchesSector) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+
+        // Render: Food Basket Page Table
+        function renderFoodBasketTable() {
+            const container = document.getElementById('food-basket-table-body');
+            if (!container) return;
+            container.innerHTML = "";
+
+            let filtered = [...families];
+            if (currentUser && currentUser.allowedSector !== "الكل") {
+                filtered = filtered.filter(f => f.sector === currentUser.allowedSector);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-slate-400 font-medium">لا توجد أسر مسجلة حالياً.</td></tr>`;
+                return;
+            }
+
+            const statusColors = {
+                "مستهدف": "bg-blue-50 text-blue-700 border border-blue-200",
+                "تم الاستلام": "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                "لم يستلم": "bg-amber-50 text-amber-700 border border-amber-200",
+                "مؤجل": "bg-slate-100 text-slate-700 border border-slate-300",
+                "غير مستحق": "bg-red-50 text-red-700 border border-red-200"
+            };
+
+            filtered.forEach(fam => {
+                const projState = projectStatuses[fam.phone]?.food || { status: "مستهدف", date: "غير معرّف", notes: "" };
+                const badgeClass = statusColors[projState.status] || "bg-slate-50 text-slate-500";
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-all";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold text-slate-900">${fam.name}</td>
+                    <td class="px-6 py-4"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold text-[10px]">${fam.sector}</span></td>
+                    <td class="px-6 py-4 text-slate-600 font-medium">${fam.square}</td>
+                    <td class="px-6 py-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${badgeClass}">${projState.status}</span></td>
+                    <td class="px-6 py-4 font-mono text-slate-500">${projState.date || '---'}</td>
+                    <td class="px-6 py-4 text-slate-400 max-w-xs truncate">${projState.notes || '---'}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="openStatusModal('${fam.phone}')" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg text-[11px] transition-all flex items-center gap-1 mx-auto shadow-md shadow-brand-500/10">
+                            <i class="fa-solid fa-pen-to-square"></i> تعديل الحالة
+                        </button>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        function filterFoodBasketTable() {
+            const input = document.getElementById('food-search-input');
+            if (!input) return;
+            const searchVal = input.value.toLowerCase();
+            const rows = document.querySelectorAll('#food-basket-table-body tr');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if (text.includes(searchVal)) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+
+        // Render: Emergency Sectors Panel
+        function renderEmergencySectors() {
+            const eastList = document.getElementById('list-sector-east');
+            const southList = document.getElementById('list-sector-south');
+            const northList = document.getElementById('list-sector-north');
+
+            if (!eastList || !southList || !northList) return;
+
+            eastList.innerHTML = "";
+            southList.innerHTML = "";
+            northList.innerHTML = "";
+
+            // Total counters labels
+            let eastCount = 0;
+            let southCount = 0;
+            let northCount = 0;
+
+            families.forEach(fam => {
+                const card = document.createElement('div');
+                card.className = "p-3 bg-slate-50 rounded-xl border border-slate-200/60 hover:bg-white transition-all flex justify-between items-center";
+                card.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-slate-900">${fam.name}</h4>
+                        <p class="text-[10px] text-slate-400 mt-0.5">المربع: ${fam.square} | هاتف: ${fam.phone}</p>
+                    </div>
+                    <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">${fam.members} أفراد</span>
+                `;
+
+                // Privacy/Role Restriction rules applied here!
+                if (currentUser) {
+                    if (currentUser.allowedSector !== "الكل" && currentUser.allowedSector !== fam.sector) {
+                        // Blurred card for forbidden sectors or simple hidden
+                        const blockedCard = document.createElement('div');
+                        blockedCard.className = "p-3 bg-slate-100/50 rounded-xl border border-dashed border-slate-200 text-center text-[10px] text-slate-400";
+                        blockedCard.innerHTML = `<i class="fa-solid fa-lock ml-1 text-slate-300"></i> بيانات قطاع مالي محجوبة عن صلاحياتك`;
+                        
+                        if (fam.sector === 'الشرقي') { eastList.appendChild(blockedCard); eastCount++; }
+                        if (fam.sector === 'الجنوبي') { southList.appendChild(blockedCard); southCount++; }
+                        if (fam.sector === 'الشمالي') { northList.appendChild(blockedCard); northCount++; }
+                    } else {
+                        // Authorized render
+                        if (fam.sector === 'الشرقي') { eastList.appendChild(card); eastCount++; }
+                        if (fam.sector === 'الجنوبي') { southList.appendChild(card); southCount++; }
+                        if (fam.sector === 'الشمالي') { northList.appendChild(card); northCount++; }
+                    }
+                }
+            });
+
+            // If empty states
+            if (eastCount === 0) eastList.innerHTML = `<div class="text-center py-10 text-slate-400 italic">لا توجد أسر مسجلة بالقطاع</div>`;
+            if (southCount === 0) southList.innerHTML = `<div class="text-center py-10 text-slate-400 italic">لا توجد أسر مسجلة بالقطاع</div>`;
+            if (northCount === 0) northList.innerHTML = `<div class="text-center py-10 text-slate-400 italic">لا توجد أسر مسجلة بالقطاع</div>`;
+
+            const eastSecTotal = document.getElementById('east-sec-total');
+            if (eastSecTotal) eastSecTotal.innerText = `${eastCount} أسر`;
+            
+            const southSecTotal = document.getElementById('south-sec-total');
+            if (southSecTotal) southSecTotal.innerText = `${southCount} أسر`;
+            
+            const northSecTotal = document.getElementById('north-sec-total');
+            if (northSecTotal) northSecTotal.innerText = `${northCount} أسر`;
+        }
+
+        // Render: Manager Approvals View
+        function renderApprovals() {
+            const container = document.getElementById('approvals-container');
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (currentUser && currentUser.allowedSector !== 'الكل') {
+                container.innerHTML = `
+                    <div class="bg-red-50 border-r-4 border-red-500 p-4 rounded-xl text-xs text-red-800 font-bold">
+                        تنبيه: أنت غير مخول للوصول لطلبات الإدارة العامة. الصلاحيات مخصصة للمدير العام فقط.
+                    </div>
+                `;
+                return;
+            }
+
+            if (approvals.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-emerald-50 text-emerald-800 p-8 rounded-2xl text-center text-xs space-y-2">
+                        <i class="fa-solid fa-envelope-circle-check text-2xl text-emerald-600"></i>
+                        <h4 class="font-bold">جميع الطلبات خالية تماماً من النزاعات!</h4>
+                        <p class="text-[11px] text-emerald-600">لا يوجد أي طلب موافقة معلق للتسجيل المكرر في القطاعات حالياً.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            approvals.forEach(req => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center p-5 gap-4";
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-2 space-x-reverse">
+                            <span class="bg-red-100 text-red-800 text-[9px] font-bold px-2 py-0.5 rounded-full">محاولة تسجيل مكررة</span>
+                            <span class="text-slate-400 text-[10px]">الراسل: ${req.requestor}</span>
+                        </div>
+                        <h4 class="font-black text-slate-900 text-sm">${req.familyName} | هاتف: ${req.phone}</h4>
+                        <p class="text-xs text-slate-500 font-medium">الطلب: النقل من قطاع [${req.existingSector}] إلى القطاع المستهدف [${req.requestedSector} - المربع ${req.square}]</p>
+                        <p class="text-xs text-slate-400 italic">السبب: "${req.reason}"</p>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button onclick="handleApproval('${req.id}', 'approve')" class="flex-1 md:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all">موافقة ونقل</button>
+                        <button onclick="handleApproval('${req.id}', 'reject')" class="flex-1 md:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all">رفض الطلب</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Render Profile Details
+        function viewFamilyProfile(phone) {
+            const fam = families.find(f => f.phone === phone);
+            if (!fam) return;
+
+            // Switch to profile view
+            switchView('family-details');
+
+            document.getElementById('detail-name').innerText = fam.name;
+            document.getElementById('detail-phone').innerText = fam.phone;
+            document.getElementById('detail-sector-square').innerText = `القطاع: ${fam.sector} / المربع ${fam.square}`;
+            document.getElementById('detail-members').innerText = `${fam.members} أفراد`;
+            document.getElementById('detail-sector-label').innerText = `القطاع ${fam.sector}`;
+            document.getElementById('detail-notes').innerText = fam.notes || "لا توجد ملاحظات عامة مسجلة لهذه الأسرة.";
+            document.getElementById('detail-badge-status').innerText = fam.socialStatus || "متزوج";
+
+            // Health Status Binding
+            const healthText = fam.healthStatus === 'مريض' ? `مريض (${fam.illnessType})` : 'سليم معافى';
+            document.getElementById('detail-health-label').innerText = healthText;
+
+            // Bind current project statuses
+            const projState = projectStatuses[phone] || { food: { status: "مستهدف", date: "", notes: "" }, zakat: "مستحق", orphans: "غير مستهدف" };
+            
+            const listContainer = document.getElementById('detail-project-status-list');
+            listContainer.innerHTML = `
+                <!-- Food status row -->
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <div>
+                        <span class="block text-slate-800 font-bold text-xs"><i class="fa-solid fa-basket-shopping ml-2 text-brand-600"></i>مشروع السلة الغذائية</span>
+                        <span class="block text-[10px] text-slate-400 mt-1">تاريخ الاستلام الأخير: ${projState.food?.date || 'لا يوجد'}</span>
+                    </div>
+                    <span class="bg-slate-200 text-slate-800 px-2 py-1 rounded-full text-[10px] font-bold">${projState.food?.status || 'مستهدف'}</span>
+                </div>
+                <!-- Zakat status row -->
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <div>
+                        <span class="block text-slate-800 font-bold text-xs"><i class="fa-solid fa-coins ml-2 text-amber-600"></i>مشروع الزكاة والصدقات</span>
+                        <span class="block text-[10px] text-slate-400 mt-1">المستند القانوني: دراسة الحالة والبحث الميداني</span>
+                    </div>
+                    <span class="bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-[10px] font-bold">${projState.zakat || 'مستحق'}</span>
+                </div>
+                <!-- Orphans status row -->
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <div>
+                        <span class="block text-slate-800 font-bold text-xs"><i class="fa-solid fa-child-reaching ml-2 text-rose-600"></i>كفالة الأيتام</span>
+                        <span class="block text-[10px] text-slate-400 mt-1">الحالة الإنسانية والاحتياجات الأساسية</span>
+                    </div>
+                    <span class="bg-slate-200 text-slate-800 px-2 py-1 rounded-full text-[10px] font-bold">${projState.orphans || 'غير مستهدف'}</span>
+                </div>
+            `;
+        }
+
+        // Delete family simulation
+        function triggerDeleteFamily(phone) {
+            const family = families.find(f => f.phone === phone);
+            if (!family) return;
+
+            showModalMessage(
+                "تأكيد عملية حذف!",
+                `هل أنت متأكد تماماً من رغبتك في حذف الأسرة: [${family.name}] نهائياً من قاعدة البيانات العامة لحي العشر؟ سيؤدي ذلك لحذف كشوف السلة والقطاعات المرتبطة بهم أيضاً.`,
+                async () => {
+                    try {
+                        const batch = db.batch();
+                        batch.delete(db.collection('families').doc(phone));
+                        batch.delete(db.collection('project_statuses').doc(phone));
+                        await batch.commit();
+
+                        pushNotification(`تم إزالة الأسرة: ${family.name} من النظام نهائياً.`);
+                        showToast("تم حذف الأسرة بنجاح من قاعدة البيانات.", "info");
+                    } catch(err) {
+                        console.error("Delete failed: ", err);
+                        showToast("فشلت المزامنة وحذف السجل السحابي.", "error");
+                    }
+                }
+            );
+        }
+
+        // Render Reports Page Statistics
+        function renderReports() {
+            // Count special stats
+            let widowsDivorced = 0;
+            let sickCount = 0;
+
+            families.forEach(fam => {
+                if (fam.socialStatus === 'أرملة' || fam.socialStatus === 'مطلقة') widowsDivorced++;
+                if (fam.healthStatus === 'مريض') sickCount++;
+            });
+
+            const widowsCountElem = document.getElementById('report-widows-count');
+            if (widowsCountElem) widowsCountElem.innerText = widowsDivorced;
+            
+            const disabledCountElem = document.getElementById('report-disabled-count');
+            if (disabledCountElem) disabledCountElem.innerText = sickCount;
+
+            // Rec status for food
+            let received = 0;
+            families.forEach(fam => {
+                if (projectStatuses[fam.phone]?.food?.status === "تم الاستلام") {
+                    received++;
+                }
+            });
+
+            const total = families.length || 1;
+            const pct = Math.round((received / total) * 100);
+
+            const recPctElem = document.getElementById('report-rec-pct');
+            if (recPctElem) recPctElem.innerText = `${pct}%`;
+            
+            const recBarElem = document.getElementById('report-rec-bar');
+            if (recBarElem) recBarElem.style.width = `${pct}%`;
+
+            let orphansCount = 0;
+            families.forEach(fam => {
+                if (projectStatuses[fam.phone]?.orphans === "مستهدف") orphansCount++;
+            });
+            const orphansCountElem = document.getElementById('report-orphans-count');
+            if (orphansCountElem) orphansCountElem.innerText = orphansCount;
+        }
+
+        function openAddProjectView() {
+            switchView('add-project');
+            const listContainer = document.getElementById('project-families-checklist');
+            if (!listContainer) return;
+            listContainer.innerHTML = "";
+            
+            if (families.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs italic">لا توجد أسر مسجلة بالنظام حالياً لتحديدها!</div>`;
+                return;
+            }
+            
+            families.forEach(fam => {
+                const label = document.createElement('label');
+                label.className = "flex items-center justify-between p-2.5 bg-white hover:bg-slate-100 rounded-lg border border-slate-200/60 cursor-pointer transition-all";
+                label.innerHTML = `
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        <input type="checkbox" name="target-families" value="${fam.phone}" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500">
+                        <span class="text-xs font-bold text-slate-800">${fam.name}</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500">${fam.sector} - ${fam.square}</span>
+                `;
+                listContainer.appendChild(label);
+            });
+        }
+
+        function selectAllFamiliesForProject(status) {
+            const checkboxes = document.querySelectorAll('input[name="target-families"]');
+            checkboxes.forEach(cb => cb.checked = status);
+        }
+
+        function filterProjectTargetFamilies(val) {
+            const query = val.toLowerCase();
+            const labels = document.querySelectorAll('#project-families-checklist label');
+            labels.forEach(lbl => {
+                const text = lbl.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    lbl.classList.remove('hidden');
+                } else {
+                    lbl.classList.add('hidden');
+                }
+            });
+        }
+
+        async function handleNewProjectSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('project-name').value.trim();
+            const desc = document.getElementById('project-desc').value.trim();
+            
+            // Get selected families
+            const checkedBoxes = document.querySelectorAll('input[name="target-families"]:checked');
+            const targetFamilyPhones = Array.from(checkedBoxes).map(cb => cb.value);
+            
+            if (targetFamilyPhones.length === 0) {
+                showModalMessage("خطأ بالتحديد", "يرجى تحديد أسرة مستهدفة واحدة على الأقل كجهة مستحقة للمشروع الجديد.");
+                return;
+            }
+
+            const projectId = "proj-" + Date.now();
+            const newProject = {
+                id: projectId,
+                name: name,
+                description: desc,
+                targets: targetFamilyPhones,
+                dateAdded: new Date().toISOString().split('T')[0]
+            };
+
+            try {
+                // Save to cloud Firestore
+                await db.collection('projects').doc(projectId).set(newProject);
+                
+                // Symmetrical database update to register statuses
+                const batch = db.batch();
+                targetFamilyPhones.forEach(phone => {
+                    const ref = db.collection('project_statuses').doc(phone);
+                    const updateObj = {};
+                    updateObj[projectId] = { status: "مستهدف", date: "", notes: "مشروع سحابي جديد" };
+                    batch.set(ref, updateObj, { merge: true });
+                });
+                await batch.commit();
+
+                showToast("تم إنشاء المشروع وإعداد المستهدفين بنجاح في السحاب!", "success");
+                pushNotification(`تم إطلاق المشروع السحابي الجديد [${name}] لـ ${targetFamilyPhones.length} أسر.`);
+                document.getElementById('add-project-form').reset();
+                switchView('projects-hub');
+            } catch (err) {
+                console.error("Save custom project failed: ", err);
+                showToast("حدث خطأ سحابي أثناء الحفظ.", "error");
+            }
+        }
+
+        function renderProjectsHub() {
+            const gridContainer = document.getElementById('projects-grid-container');
+            if (!gridContainer) return;
+            
+            // Set base core static layout
+            let htmlContent = `
+                <!-- Project Card 1 -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                        </div>
+                        <h3 class="text-base font-black text-slate-900">مشروع السلة الغذائية</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">المشروع الأساسي لتوزيع المؤن والاحتياجات الغذائية الدورية لأسر حي العشر بحسب الاستحقاق.</p>
+                    </div>
+                    <button onclick="switchView('food-basket')" class="w-full py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition-all">
+                        إدارة وتحديث السلة
+                    </button>
+                </div>
+                <!-- Project Card 2 -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-navy-50 text-navy-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-kit-medical"></i>
+                        </div>
+                        <h3 class="text-base font-black text-slate-900">لجنة الطوارئ والقطاعات</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">الاستجابة الفورية للأزمات والكوارث والمساعدات العاجلة مقسمة ومحجوبة جغرافياً حسب المسؤول.</p>
+                    </div>
+                    <button onclick="switchView('emergency-committee')" class="w-full py-2 bg-navy-600 hover:bg-navy-700 text-white font-bold rounded-xl text-xs transition-all">
+                        إدارة القطاعات والأزمات
+                    </button>
+                </div>
+            `;
+
+            // Append custom dynamic projects with beautiful styling
+            projects.forEach(proj => {
+                htmlContent += `
+                    <!-- Custom Firestore Project Card -->
+                    <div class="bg-white rounded-2xl border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/5 shadow-sm p-6 space-y-4 flex flex-col justify-between relative transition-all animate-fade-in">
+                        <span class="absolute top-4 left-4 bg-indigo-100 text-indigo-700 text-[9px] font-black px-2 py-0.5 rounded-full">سحابي نشط</span>
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-folder-open"></i>
+                            </div>
+                            <h3 class="text-base font-black text-slate-900">${proj.name}</h3>
+                            <p class="text-xs text-slate-500 leading-relaxed max-h-16 overflow-hidden">${proj.description}</p>
+                            <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-100/60 mt-2">
+                                <span>الأسر المستهدفة: <strong class="text-indigo-600">${proj.targets ? proj.targets.length : 0}</strong></span>
+                                <span class="font-mono text-[9px]">${proj.dateAdded}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1.5 pt-2">
+                            <button onclick="openCustomProjectDetails('${proj.id}')" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all">
+                                تفاصيل المستهدفين
+                            </button>
+                            <button onclick="deleteCustomProject('${proj.id}', '${proj.name}')" class="px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-xl transition-all" title="حذف المشروع">
+                                <i class="fa-regular fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Append remaining standard project cards
+            htmlContent += `
+                <!-- Project Card 3 -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                        <h3 class="text-base font-black text-slate-900">مشروع الزكاة والصدقات</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">تنظيم الدعم المالي النقدي المباشر للأسر الأكثر حاجة وبحث الاستحقاق الدوري المالي.</p>
+                    </div>
+                    <button onclick="simulateOtherProjects('الزكاة والصدقات')" class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition-all">
+                        معاينة المخطط
+                    </button>
+                </div>
+                <!-- Project Card 4 -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-child-reaching"></i>
+                        </div>
+                        <h3 class="text-base font-black text-slate-900">برنامج كفالة الأيتام</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">حصر ومتابعة الأيتام بالحي وتأمين الرعاة والداعمين للمستلزمات التعليمية والمعيشية.</p>
+                    </div>
+                    <button onclick="simulateOtherProjects('كفالة الأيتام')" class="w-full py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-all">
+                        معاينة المخطط
+                    </button>
+                </div>
+                <!-- Project Card 5 -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-person-breastfeeding"></i>
+                        </div>
+                        <h3 class="text-base font-black text-slate-900">برنامج الأرامل والمطلقات</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">برنامج مخصص لتمكين ورعاية الأسر المعيلة من النساء، الأرامل والمطلقات وتأمين الدعم المناسب.</p>
+                    </div>
+                    <button onclick="simulateOtherProjects('الأرامل والمطلقات')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all">
+                        معاينة المخطط
+                    </button>
+                </div>
+            `;
+            gridContainer.innerHTML = htmlContent;
+        }
+
+        async function deleteCustomProject(id, name) {
+            showModalMessage("تأكيد إزالة المشروع", `هل أنت متأكد تماماً من رغبتك في حذف مشروع [${name}] نهائياً مع كافة سجلات الصرف المرتبطة به؟`, async () => {
+                try {
+                    await db.collection('projects').doc(id).delete();
+                    showToast("تمت إزالة المشروع والارتباطات بنجاح.", "info");
+                    pushNotification(`تم حذف المشروع السحابي المخصص: ${name}`);
+                } catch (err) {
+                    console.error("Delete custom project failed: ", err);
+                    showToast("حدث خطأ أثناء المحاولة.", "error");
+                }
+            });
+        }
+
+        function openCustomProjectDetails(projId) {
+            const proj = projects.find(p => p.id === projId);
+            if (!proj) return;
+            
+            let listHtml = "";
+            proj.targets.forEach(phone => {
+                const fam = families.find(f => f.phone === phone);
+                if (fam) {
+                    listHtml += `
+                        <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-right">
+                            <div class="flex-1">
+                                <span class="font-bold text-slate-900 text-xs block">${fam.name}</span>
+                                <span class="text-[10px] text-slate-400 block mt-0.5">${fam.sector} | المربع: ${fam.square} | الهاتف: ${fam.phone}</span>
+                            </div>
+                            <span class="bg-indigo-50 text-indigo-700 text-[10px] font-black px-2.5 py-1 rounded-full flex-shrink-0">مستهدف للخدمة</span>
+                        </div>
+                    `;
+                }
+            });
+
+            showModalMessage(
+                `الأسر المستهدفة لـ [${proj.name}]`,
+                `
+                <div class="space-y-3 max-h-72 overflow-y-auto text-right">
+                    <p class="text-xs text-slate-500 leading-relaxed font-bold border-b pb-2">وصف المشروع: <span class="font-normal block mt-1">${proj.description}</span></p>
+                    <div class="space-y-2 mt-3">
+                        ${listHtml || '<div class="text-center py-4 text-slate-400 italic text-[11px]">لا توجد أسر نشطة حالياً في كشوفات هذا مشروع</div>'}
+                    </div>
+                </div>
+                `
+            );
+        }
+
+        // --- NOTIFICATIONS CENTER SIMULATION ---
+        function toggleNotifications() {
+            const box = document.getElementById('notifications-box');
+            if (box.classList.contains('hidden')) {
+                box.classList.remove('hidden');
+                // Hide red notification alert dot
+                document.getElementById('notification-dot').classList.add('hidden');
+                renderNotifications();
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        function renderNotifications() {
+            const container = document.getElementById('notifications-list');
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (notifications.length === 0) {
+                container.innerHTML = `<div class="p-4 text-center text-slate-400 italic">لا توجد إشعارات جديدة</div>`;
+                return;
+            }
+
+            notifications.forEach(notif => {
+                const item = document.createElement('div');
+                item.className = "px-4 py-3 hover:bg-slate-50 transition-all flex justify-between items-start gap-2";
+                item.innerHTML = `
+                    <div class="flex-1">
+                        <p class="font-medium text-slate-800">${notif.text}</p>
+                        <span class="text-[10px] text-slate-400 block mt-1">${notif.time || "الآن"}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function pushNotification(text) {
+            try {
+                await db.collection('notifications').add({
+                    text: text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    time: "منذ ثوانٍ"
+                });
+                document.getElementById('notification-dot').classList.remove('hidden');
+            } catch(e) {
+                console.error("Save notification failed: ", e);
+            }
+        }
+
+        async function clearNotifications() {
+            try {
+                const snap = await db.collection('notifications').get();
+                const batch = db.batch();
+                snap.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+                showToast("تم تصفير لوحة الإشعارات بنجاح.", "info");
+            } catch(e) {
+                console.error("Clear notifications failed: ", e);
+            }
+        }
+
+        // --- SIMULATED USER GLOBAL SEARCH SEARCH ---
+        function globalSearch(val) {
+            const query = val.trim().toLowerCase();
+            if (query.length < 2) return;
+
+            // Search by name or phone
+            const match = families.find(f => f.name.toLowerCase().includes(query) || f.phone.includes(query));
+            if (match) {
+                // Instantly navigate and load profile!
+                viewFamilyProfile(match.phone);
+                showToast(`تم العثور على الأسرة وعرض ملفها: ${match.name}`, "success");
+            }
+        }
+
+        function simulateOtherProjects(projectName) {
+            showModalMessage(
+                `نظام مشاريع هَمس: ${projectName}`,
+                `تم تصميم نموذج قاعدة البيانات ليتم إدخال الأسرة لمرة واحدة فقط كجزء من حي العشر، تم تفعيل المشاريع الأخرى برمجياً للربط لاحقاً بنفس ملف الأسرة بكل سهولة.`
+            );
+        }
+
+        // --- CUSTOM TOASTS AND DIALOG MODALS (Avoids system alerts) ---
+        function showToast(message, type = "success") {
+            const toast = document.getElementById('toast');
+            const msgSpan = document.getElementById('toast-message');
+            const iconWrapper = document.getElementById('toast-icon-wrapper');
+
+            msgSpan.innerText = message;
+            
+            if (type === "success") {
+                iconWrapper.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+                iconWrapper.className = "text-emerald-400 text-sm";
+            } else if (type === "info") {
+                iconWrapper.innerHTML = `<i class="fa-solid fa-circle-info"></i>`;
+                iconWrapper.className = "text-navy-400 text-sm";
+            }
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Pure HTML CSS confirmation / info modal box
+        function showModalMessage(title, text, confirmCallback = null) {
+            // Create a clean dynamically inject element
+            const modalDiv = document.createElement('div');
+            modalDiv.className = "fixed inset-0 z-50 flex items-center justify-center p-4";
+            modalDiv.innerHTML = `
+                <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>
+                <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative z-10 p-6 space-y-4 border border-slate-100">
+                    <div class="flex items-center space-x-3 space-x-reverse text-brand-600">
+                        <i class="fa-solid fa-circle-info text-2xl"></i>
+                        <h4 class="font-black text-slate-900 text-base">${title}</h4>
+                    </div>
+                    <div class="text-xs text-slate-600 leading-relaxed">${text}</div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2 space-x-reverse">
+                        ${confirmCallback ? `<button id="modal-cancel-btn" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">إلغاء</button>` : ''}
+                        <button id="modal-ok-btn" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all">موافق</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalDiv);
+
+            // Add Event listeners
+            modalDiv.querySelector('#modal-ok-btn').addEventListener('click', () => {
+                if (confirmCallback) confirmCallback();
+                modalDiv.remove();
+            });
+
+            if (confirmCallback) {
+                modalDiv.querySelector('#modal-cancel-btn').addEventListener('click', () => {
+                    modalDiv.remove();
+                });
+            }
+        }
+    </script>
+</body>
+</html>
